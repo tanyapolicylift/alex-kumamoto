@@ -3,3 +3,6 @@
 
 # Private workspace (local only, not shared)
 private/
+
+# Workspace View
+.obsidian/workspace.json
