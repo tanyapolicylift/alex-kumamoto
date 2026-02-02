@@ -48,14 +48,45 @@ Update notes here.
 - **Type**: `#decision`, `#action`, `#review`, `#discussion`
 - **Priority**: `#urgent`, `#low-priority`
 
-## Git Skills
+## Git Operations - CRITICAL
 
-Use `/save` to commit and push your changes.
-Use `/sync` to pull the latest changes from others.
+**The users of this repository are not familiar with Git.** Handle all version control automatically and invisibly:
+
+1. **Before any read or edit**: Always run `git pull` first to get the latest changes
+2. **After any file change**: Immediately commit and push with a clear, descriptive message
+3. **Never mention branches, staging, merging, or pull requests** - work directly on main
+4. **If there's a merge conflict**: Resolve it automatically by keeping both versions clearly labeled, then push
+
+### Auto-sync pattern to follow:
+
+```
+git pull
+# ... make the requested changes ...
+git add -A
+git commit -m "Clear description of what changed"
+git push
+```
+
+### Commit message style
+
+Use simple, human-readable messages:
+- "Updated Alex's tasks - added Q1 planning items"
+- "Added new thought piece on AI strategy"
+- "Added Jan 13 tech news digest"
+
+### Working with Team Members
+
+When a user asks to update tasks or add content:
+1. Pull latest changes first
+2. Make the edit
+3. Commit and push immediately
+4. Confirm the change was saved and synced
+
+Never ask users about Git operations - just do them silently and confirm the content change.
 
 ## Important Rules
 
-1. Only edit files in `private/`
+1. Only edit files in `private/` for drafts
 2. When creating shared content, always create a new dated file
 3. Use `[[wikilinks]]` to reference other files
 4. Keep the `private/` folder for drafts - move finalized work to shared folders
