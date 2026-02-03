@@ -14,15 +14,19 @@
   - 1.1.1.a **SQL Query Prompt:**
     1. Retrieve total number of calls for this customer within the report period.
     2. Sum the duration of all calls within the report period (for cumulative time saved calculation).
-    3. Count calls where call_reason IS NOT NULL AND call_reason != 'unknown'.
-    4. Calculate whether calls with valid call_reason (not null, not 'unknown') represent ≥66% of total calls.
+    3. Count calls that meet ANY of the following success criteria:
+       - call_reason IS NOT NULL AND call_reason != 'unknown'
+       - callback_requested = true
+       - transfer_performed = true
+       - appointment_booked = true
+    4. Calculate whether calls meeting at least one success criterion represent ≥66% of total calls.
     5. If ≥66% threshold met: break out call counts by subcategory where call_reason = 'service' and call_reason = 'claim'.
 
-    Return: total_calls, cumulative_call_duration, valid_reason_count, valid_reason_percentage, service_calls (if threshold met), claim_calls (if threshold met).
+    Return: total_calls, cumulative_call_duration, successful_calls_count, successful_calls_percentage, service_calls (if threshold met), claim_calls (if threshold met).
 
   - 1.1.1.b **Report Setup Prompt:** Generate a success narrative for voice calls highlighting:
     - Total calls handled in the period
-    - Number of calls with identifiable reason (not null/unknown) — emphasize these were serviced without human intervention
+    - Number of calls with a successful outcome (identified reason, callback requested, transfer performed, or appointment booked) — emphasize these were serviced without human intervention
     - If subcategory breakdown available: show service vs. claim distribution
     - Cumulative time saved (sum of all call durations) — frame as time the agency didn't need staff on phones
     - Value propositions to emphasize:
