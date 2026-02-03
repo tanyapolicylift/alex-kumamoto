@@ -606,29 +606,30 @@
 │  REPORT HEADER                                              │
 │  Customer Name | Report Period | Prepared By                │
 ├─────────────────────────────────────────────────────────────┤
-│  📊 EXECUTIVE SUMMARY (Section 6 content - placed first)    │
+│  [chart-icon] EXECUTIVE SUMMARY (Section 6 - placed first)  │
 │  ┌─────────────────────────────────────────────────────┐   │
 │  │ Overall Assessment (2-3 sentences)                   │   │
-│  │ ✅ Top Wins (bulleted highlights)                    │   │
-│  │ 🎯 Opportunities (prioritized list)                  │   │
+│  │ [check-icon] Top Wins (bulleted highlights)          │   │
+│  │ [target-icon] Opportunities (prioritized list)       │   │
 │  └─────────────────────────────────────────────────────┘   │
 ├─────────────────────────────────────────────────────────────┤
 │  CATEGORY SECTIONS (Each as a "card")                       │
 │                                                             │
 │  Row 1: Communication Channels (3 cards)                    │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │ 📞 Voice     │  │ 💬 Chat      │  │ 📝 Forms     │      │
+│  │ [phone] Voice│  │ [chat] Chat  │  │ [form] Forms │      │
 │  │ [metrics]    │  │ [metrics]    │  │ [metrics]    │      │
 │  │ [summary]    │  │ [summary]    │  │ [summary]    │      │
 │  └──────────────┘  └──────────────┘  └──────────────┘      │
 │                                                             │
 │  Row 2: Platform & Engagement (4 cards)                     │
 │  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌──────────┐ │
-│  │ 🌐 Website│  │ 📧 Email  │  │ ⭐ Reputa-│  │ 📅 Calen-│ │
-│  │ [metrics] │  │ [metrics] │  │ tion      │  │ dar      │ │
-│  │ [summary] │  │ [summary] │  │ [metrics] │  │ [metrics]│ │
-│  └───────────┘  └───────────┘  │ [summary] │  │ [summary]│ │
-│                                └───────────┘  └──────────┘ │
+│  │ [globe]   │  │ [mail]    │  │ [star]    │  │ [calendar│ │
+│  │ Website   │  │ Email     │  │ Reputation│  │ ] Calen- │ │
+│  │ [metrics] │  │ [metrics] │  │ [metrics] │  │ dar      │ │
+│  │ [summary] │  │ [summary] │  │ [summary] │  │ [metrics]│ │
+│  └───────────┘  └───────────┘  └───────────┘  │ [summary]│ │
+│                                               └──────────┘ │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -639,9 +640,9 @@ Each category section should follow this structure:
 ```markdown
 ---
 
-## <Icon> Category Name
+## [svg-icon] Category Name
 
-<span style="color: #00A67E; font-size: 0.9em;">STATUS: ✅ Active | ⚠️ Low Activation | 🔘 Not Activated</span>
+<span style="color: #00A67E; font-size: 0.9em;">STATUS: Active | Needs Attention | Not Activated</span>
 
 ### Key Metrics
 
@@ -663,6 +664,8 @@ Each category section should follow this structure:
 ---
 ```
 
+**Note:** Status indicators should use colored SVG icons or colored text/badges rather than emojis. See Section 7.5 for SVG icon specifications.
+
 ### 7.4 Typography Hierarchy
 
 | Element | Style | Size | Color |
@@ -677,28 +680,50 @@ Each category section should follow this structure:
 
 ### 7.5 Status Indicators
 
-Use consistent visual indicators for feature status:
+Use consistent SVG icons for feature status. Do NOT use emojis in output text.
 
-| Status | Icon | Color | Label |
-|--------|------|-------|-------|
-| Success/Active | ✅ | `#00A67E` | "Active" or "Performing Well" |
-| Low Activation | ⚠️ | `#D69E2E` | "Needs Attention" |
-| Not Activated | 🔘 | `#718096` | "Not Activated" |
-| Opportunity | 🎯 | `#3182CE` | "Opportunity" |
-| Win/Celebration | 🏆 | `#00A67E` | Use for highlighting wins |
+| Status | SVG Icon | Color | Label |
+|--------|----------|-------|-------|
+| Success/Active | `check-circle` | `#00A67E` | "Active" or "Performing Well" |
+| Low Activation | `alert-triangle` | `#D69E2E` | "Needs Attention" |
+| Not Activated | `circle` (outline) | `#718096` | "Not Activated" |
+| Opportunity | `target` | `#3182CE` | "Opportunity" |
+| Win/Celebration | `trophy` | `#00A67E` | Use for highlighting wins |
 
-### 7.6 Category Icons
+**SVG Implementation Example:**
+```html
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A67E" stroke-width="2">
+  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+</svg>
+```
 
-| Category | Icon | Alternative |
-|----------|------|-------------|
-| Voice | 📞 | ☎️ |
-| Chat | 💬 | 🗨️ |
-| Forms | 📝 | 📋 |
-| Website | 🌐 | 💻 |
-| Email | 📧 | ✉️ |
-| Calendar | 📅 | 🗓️ |
-| Reputation | ⭐ | 🏆 |
-| Summary | 📊 | 📈 |
+Recommended icon libraries: Lucide, Feather Icons, or Heroicons (all support the icon names above).
+
+### 7.6 Category Icons (SVG)
+
+Use SVG icons for all category headers. Do NOT use emojis.
+
+| Category | SVG Icon Name | Lucide/Feather Equivalent |
+|----------|---------------|---------------------------|
+| Voice | `phone` | `phone` or `phone-call` |
+| Chat | `message-circle` | `message-circle` |
+| Forms | `file-text` | `file-text` or `clipboard` |
+| Website | `globe` | `globe` |
+| Email | `mail` | `mail` |
+| Calendar | `calendar` | `calendar` |
+| Reputation | `star` | `star` |
+| Summary | `bar-chart-2` | `bar-chart-2` or `pie-chart` |
+
+**SVG Implementation:**
+```html
+<!-- Example: Voice icon in primary color -->
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00A67E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+</svg>
+```
+
+All icons should use `stroke="#00A67E"` (primary teal) for consistency.
 
 ### 7.7 Metric Display Formats
 
@@ -727,6 +752,8 @@ Use consistent visual indicators for feature status:
 
 ### 7.8 Summary Section Template (Placed at Top of Report)
 
+**IMPORTANT:** Do not use emojis anywhere in the generated report output. Use SVG icons for visual elements only.
+
 ```markdown
 # <span style="color: #00A67E;">Customer Success Report</span>
 
@@ -734,7 +761,7 @@ Use consistent visual indicators for feature status:
 
 ---
 
-## 📊 Executive Summary
+## [svg: bar-chart-2] Executive Summary
 
 ### Overall Health
 > [2-3 sentence assessment of overall performance, traffic, and engagement]
@@ -746,16 +773,16 @@ Use consistent visual indicators for feature status:
 | **[X]** interactions | **[Y]** emails sent | **[Z]** visits |
 | (Voice + Chat + Forms) | (Marketing + NPS + Reviews) | |
 
-### 🏆 Top Wins
-- ✅ **[Win 1]:** Brief description with number
-- ✅ **[Win 2]:** Brief description with number
-- ✅ **[Win 3]:** Brief description with number
+### [svg: trophy] Top Wins
+- **[Win 1]:** Brief description with number
+- **[Win 2]:** Brief description with number
+- **[Win 3]:** Brief description with number
 
-### 🎯 Opportunities
+### [svg: target] Opportunities
 | Feature | Status | Recommended Action |
 |---------|--------|-------------------|
-| [Feature 1] | ⚠️ Low Activation | [Brief action] |
-| [Feature 2] | 🔘 Not Activated | [Brief action] |
+| [Feature 1] | Needs Attention | [Brief action] |
+| [Feature 2] | Not Activated | [Brief action] |
 
 ---
 
@@ -763,6 +790,8 @@ Use consistent visual indicators for feature status:
 
 [Category sections follow below...]
 ```
+
+**Rendering Note:** Replace `[svg: icon-name]` placeholders with actual inline SVG elements or icon component references during report generation.
 
 ### 7.9 Visual Separators
 
