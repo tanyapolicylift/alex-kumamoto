@@ -2,64 +2,39 @@
 
 ## Purpose
 
-This directory contains side-by-side conversation output files for comparing control (old prompts) vs test (new prompts) in the voice_prompt system.
+Side-by-side comparison of conversation outputs using control (old prompts) vs test (new prompts).
 
-## Test Strategy
+## Structure
 
-### Structure
-- **Control files** (`*_control.md`): Conversations generated using the original/baseline prompts
-- **Test files** (`*_test.md`): Conversations generated using the new/experimental prompts
+- `XX_control.md` - Conversation output from live call using original prompts
+- `XX_test.md` - Same call scenario replayed using new prompts
 
-### Test Cases
+10 test pairs (01-10), 20 files total.
 
-| # | File Prefix | Scenario |
-|---|-------------|----------|
-| 1 | `01_inbound_general` | General inbound inquiry |
-| 2 | `02_appointment_booking` | Standard appointment scheduling |
-| 3 | `03_reschedule_request` | Caller wants to change existing appointment |
-| 4 | `04_cancel_request` | Caller wants to cancel |
-| 5 | `05_specific_person` | Asks for a specific person by name |
-| 6 | `06_complex_routing` | Ambiguous routing scenario |
-| 7 | `07_returning_caller` | Caller with prior agency interaction |
-| 8 | `08_urgent_matter` | High-priority/time-sensitive request |
-| 9 | `09_information_only` | Caller just needs information, no booking |
-| 10 | `10_edge_case` | Edge case / error handling scenario |
+## Workflow
 
-## Analysis Method
+1. Pull a live call transcript
+2. Paste the control output into `XX_control.md`
+3. Replay the same caller inputs with new prompts
+4. Paste the test output into `XX_test.md`
+5. Run semantic analysis comparing each pair
 
-### 1. Semantic Analysis
-Compare the semantic similarity and intent preservation between control and test outputs:
-- Does the test version maintain the same intent?
-- Are key information elements preserved?
-- Is the tone appropriate?
+## Analysis
 
-### 2. Conversational Quality Comparison
-Evaluate each pair on:
-- **Clarity**: How clear is the communication?
-- **Efficiency**: Number of turns to resolution
-- **Accuracy**: Correct routing/information provided
-- **Naturalness**: Does it sound human-like?
-- **Error Handling**: How gracefully are issues handled?
+### Semantic Comparison
+- Intent preservation
+- Information accuracy
+- Routing correctness
 
-### 3. Scoring Rubric
-Rate each dimension 1-5:
-- 1: Poor - significantly worse than baseline
-- 2: Below average - noticeable degradation
-- 3: Equivalent - no meaningful difference
-- 4: Better - noticeable improvement
-- 5: Excellent - significant improvement
+### Conversational Quality
+- Clarity
+- Efficiency (turns to resolution)
+- Naturalness
+- Error handling
 
-## How to Use
-
-1. Generate conversations for each scenario using both prompt versions
-2. Paste control output into `*_control.md` files
-3. Paste test output into `*_test.md` files
-4. Run semantic analysis comparing each pair
-5. Document findings in a summary report
-
-## File Naming Convention
-
-```
-{number}_{scenario_name}_control.md
-{number}_{scenario_name}_test.md
-```
+### Scoring (1-5)
+- 1: Significantly worse
+- 2: Noticeable degradation
+- 3: Equivalent
+- 4: Noticeable improvement
+- 5: Significant improvement
