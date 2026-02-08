@@ -671,7 +671,7 @@ quote_packet: "Rodriguez LLC - CA WC New Business"
 
 ## 10. Example Template: PLRater Personal Auto
 
-> **Note:** The `context_plrater_home_auto.md` file is currently empty. This template is derived from `context_general.md` rater notes (Client Info, Vehicle Info, Incident Info, Choose Carriers) and standard personal auto rating requirements. **Must be validated against actual PLRater field screenshots.**
+> **Validated against PLRater screenshots** (PLRater UI for Colorado Personal Auto flow). Field list reflects actual PLRater tabs: Client Info, General Info, Vehicle Info, Driver Info, Incident Info, Co. Questions, Rate.
 
 **`packet_template`:**
 
@@ -685,92 +685,157 @@ quote_packet: "Rodriguez LLC - CA WC New Business"
 | rater_platform | PLRater |
 | description | Personal auto quote for PLRater comparative rater. |
 
+### PLRater Auto Tab Structure (from screenshots)
+
+```
+PLRater Sidebar Tabs          Maps to Entity
+─────────────────────         ──────────────
+Select Companies              (carrier selection - not modeled as entity)
+General Info                  → coverage (one)
+Vehicle Info                  → asset (many)
+Additional Interest           → (co-applicant on applicant entity)
+Driver Info                   → person (many)
+Incident Info                 → loss_run (many)
+Co. Questions                 → (carrier-specific - V2 consideration)
+Rate → Results                (output - not modeled)
+```
+
 ### Entity & Field Map
 
 #### 10.1 `applicant` (one) - "Client Information"
 
+Maps to PLRater **Client Information** tab.
+
 | Field Group | Key | Label | Type | Req | Priority | Rater Mapping |
 |-------------|-----|-------|------|:---:|----------|---------------|
 | **Personal Info** | | | | | | |
+| | `prefix` | Prefix | select | no | low | PLRater.Client.Prefix |
+| | | *Options:* `mr`, `mrs`, `ms`, `dr` | | | | |
 | | `first_name` | First Name | text | yes | critical | PLRater.Client.FirstName |
+| | `middle_name` | Middle Name | text | no | low | PLRater.Client.MiddleName |
 | | `last_name` | Last Name | text | yes | critical | PLRater.Client.LastName |
 | | `date_of_birth` | Date of Birth | date | yes | critical | PLRater.Client.DOB |
-| | `ssn` | Social Security Number | ssn | no | low | PLRater.Client.SSN |
-| | `gender` | Gender | select | yes | high | PLRater.Client.Gender |
-| | | *Options:* `male`, `female`, `non_binary` | | | | |
+| | `ssn` | Social Security Number | ssn | no | medium | PLRater.Client.SSN |
 | | `marital_status` | Marital Status | select | yes | high | PLRater.Client.MaritalStatus |
 | | | *Options:* `single`, `married`, `divorced`, `widowed`, `separated` | | | | |
-| **Contact** | | | | | | |
-| | `phone` | Phone | phone | yes | critical | PLRater.Client.Phone |
-| | `email` | Email | email | yes | high | PLRater.Client.Email |
+| | `state_licensed` | State Licensed | select | yes | high | PLRater.Client.StateLicensed |
+| | `driver_license` | Driver License # | text | yes | high | PLRater.Client.DriverLicense |
 | **Address** | | | | | | |
-| | `home_address` | Home Address | address | yes | critical | PLRater.Client.Address |
-| | `years_at_address` | Years at Address | number | no | medium | PLRater.Client.YearsAtAddr |
-| **Current Coverage** | | | | | | |
-| | `currently_insured` | Currently Insured? | boolean | yes | high | PLRater.Client.CurrentlyInsured |
-| | `current_carrier` | Current Carrier | text | no | medium | PLRater.Client.CurrentCarrier |
-| | `current_policy_expiration` | Current Policy Expiration | date | no | medium | PLRater.Client.PolicyExpDate |
-| | `years_with_prior_carrier` | Years with Prior Carrier | number | no | medium | PLRater.Client.YearsWithCarrier |
+| | `home_address` | Current Address | address | yes | critical | PLRater.Client.Address |
+| | `county` | County | text | no | medium | PLRater.Client.County |
+| | `residence_type` | Residence Type | select | yes | high | PLRater.Client.ResidenceType |
+| | | *Options:* `own_home`, `own_condo`, `rent`, `other` | | | | |
+| | `time_at_address_years` | Years at Address | number | no | medium | PLRater.Client.YearsAtAddr |
+| | `time_at_address_months` | Months at Address | number | no | low | PLRater.Client.MonthsAtAddr |
+| | `mailing_address_different` | Mailing Address Different? | boolean | no | low | -- |
+| | `mailing_address` | Mailing Address | address | no | low | PLRater.Client.MailingAddr |
+| **Contact** | | | | | | |
+| | `cell_phone` | Cell Phone | phone | yes | critical | PLRater.Client.CellPhone |
+| | `home_phone` | Home Phone | phone | no | low | PLRater.Client.HomePhone |
+| | `work_phone` | Work Phone | phone | no | low | PLRater.Client.WorkPhone |
+| | `email` | Email | email | yes | high | PLRater.Client.Email |
+| | `preferred_contact_method` | Preferred Contact Method | select | no | low | PLRater.Client.PrefContact |
+| | | *Options:* `cell`, `home`, `work`, `email` | | | | |
+| **Additional Insured** | | | | | | |
+| | `has_co_applicant` | Co-Applicant? | boolean | no | high | PLRater.Client.CoApplicant |
+| | `co_first_name` | Co-Applicant First Name | text | no | high | PLRater.CoApp.FirstName |
+| | `co_last_name` | Co-Applicant Last Name | text | no | high | PLRater.CoApp.LastName |
+| | `co_date_of_birth` | Co-Applicant DOB | date | no | high | PLRater.CoApp.DOB |
+| | `co_ssn` | Co-Applicant SSN | ssn | no | low | PLRater.CoApp.SSN |
+| | `co_marital_status` | Co-Applicant Marital Status | select | no | medium | PLRater.CoApp.MaritalStatus |
+| | `co_relationship` | Relationship to Client | select | no | high | PLRater.CoApp.Relationship |
+| | | *Options:* `spouse`, `domestic_partner`, `child`, `other` | | | | |
 
-**Dependency:** `currently_insured` = true --> `show` `current_carrier`, `current_policy_expiration`, `years_with_prior_carrier`
+**Dependencies:**
+- `mailing_address_different` = true --> `show` `mailing_address`
+- `has_co_applicant` = true --> `show` all `co_*` fields
+- `residence_type` = `own_home` or `own_condo` --> AI note: "Homeowner - check for multi-policy discount opportunity"
 
 ---
 
 #### 10.2 `person` (many) - "Drivers"
 
-One instance per driver (including the applicant as primary driver). `min_count: 1`.
+Maps to PLRater **Driver Info** tab. One instance per driver (including the applicant as primary driver). `min_count: 1`.
 
 | Field Group | Key | Label | Type | Req | Priority | Rater Mapping |
 |-------------|-----|-------|------|:---:|----------|---------------|
 | **Driver Info** | | | | | | |
 | | `first_name` | First Name | text | yes | critical | PLRater.Driver.FirstName |
+| | `middle_name` | Middle Name | text | no | low | PLRater.Driver.MiddleName |
 | | `last_name` | Last Name | text | yes | critical | PLRater.Driver.LastName |
 | | `date_of_birth` | Date of Birth | date | yes | critical | PLRater.Driver.DOB |
 | | `gender` | Gender | select | yes | high | PLRater.Driver.Gender |
-| | `relationship` | Relationship to Applicant | select | yes | high | PLRater.Driver.Relationship |
-| | | *Options:* `self`, `spouse`, `child`, `other_relative`, `other` | | | | |
 | | `marital_status` | Marital Status | select | yes | medium | PLRater.Driver.MaritalStatus |
+| | | *Options:* `single`, `married`, `divorced`, `widowed`, `separated` | | | | |
+| | `ssn` | SSN | ssn | no | medium | PLRater.Driver.SSN |
+| | `relationship` | Relationship to Applicant | select | yes | high | PLRater.Driver.Relationship |
+| | | *Options:* `self`, `spouse`, `child`, `other_relative`, `other`, `related_insured` | | | | |
 | **License** | | | | | | |
-| | `license_number` | Driver's License # | text | yes | high | PLRater.Driver.LicenseNum |
+| | `license_number` | Driver License # | text | yes | high | PLRater.Driver.LicenseNum |
 | | `license_state` | License State | select | yes | high | PLRater.Driver.LicenseState |
+| | `foreign_international_license` | Foreign or International License? | boolean | no | low | PLRater.Driver.ForeignLicense |
+| | `date_licensed` | Date Licensed | date | yes | medium | PLRater.Driver.DateLicensed |
 | | `years_licensed` | Years Licensed | number | yes | medium | PLRater.Driver.YearsLicensed |
-| | `sr22_required` | SR-22 Required? | boolean | no | medium | PLRater.Driver.SR22 |
+| | `sr22_required` | SR-22 / Financial Responsibility Filing? | boolean | no | medium | PLRater.Driver.SR22 |
+| **Assignment** | | | | | | |
+| | `principal_occasional` | Principal / Occasional | select | yes | high | PLRater.Driver.PrincipalOccasional |
+| | | *Options:* `principal`, `occasional` | | | | |
+| | `operates_vehicle` | Operates Vehicle | text | no | high | PLRater.Driver.OperatesVehicle |
+| | `excluded_driver` | Excluded Driver? | boolean | no | medium | PLRater.Driver.Excluded |
+| **Demographics** | | | | | | |
+| | `education` | Highest Education Level | select | no | low | PLRater.Driver.Education |
+| | | *Options:* `no_high_school`, `high_school`, `some_college`, `associates`, `bachelors`, `masters`, `doctorate` | | | | |
+| | `industry` | Industry | text | no | low | PLRater.Driver.Industry |
+| | `occupation` | Occupation | text | no | low | PLRater.Driver.Occupation |
+| | `years_at_occupation` | Years at Occupation | number | no | low | PLRater.Driver.YearsOccupation |
+| | `good_student` | Good Student Discount? | boolean | no | medium | PLRater.Driver.GoodStudent |
+| | `defensive_driving_course` | Defensive Driving Course? | boolean | no | medium | PLRater.Driver.DefensiveDriving |
 
 ---
 
 #### 10.3 `asset` (many) - "Vehicles"
 
-One instance per vehicle. `min_count: 1`.
+Maps to PLRater **Vehicle Info** tab. One instance per vehicle (PLRater supports up to 4 vehicles per quote). `min_count: 1`, `max_count: 4`.
 
 | Field Group | Key | Label | Type | Req | Priority | Rater Mapping |
 |-------------|-----|-------|------|:---:|----------|---------------|
-| **Vehicle Info** | | | | | | |
+| **Vehicle Identification** | | | | | | |
 | | `vin` | VIN | vin | no | high | PLRater.Vehicle.VIN |
+| | `license_plate` | License Plate Number | text | no | low | PLRater.Vehicle.LicensePlate |
 | | `year` | Year | number | yes | critical | PLRater.Vehicle.Year |
 | | `make` | Make | text | yes | critical | PLRater.Vehicle.Make |
 | | `model` | Model | text | yes | critical | PLRater.Vehicle.Model |
 | | `body_type` | Body Type | select | no | medium | PLRater.Vehicle.BodyType |
-| | | *Options:* `sedan`, `suv`, `truck`, `van`, `coupe`, `convertible`, `wagon`, `other` | | | | |
+| | | *Options:* `sedan`, `suv`, `truck`, `van`, `coupe`, `convertible`, `wagon`, `pickup`, `other` | | | | |
 | **Usage** | | | | | | |
 | | `primary_use` | Primary Use | select | yes | high | PLRater.Vehicle.Use |
 | | | *Options:* `pleasure`, `commute`, `business`, `farm` | | | | |
 | | `annual_mileage` | Annual Mileage | number | yes | high | PLRater.Vehicle.AnnualMiles |
 | | `one_way_commute` | One-Way Commute (miles) | number | no | medium | PLRater.Vehicle.CommuteMiles |
+| | `days_driven_per_week` | Days Driven per Week | number | no | low | PLRater.Vehicle.DaysPerWeek |
 | | `ownership` | Ownership | select | yes | medium | PLRater.Vehicle.Ownership |
 | | | *Options:* `owned`, `leased`, `financed` | | | | |
 | **Garaging** | | | | | | |
-| | `garaging_address` | Garaging Address | address | no | medium | PLRater.Vehicle.GaragingAddr |
 | | `garaging_same_as_home` | Same as Home Address? | boolean | no | low | -- |
+| | `garaging_address` | Garaging Address | address | no | medium | PLRater.Vehicle.GaragingAddr |
+| **Safety & Anti-Theft** | | | | | | |
+| | `anti_theft_device` | Anti-Theft Device? | boolean | no | low | PLRater.Vehicle.AntiTheft |
+| | `automatic_braking` | Automatic Braking Technology? | boolean | no | low | PLRater.Vehicle.AutoBraking |
+| | `blind_spot_warning` | Blind Spot Warning? | boolean | no | low | PLRater.Vehicle.BlindSpot |
 | **Per-Vehicle Coverage** | | | | | | |
 | | `comprehensive_deductible` | Comprehensive Deductible | select | yes | high | PLRater.Vehicle.CompDed |
 | | | *Options:* `none`, `100`, `250`, `500`, `1000`, `2500` | | | | |
 | | `collision_deductible` | Collision Deductible | select | yes | high | PLRater.Vehicle.CollDed |
 | | | *Options:* `none`, `100`, `250`, `500`, `1000`, `2500` | | | | |
 | | `rental_reimbursement` | Rental Reimbursement | boolean | no | low | PLRater.Vehicle.Rental |
-| | `roadside_assistance` | Roadside Assistance | boolean | no | low | PLRater.Vehicle.Roadside |
+| | `roadside_assistance` | Towing & Roadside | boolean | no | low | PLRater.Vehicle.Roadside |
+| | `full_glass` | Full Glass Coverage | boolean | no | low | PLRater.Vehicle.FullGlass |
+| | `gap_coverage` | Loan/Lease Gap Coverage | boolean | no | low | PLRater.Vehicle.Gap |
 
-**Dependency:** `primary_use` = `commute` --> `show` `one_way_commute`
-**Dependency:** `garaging_same_as_home` = false --> `show` `garaging_address`
+**Dependencies:**
+- `primary_use` = `commute` --> `show` `one_way_commute`, `days_driven_per_week`
+- `garaging_same_as_home` = false --> `show` `garaging_address`
+- `ownership` = `leased` or `financed` --> `require` `comprehensive_deductible` and `collision_deductible` (lienholders require physical damage coverage) + `show` `gap_coverage`
 
 ---
 
@@ -790,67 +855,104 @@ One instance per incident. `min_count: 0`.
 
 ---
 
-#### 10.5 `coverage` (one) - "Coverage Selections"
+#### 10.5 `coverage` (one) - "General Info & Coverage Selections"
+
+Maps to PLRater **General Info** tab (which contains policy details, prior carrier, and coverage limits in a single screen).
 
 | Field Group | Key | Label | Type | Req | Priority | Rater Mapping |
 |-------------|-----|-------|------|:---:|----------|---------------|
+| **Policy Setup** | | | | | | |
+| | `effective_date` | Effective Date | date | yes | critical | PLRater.General.EffectiveDate |
+| | `policy_term` | Policy Term | select | yes | high | PLRater.General.PolicyTerm |
+| | | *Options:* `6_month`, `12_month` | | | | |
+| | `business_type` | Business Type | select | yes | medium | PLRater.General.BusinessType |
+| | | *Options:* `new_business`, `rewrite`, `transfer` | | | | |
+| | `named_non_owner` | Named Non-Owner Policy? | boolean | no | low | PLRater.General.NonOwner |
+| | `billing_plan` | Billing Plan | select | no | low | PLRater.General.BillingPlan |
+| | `payment_option` | Payment Option | select | no | low | PLRater.General.PaymentOption |
+| | `paperless` | Paperless? | boolean | no | low | PLRater.General.Paperless |
+| | `credit_check_authorized` | Credit Check Authorized? | boolean | no | medium | PLRater.General.CreditCheck |
+| **Prior Carrier** | | | | | | |
+| | `current_prior_insurance` | Current/Prior Insurance | select | yes | high | PLRater.General.PriorInsurance |
+| | | *Options:* `currently_insured`, `no_prior`, `lapsed` | | | | |
+| | `current_carrier` | Current Carrier | text | no | medium | PLRater.General.CurrentCarrier |
+| | `prior_liability_limits` | Prior Liability Limits | text | no | medium | PLRater.General.PriorLimits |
+| | `years_continuously_insured` | Years Continuously Insured | number | no | medium | PLRater.General.YearsInsured |
 | **Liability** | | | | | | |
-| | `bi_per_person` | Bodily Injury - Per Person | select | yes | critical | PLRater.Coverage.BIPerPerson |
-| | | *Options:* `15000`, `25000`, `50000`, `100000`, `250000`, `500000` | | | | |
-| | `bi_per_accident` | Bodily Injury - Per Accident | select | yes | critical | PLRater.Coverage.BIPerAccident |
-| | | *Options:* `30000`, `50000`, `100000`, `300000`, `500000`, `1000000` | | | | |
-| | `property_damage` | Property Damage | select | yes | critical | PLRater.Coverage.PD |
-| | | *Options:* `10000`, `25000`, `50000`, `100000`, `300000` | | | | |
-| **Additional Coverages** | | | | | | |
-| | `um_bi` | Uninsured Motorist BI | select | yes | high | PLRater.Coverage.UMBI |
-| | `uim_bi` | Underinsured Motorist BI | select | no | medium | PLRater.Coverage.UIMBI |
+| | `liability_bi_limit` | Liability CSL/BI Limit | select | yes | critical | PLRater.Coverage.BILimit |
+| | | *Options:* `15/30` (CA min), `25/50`, `30/60` (TX min), `50/100`, `100/300`, `250/500`, `500/1000` | | | | |
+| | `liability_pd_limit` | Liability PD Limit | select | yes | critical | PLRater.Coverage.PDLimit |
+| | | *Options:* `5000` (CA min), `10000`, `25000` (TX min), `50000`, `100000`, `300000` | | | | |
+| **UM/UIM** | | | | | | |
+| | `um_bi_limit` | UM Single/BI Limit | select | yes | high | PLRater.Coverage.UMBILimit |
+| | `um_pd_deductible` | UM PD Deductible | select | no | medium | PLRater.Coverage.UMPDDed |
+| | | *Options:* `rejected`, `none`, `100`, `250`, `500` | | | | |
+| **Medical / PIP** | | | | | | |
 | | `medical_payments` | Medical Payments | select | no | medium | PLRater.Coverage.MedPay |
 | | | *Options:* `none`, `1000`, `2000`, `5000`, `10000` | | | | |
 | | `pip` | Personal Injury Protection | select | no | medium | PLRater.Coverage.PIP |
+| | | *Options:* `rejected`, `2500` (TX min), `5000`, `10000` | | | | |
+| **Additional Discounts** | | | | | | |
+| | `careful_driver` | Careful Driver | select | no | low | PLRater.Coverage.CarefulDriver |
+| | | *Options:* `none`, `yes` | | | | |
+
+**State-specific dependencies:**
+- If `state` = TX --> `prefill` `pip` with `2500` (Texas requires PIP offered at $2,500 minimum)
+- If `state` = CA --> `hide` `pip` (CA has no PIP; Med Pay only)
+- `named_non_owner` = true --> `hide` all vehicle entities (non-owner policies have no vehicles)
+- `current_prior_insurance` = `currently_insured` --> `show` `current_carrier`, `prior_liability_limits`, `years_continuously_insured`
 
 ---
 
 ### 10.6 Visual: PLRater Auto Entity Map
 
 ```
-quote_packet: "Sarah Chen - Personal Auto"
+quote_packet: "Anthony Rocabado - Personal Auto"
 │  template: plrater_auto
 │  status: in_progress
-│
+│                                                        PLRater Tab
 ├── [applicant] Client Information ─────────────────────┐
-│   ├── Personal: Sarah Chen, DOB 1988-03-15, Married   │
-│   ├── Contact: (555) 234-5678, sarah@email.com        │  PLRater
-│   ├── Address: 456 Oak Ave, Sacramento CA 95814       │  Client
-│   └── Current: Insured w/ State Farm, exp 4/1/26      │  Info
-│                                                        │  Screen
-├── [person] Driver: "Sarah Chen" ──────────────────────┤
-│   └── self, DOB 1988-03-15, DL# D1234567, CA, 18yr   │
+│   ├── Personal: Anthony Rocabado, Married, CO          │ Client
+│   ├── Address: [address], Residence: Own Home           │ Information
+│   ├── Contact: (303)513-7499, cell                     │
+│   └── Co-Applicant: [spouse info if applicable]        │
 │                                                        │
-├── [person] Driver: "Michael Chen" ────────────────────┤  PLRater
-│   └── spouse, DOB 1986-07-22, DL# D7654321, CA, 20yr │  Driver
-│                                                        │  Screen
-├── [asset] Vehicle: "2022 Honda Civic" ────────────────┤
-│   ├── VIN: 2HGFE2F..., sedan, commute, 12K mi/yr     │
-│   └── Coverage: comp $500, collision $500, rental=yes  │  PLRater
-│                                                        │  Vehicle
-├── [asset] Vehicle: "2020 Toyota RAV4" ────────────────┤  Screen
-│   ├── VIN: JTMRF..., suv, pleasure, 8K mi/yr         │
-│   └── Coverage: comp $500, collision $1000             │
+├── [person] Driver: "Anthony Rocabado" ────────────────┤
+│   ├── self, Married, DL# [CO], licensed 04/14/2000    │ Driver
+│   ├── Principal driver → 2022 Toyota Tundra            │ Info
+│   ├── Education: [level], Occupation: [text]           │
+│   └── Defensive driving: no, Good student: n/a        │
 │                                                        │
-├── [loss_run] "2024 Fender Bender" ────────────────────┤  PLRater
-│   └── 2024-08-15, not_at_fault, $3,200, Sarah         │  Incident
-│                                                        │  Screen
-└── [coverage] Coverage Selections ─────────────────────┘
-    ├── Liability: 100/300/100                            PLRater
-    ├── UM/UIM: 100/300                                   Coverage
-    └── MedPay: $5,000                                    Screen
+├── [asset] Vehicle: "2022 Toyota Tundra Crew Max" ─────┤
+│   ├── VIN: [decoded], pickup, Platinum trim            │ Vehicle
+│   ├── Usage: commute, [X] mi/yr                        │ Info
+│   ├── Safety: auto braking=yes, blind spot=yes         │
+│   └── Coverage: comp $500, collision $500              │
+│                                                        │
+├── [loss_run] (none - clean record) ───────────────────┤ Incident
+│                                                        │ Info
+├── [coverage] General Info & Coverages ────────────────┤
+│   ├── Policy: Eff 1/28/26, 6-mo term, New Business    │ General
+│   ├── Prior: [current/prior insurance]                  │ Info
+│   ├── Liability: 100/300 BI, 50K PD                    │
+│   ├── UM: 100/300 BI, PD Ded=Rejected                 │
+│   └── MedPay: $5,000                                   │
+│                                                        │
+│   [Co. Questions - carrier-specific] ─────────────────┤ Co.
+│   ├── Progressive: home policy? no, credit=Superior    │ Questions
+│   └── The General: double deductible? no               │
+│                                                        │
+│   [Rate Results] ─────────────────────────────────────┘
+│   ├── Progressive Smart Savings: $870.50 / 6mo         Rate
+│   ├── Progressive Standard: $1,206.50 / 6mo
+│   └── The General: (pending credentials)
 ```
 
 ---
 
 ## 11. Example Template: PLRater Homeowners
 
-> **Note:** Same caveat as Auto - derived from general rater knowledge. Requires validation against PLRater screenshots.
+> **Validated against PLRater context doc** (detailed Home workflow for CA and TX). Field list reflects PLRater home quoting sections: Applicant/Property Location, Home Construction & Property Details, Coverage Selection, Prior Claims History. No Home-specific screenshots yet - fields derived from detailed context doc and Auto screenshot patterns.
 
 **`packet_template`:**
 
@@ -909,6 +1011,21 @@ One property per packet (V1). `cardinality: many`, `min_count: 1`, `max_count: 1
 | | `roof_year` | Year Roof Last Replaced | number | yes | high | PLRater.Property.RoofYear |
 | | `foundation_type` | Foundation Type | select | no | medium | PLRater.Property.Foundation |
 | | | *Options:* `slab`, `basement`, `crawlspace`, `pier`, `raised` | | | | |
+| **Structure Details** | | | | | | |
+| | `num_bedrooms` | Bedrooms | number | no | medium | PLRater.Property.Bedrooms |
+| | `num_bathrooms_full` | Full Bathrooms | number | no | medium | PLRater.Property.BathFull |
+| | `num_bathrooms_half` | Half Bathrooms | number | no | medium | PLRater.Property.BathHalf |
+| | `num_fireplaces` | Fireplaces | number | no | medium | PLRater.Property.Fireplaces |
+| | `garage_type` | Garage Type | select | no | medium | PLRater.Property.GarageType |
+| | | *Options:* `none`, `attached_1`, `attached_2`, `attached_3`, `detached_1`, `detached_2`, `carport` | | | | |
+| | `finished_basement` | Finished Basement? | boolean | no | medium | PLRater.Property.FinishedBasement |
+| | `exterior_wall` | Exterior Wall Material | select | no | medium | PLRater.Property.ExteriorWall |
+| | | *Options:* `wood_siding`, `vinyl_siding`, `brick_veneer`, `stucco`, `stone`, `aluminum`, `other` | | | | |
+| **Occupancy** | | | | | | |
+| | `occupancy_type` | Occupancy | select | yes | high | PLRater.Property.Occupancy |
+| | | *Options:* `primary_residence`, `secondary_seasonal`, `tenant_occupied` | | | | |
+| | `num_families` | Number of Families/Units | select | no | medium | PLRater.Property.NumFamilies |
+| | | *Options:* `1`, `2`, `3`, `4` | | | | |
 | **Home Systems** | | | | | | |
 | | `heating_type` | Heating Type | select | yes | high | PLRater.Property.Heating |
 | | | *Options:* `central_forced_air`, `heat_pump`, `baseboard`, `radiant`, `wood_stove`, `other` | | | | |
@@ -1055,14 +1172,25 @@ Required fields are determined by:
 
 ## 13. Questions & Follow-ups
 
+### Resolved
+
+| # | Question | Resolution |
+|---|----------|------------|
+| ~~**Q1**~~ | **PLRater context doc is empty.** | **Resolved.** Full PLRater context doc and Auto flow screenshots now available. Auto template updated to match actual PLRater UI fields. Home template updated from detailed context doc. |
+| ~~**Q2**~~ | **Per-asset coverage fields.** Per-vehicle comp/collision deductibles on the asset entity - clean enough? | **Resolved.** Confirmed acceptable for V1. PLRater screenshot validates this: vehicle coverages are set per-vehicle in the rater UI itself, so our model mirrors reality. |
+| ~~**Q3**~~ | **Nested repeating groups: WC class codes within locations.** | **Resolved.** Accepted denormalization for V1. Each asset instance = one class code at one location. Simple and sufficient. |
+| ~~**T4**~~ | **Multi-template packets.** | **Resolved.** V1 is one packet = one template. Acceptable. Post-V1 can introduce `packet_bundle` if needed. |
+| ~~**T6**~~ | **ACORD mapping fidelity.** | **Resolved.** V1 uses semantic mapping keys (e.g., `125.FEIN`). Actual PDF coordinate mapping will be a separate export layer built later. |
+| ~~**T7**~~ | **Rater mapping fidelity.** | **Resolved.** V1 uses structural placeholder mappings. Actual PLRater field selectors for Super Copy Paste / chrome extension integration will be built in a separate export workstream. Screenshots provide visual reference for field identification. |
+
 ### Must Resolve Before Build
 
 | # | Question | Impact | Suggested Resolution |
 |---|----------|--------|----------------------|
-| **Q1** | **PLRater context doc is empty.** We have no screenshots or field-level specs for PLRater Home or Auto. | High - Auto and Home template field lists are best-guesses. | Raghav/Alex to capture PLRater field screenshots for Auto and Home flows before template finalization. |
-| **Q2** | **Per-asset coverage fields.** Auto has per-vehicle coverage (comp/collision deductible). We currently model this as field groups on the `asset` entity. Is this clean enough, or do we need a separate `coverage` entity per asset? | Medium - affects data model and UI for vehicle coverage editing. | V1: keep per-vehicle coverage as fields on the `asset` entity (in a "Per-Vehicle Coverage" field group). Simple and works for rater mapping. Revisit if we need coverage entity relationships later. |
-| **Q3** | **Nested repeating groups: WC class codes within locations.** A single location can have multiple class codes. We flatten this: each asset instance = one class code at one location. This denormalizes location data (same address repeated). | Medium - data duplication, but simple. | V1: accept denormalization. Location address is duplicated across class codes at same location. Add a `location_id` grouping field later if needed. |
 | **Q4** | **Document attachment model.** Loss runs, mod worksheets, and supplementals are often PDFs. The `packet_attachment` table in Section 8 is suggested but not fully spec'd. | Medium - needed for complete WC submissions. | Build `packet_attachment` as a simple file storage table in V1. AI parsing of documents can be a fast-follow. |
+| **Q5** | **Carrier-specific "Company Questions."** PLRater screenshots show a **Co. Questions** tab with per-carrier fields (e.g., Progressive asks about home policy, credit score, vehicle tech; The General asks about double deductible). These are not part of the core packet data model - they are carrier-specific and dynamic. | Medium - affects completeness of rater export. | V1: do not model carrier-specific questions in the template. These are handled at export time by the rater integration layer. Flag as a V2 enhancement if we need to pre-fill carrier questions from packet data. |
+| **Q6** | **PLRater Home screenshots.** We have Auto flow screenshots but no Home-specific screenshots yet. The Home template fields are derived from the detailed context doc, which is thorough but not screenshot-validated. | Low - context doc is very detailed. Fields are likely accurate. | Capture PLRater Home flow screenshots to validate fields before finalizing Home template seed data. |
+| **Q7** | **State-specific field variations.** PLRater context doc details significant CA vs TX differences (PIP vs MedPay, Good Driver discount, credit scoring, wind/hail deductibles, roof ACV rules). Should we have separate templates per state, or handle via field dependencies? | Medium - affects template proliferation vs complexity. | V1: use a single template per line (e.g., `plrater_auto`) with state-aware field dependencies (e.g., `state=TX` shows PIP, `state=CA` shows MedPay). Only create state-specific templates if the field set is fundamentally different. |
 
 ### Design Trade-offs to Monitor
 
@@ -1071,10 +1199,9 @@ Required fields are determined by:
 | **T1** | **Field dependency complexity.** The `field_dependency` table handles pairwise field rules. Multi-field compound conditions (e.g., "if entity_type = Corp AND state = CA, then show officer exclusion") are not supported in V1. | Low for V1 (most rules are simple show/hide). Could limit complex ACORD logic later. | V1 rules are sufficient for our 3 templates. If compound rules are needed, extend `condition` to support `{all: [cond1, cond2]}` syntax. |
 | **T2** | **Shared field schemas across templates.** Many fields repeat (first_name, address, phone). Currently each template defines its own field_templates independently - no shared canonical library. | Low for V1 (only 3 templates). Risk: data from one packet can't auto-populate another. | Post-V1: introduce a `canonical_field` table that field_templates reference. Enables cross-template data reuse ("we already know this client's name from their auto packet"). |
 | **T3** | **Custom agency fields.** Context doc mentions agencies wanting their own "flavor." No customization mechanism exists in V1. | Low for V1 (templates are system-defined). | Post-V1: allow agencies to add `custom_field_template` rows to a base template via an "agency override" layer. |
-| **T4** | **Multi-template packets.** Some commercial submissions bundle lines (GL + WC = ACORD 125 + 126 + 130). V1 is one packet = one template. | Medium - could require agents to create separate packets for bundled submissions, with duplicated applicant info. | V1: one-to-one. Post-V1: allow a `packet_bundle` that groups multiple quote_packets and shares applicant/business entities. |
 | **T5** | **Operations entity generality.** The `operations` entity type works for WC underwriting questions but GL, BOP, etc. will have entirely different questions. The entity type name is generic but contents are line-specific. | Low - this is working as designed (the template defines the specific fields). | No change needed. Each template defines its own operations fields. The entity_type is just a semantic bucket. |
-| **T6** | **ACORD mapping fidelity.** The `acord_mapping` jsonb on field_template is a placeholder format. Actual ACORD PDF coordinate mapping (for PDF generation) will need form coordinates or an ACORD XML schema reference. | Medium - affects export feature. | V1: use semantic mapping keys (e.g., `125.FEIN`). Build the actual PDF coordinate mapping as a separate export layer that translates these keys to PDF field positions. |
-| **T7** | **Rater mapping fidelity.** PLRater field mappings are guesses. Actual rater integration (Super Copy Paste chrome extension or API) will need exact field selectors/identifiers. | High for PLRater export. | Block: requires PLRater field documentation or reverse-engineering of the rater UI. Mappings in this ADR are structural placeholders. |
+| **T8** | **PLRater "Package Quote" flow.** PLRater supports quoting Auto + Home together as a package, which triggers multi-policy discounts. Our V1 model doesn't support cross-packet linking. | Low for V1 (most customers quote one line at a time). | Post-V1: similar to multi-template packets, allow a `packet_bundle` for package quoting that shares applicant data and triggers discount flags. |
+| **T9** | **Driver-Vehicle assignment.** PLRater assigns each driver as Principal or Occasional for a specific vehicle. Our model captures this on the `person` entity (`operates_vehicle` field) as a text reference. A formal FK relationship between person and asset entities would be cleaner but adds complexity. | Low - text reference works for V1 rater export. | V1: use text reference. Post-V1: consider a `person_asset_assignment` join table if we need structured driver-vehicle relationships for analytics or validation. |
 
 ---
 
