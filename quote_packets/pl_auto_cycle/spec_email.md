@@ -272,3 +272,131 @@ Agencies on other providers (GoDaddy, Rackspace, etc.) can use IMAP/SMTP fallbac
 | OAuth token expires, producer doesn't re-auth | `grant.expired` webhook → in-app notification + SMS alert. Grace period queues emails. |
 | Agency uses non-Google/Microsoft email | IMAP/SMTP fallback or V1 prerequisite. ~70% of small businesses covered by Google + Microsoft. |
 | Nylas pricing increases at scale | EmailEngine migration path is our hedge. Crossover at ~50 connected accounts. |
+
+---
+
+## Appendix A: Google OAuth Verification & Security Review
+
+### Why This Matters
+
+Any app that accesses Gmail via OAuth2 (whether through Nylas or direct Google API integration) must go through Google's verification process if it serves users outside a single Google Workspace organization. This has historically been cited as a major blocker for BYOD email implementations — stories of $15,000-$75,000 security audits and months-long review timelines are common in developer forums.
+
+**The reality is significantly more favorable than the conventional wisdom suggests.** There are multiple paths to production access, and the costs/timelines are a fraction of what's commonly reported.
+
+### Background: Google's OAuth Scope Tiers
+
+Google classifies OAuth scopes into three tiers, each with different verification requirements:
+
+| Tier | Example Scopes | Verification Required | Security Assessment (CASA) |
+|---|---|---|---|
+| **Non-sensitive** | `openid`, `profile`, `email` | None | None |
+| **Sensitive** | `gmail.send`, `calendar.events`, `contacts` | Google verification (brand/domain/privacy policy review) | None |
+| **Restricted** | `gmail.readonly`, `gmail.modify`, `gmail.compose` | Google verification + CASA security assessment | Required |
+
+**Key insight**: The scope you need determines the path. If we only need to **send** emails (not read the full inbox), `gmail.send` is a **sensitive** scope that requires only Google verification — no CASA assessment at all.
+
+However, for full BYOD functionality (reading replies, accessing threads, detecting attachments), we likely need `gmail.modify` or `gmail.readonly` — **restricted** scopes that require the CASA assessment.
+
+### Three Paths to Production Access
+
+#### Path 1: Nylas Shared GCP Project (Recommended for V1)
+
+Nylas maintains their own pre-verified, CASA-assessed Google Cloud Platform project. Customers on **Nylas Contract plans** (not self-serve) can use Nylas's existing verification instead of going through the process themselves.
+
+- **How it works**: Nylas's GCP project is already verified for restricted Gmail scopes. When your users OAuth through Nylas, they're authenticating against Nylas's verified app — not yours.
+- **What's required**: Sign a Nylas Contract plan (vs. self-serve billing). Contact Nylas Account Manager to enable Shared GCP.
+- **Cost**: Only the Nylas subscription itself — no separate verification or CASA fees.
+- **Timeline**: Immediate once on Contract plan.
+- **Limitations**: You're dependent on Nylas maintaining their verification. If you later migrate off Nylas, you'd need your own verification.
+
+**This is the fastest path to production.** It completely eliminates the Google Security Review as a concern for V1.
+
+#### Path 2: Google Workspace Admin Trust/Allowlist
+
+For agencies that use **Google Workspace** (not consumer Gmail), the Workspace admin can explicitly trust an unverified app, bypassing the verification requirement entirely.
+
+- **How it works**: In Google Admin Console → Security → API Controls → App Access Control, the admin adds your app's OAuth Client ID and sets it to "Trusted." This overrides the unverified app warning and grants access to restricted scopes for all users in the organization.
+- **What's required**: The agency's Google Workspace admin performs a one-time configuration (~2 minutes).
+- **Cost**: Zero.
+- **Timeline**: Immediate.
+- **Limitations**: Only works for Google Workspace accounts (not consumer Gmail). Requires agency admin cooperation during onboarding. Each agency's admin must do this independently.
+
+**This is highly practical for our use case** because our target customers are insurance agencies — businesses that overwhelmingly use Google Workspace (not consumer Gmail). Adding "trust our app" to the agency onboarding checklist is straightforward, especially since these agencies are already choosing to integrate with our platform.
+
+#### Path 3: Full Google Verification + CASA Assessment (Own GCP Project)
+
+If we want our own verified GCP project (e.g., for independence from Nylas, or if we build direct Gmail API integration), we go through the full process.
+
+**Step 1: Google OAuth Verification (All Apps with Sensitive+ Scopes)**
+
+| Requirement | Details |
+|---|---|
+| Verified domain | Must own the domain associated with the app |
+| Privacy policy | Public URL, covers data usage, deletion |
+| Homepage | Public URL explaining the app |
+| Google review | Submit via Google Cloud Console → OAuth Consent Screen → "Publish" |
+| Timeline | 3-5 business days (typically) |
+| Cost | Free |
+
+**Step 2: CASA Security Assessment (Restricted Scopes Only)**
+
+Google requires apps accessing restricted scopes (gmail.modify, gmail.readonly, gmail.compose) to complete a Cloud Application Security Assessment (CASA). The assessment tier is assigned by Google based on the number of users and data access scope:
+
+| CASA Tier | When Assigned | What's Involved | Cost | Timeline |
+|---|---|---|---|---|
+| **Tier 1** | Low user count, minimal data | Self-assessment questionnaire only | Free | Days |
+| **Tier 2** | Moderate user/data scope | Independent assessor reviews against OWASP ASVS/MASVS controls. Can be lab-based (no source access needed). | **$540 - $1,800** | 1-3 weeks |
+| **Tier 3** | High user count, broad data access | Full pen-test style assessment by authorized lab. Source code or binary access may be required. | **$4,500 - $8,000+** | 2-4 weeks |
+
+**Cheapest CASA Tier 2 providers** (as of 2025):
+
+| Provider | Tier 2 Price | Tier 3 Price | Notes |
+|---|---|---|---|
+| **TAC Security** | **$540** | $4,500 | Cheapest option. India-based. |
+| **Neuvik** | $1,350 | $7,000 | US-based. |
+| **Leviathan Security** | ~$1,800 | ~$6,000-$8,000 | Nylas partner. Offers "Express Security Review" bundle. |
+| **Bishop Fox** | ~$1,500 | ~$7,500 | Well-known US firm. |
+
+**Annual re-verification**: CASA assessments must be renewed annually. Budget for recurring cost.
+
+**Important**: If we already have **SOC 2 Type II** certification, much of the CASA evidence can be reused, significantly simplifying the assessment. Nylas completed their own CASA in ~2 weeks leveraging their existing SOC 2.
+
+### Which Scopes Do We Actually Need?
+
+The scope selection directly determines whether we need CASA:
+
+| Use Case | Minimum Scope | Tier | CASA Required? |
+|---|---|---|---|
+| Send emails only | `gmail.send` | Sensitive | **No** |
+| Send + read replies | `gmail.modify` | Restricted | **Yes** |
+| Send + read + full inbox access | `gmail.readonly` + `gmail.send` | Restricted | **Yes** |
+| Full inbox control (Nylas default) | `gmail.modify` | Restricted | **Yes** |
+
+For our full BYOD implementation (send automated emails, read replies via webhook, access threads, download attachments), we need `gmail.modify` — a restricted scope.
+
+**However**, if using Nylas's Shared GCP (Path 1), this is moot — Nylas's app is already verified for these scopes.
+
+### Recommended Strategy
+
+| Phase | Path | Why |
+|---|---|---|
+| **V1 (Launch)** | **Nylas Shared GCP** (Path 1) + **Admin Trust** (Path 2) as fallback | Zero verification overhead. Fastest to market. Nylas handles all Google compliance. For agencies that can't use Nylas's shared project for any reason, admin allowlist is instant. |
+| **V2 (If migrating off Nylas)** | **Full verification + CASA Tier 2** (Path 3) | Budget $540-$1,800 for initial CASA + ~$540/year renewal. 2-4 weeks total timeline. Not a blocker if planned in advance. |
+
+### Common Misconceptions vs Reality
+
+| Misconception | Reality |
+|---|---|
+| "Google Security Review costs $15,000-$75,000" | CASA Tier 2 starts at **$540** (TAC Security). The $15K+ figure is for white-glove consulting bundles, not the assessment itself. |
+| "It takes 3-6 months" | CASA assessment: 1-4 weeks. Google review: 3-5 business days after. Total: **2-6 weeks**. |
+| "You need it for any Gmail access" | Only for **restricted** scopes. `gmail.send` (sensitive) only needs free Google verification. |
+| "There's no way around it" | Nylas Shared GCP eliminates it entirely. Workspace Admin Trust bypasses it for managed accounts. |
+| "Small apps can't get through" | Google has an informal <100 user exception for low-risk apps. CASA Tier 1 (self-assessment, free) may be assigned for small user bases. |
+| "We need to do this before writing any code" | Development and testing use unverified apps freely (with a warning screen). Verification is only needed for production deployment to external users. |
+
+### Open Questions
+
+- [ ] **Confirm Nylas Contract plan pricing and Shared GCP availability** — Reach out to Nylas sales to confirm Contract tier pricing and that Shared GCP is available for our use case.
+- [ ] **Determine our likely CASA tier** — If we pursue Path 3, Google assigns the tier. For a new app with <1,000 users initially, Tier 2 is most likely. Confirm with Google's CASA team.
+- [ ] **Admin Trust onboarding flow** — Design the agency onboarding step where a Google Workspace admin trusts our app. Should be a guided walkthrough with screenshots (similar to how Slack and other SaaS tools handle Workspace admin approval).
+- [ ] **Scope minimization analysis** — Evaluate whether we can achieve core functionality with `gmail.send` (sensitive, no CASA) for sending + a separate webhook/push notification mechanism for inbound reply detection, avoiding restricted scopes entirely.
