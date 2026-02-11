@@ -228,3 +228,90 @@ For a personal lines quote, we need ~40-80 fields across auto and home. Many of 
 4. **Verisk products for enrichment**: 360Value (replacement cost), ISO PPC (fire protection class), property data products. Access requirements and pricing?
 5. **Other insurance enrichment startups**: Any new entrants in the market? Search for companies offering insurance data enrichment, prefill, or policy data APIs.
 6. **Comparison matrix**: Build a comparison of all enrichment APIs on: fields provided, data coverage (states/carriers), pricing model, integration complexity, accuracy, and access requirements.
+
+---
+
+## 6. Research Findings Summary
+
+*See [[research_data_enrichment_public]] and [[research_data_enrichment_apis]] for full details.*
+
+### Recommended Enrichment Stack by Phase
+
+#### V1: Personal Auto (CA, TX, OH, FL) — $1,500-4,000/month, 2-3 weeks
+
+| Integration | What It Does | Cost | Priority |
+|---|---|---|---|
+| **Canopy Connect** | Customer links carrier account → pulls exact policy, coverages, vehicles, drivers, claims, dec pages. 400+ carriers, 96% auto market, 5.6-sec avg pull. | $1,000-2,500/mo + per-pull | **P0** |
+| **Fenris Auto Prefill** | From name + address: populates drivers, vehicles (VIN), household, violation history. 80+ data points in <1 second. | $500-1,500/mo (per-request) | **P0** |
+| **NHTSA VIN Decoder** | Free: year, make, model, trim, engine, 130+ attributes including ADAS safety features. | **Free** | **P0** |
+
+**Combined V1 workflow**: Customer enters name + address → Fenris pre-fills 80+ fields passively → Optional Canopy link overwrites with exact carrier data → Smart form shows only remaining gaps → Submit to rater.
+
+**Estimated impact**: 70-85% reduction in data collection time.
+
+**Critical risk**: Fenris has **CA as a restricted state for vehicle VIN data**. Since CA is our largest target market, Canopy Connect must compensate. Need to test and quantify the CA gap in Fenris sandbox.
+
+#### V2: Add Personal Home — $5,000-12,000/month total, +6-10 weeks
+
+| Integration | What It Does | Cost | Priority |
+|---|---|---|---|
+| **Fenris Property Assessment** | 500+ property data points from address: year built, sq ft, beds/baths, construction, roof, foundation, heating/cooling, valuation. | Bundled with auto | **P0 for home** |
+| **ATTOM Property API** | 158M+ properties, 9,000 attributes. Alternative to Fenris property data, better for counties where Fenris has gaps. | $500+/mo | **P1** |
+| **Verisk 360Value** | Industry-standard replacement cost estimation (Coverage A). Covers 90M+ residential structures. | $2K-5K/mo (via carrier partner) | **P0 for home** |
+| **Verisk ISO PPC** | Fire protection class (1-10). Required rating factor for home insurance. | Bundled with 360Value | **P0 for home** |
+| **FEMA NFHL** | Free flood zone lookup by coordinates. | **Free** | **P0** |
+| **CAL FIRE FHSZ** | Free wildfire hazard severity zones for California. Major 2025 update. | **Free** | **P0 for CA** |
+| **LexisNexis Prefill + CLUE** | Gold-standard data: 80+ property elements, 7 years claims history (99.6% of auto industry contributes). | Enterprise (via carrier sponsorship) | **P1** |
+
+**Estimated impact**: 85-95% reduction in data collection for auto + home combined.
+
+#### V3+: Advanced — $15,000-30,000+/month total
+
+| Integration | What It Does | Cost |
+|---|---|---|
+| **ZestyAI Z-FIRE** | Property-level wildfire risk scoring (filing-ready in CA). Critical for CA market. | Enterprise |
+| **Cape Analytics** (Moody's) | AI roof condition rating from aerial imagery. Approved for ratemaking in 40 states. | Enterprise |
+| **TransUnion DriverRisk** | 30-50% MVR cost savings, catches out-of-state violations. | Per-lookup |
+| **CoreLogic/Cotality** | Deep property analytics, Marshall & Swift replacement cost (gold standard). | Enterprise $$$ |
+
+### Key Public Data Findings
+
+| Source | Fields | Cost | Accessibility |
+|---|---|---|---|
+| **NHTSA VIN Decoder** | 130+ vehicle attributes (Y/M/M, trim, engine, ADAS, fuel, drive type) | Free, no registration | Excellent — no limits |
+| **FEMA NFHL** | Flood zone, SFHA status, base flood elevation | Free | Good — ArcGIS REST API |
+| **CAL FIRE FHSZ** | Fire Hazard Severity Zone (Moderate/High/Very High) | Free (shapefile download) | Good for CA only |
+| **USFS Wildfire Risk** | National wildfire risk score | Free (data download) | Moderate — need spatial processing |
+| **TX Appraisal Districts** | Year built, sq ft, beds/baths, construction, assessed value | Free (bulk download) | Good for TX counties |
+| **County assessors (CA, OH, FL)** | Similar to TX but access varies county by county | Free but fragmented | Moderate — per-county effort |
+| **USPS Address Validation** | Address standardization | Free but **60 calls/hour limit** — unusable | Bad — use Smarty instead |
+| **Smarty (fka SmartyStreets)** | CASS-certified address validation | $20-1,000/mo | Excellent — recommended replacement for USPS |
+| **HERE Geocoding** | Lat/lon, standardized address | Free (250K/mo) | Excellent — best free tier |
+
+### Enrichment Coverage Map (Can We Auto-Fill?)
+
+**Personal Auto** — from VIN alone (NHTSA, free):
+- Year, make, model, trim, body type, engine, fuel type, drive type, safety features, EV status → **All auto-filled**
+- Annual mileage, vehicle use, driver info, prior insurance → **Must ask customer**
+
+**Personal Home** — from address (ATTOM/Fenris + free sources):
+- Year built, sq ft, beds/baths, stories, construction, roof material, foundation, heating, cooling, lot size, assessed value, pool → **All auto-filled**
+- Flood zone (FEMA), wildfire risk (CAL FIRE/USFS), fire station distance → **All auto-filled**
+- Roof age/condition → **Tier 3 only (Cape Analytics)**
+- Replacement cost → **Requires Verisk 360Value**
+
+### Per-Quote Enrichment Cost Estimate
+
+| Tier | Home Quote | Auto Quote |
+|---|---|---|
+| Free sources only (NHTSA, FEMA, geocoding) | $0.00-$0.01 | $0.00 |
+| + Commercial APIs (ATTOM, Fenris, NADA) | $0.30-$1.50 | $0.10-$0.60 |
+| + Premium (Cape Analytics, CoreLogic) | $2.00-$7.00 | $0.50-$1.50 |
+
+### Immediate Next Steps
+
+- [ ] **Schedule Canopy Connect demo/sales call** — confirm carrier coverage for CA/TX/OH/FL, get production pricing
+- [ ] **Register for Fenris developer sandbox** — test CA vehicle data restrictions, evaluate accuracy
+- [ ] **Register for Canopy Connect sandbox** — free at usecanopy.com/api/developer-account
+- [ ] **Map carrier partnership strategy** — which carriers can sponsor LexisNexis/Verisk access?
+- [ ] **Integrate NHTSA VIN Decoder** — free, instant, should be first enrichment live

@@ -194,3 +194,67 @@ SMS is the **primary outbound channel** for automated follow-up with customers w
 4. What are the best multi-channel orchestration platforms for startups (Customer.io vs Knock vs Courier vs Braze vs OneSignal)? Compare on: SMS + email support, programmable workflows, pricing at ~5-50K messages/month, API-first design.
 5. TCPA compliance best practices for automated SMS in insurance — consent capture patterns, quiet hours by state (CA, TX, OH, FL), record-keeping requirements.
 6. What open-source or off-the-shelf tools exist for conversational SMS state management? Or is this universally custom-built?
+
+---
+
+## 7. Research Findings Summary
+
+*See [[research_sms]] for full details.*
+
+### Recommended Stack
+
+| Layer | Vendor | Why | Cost |
+|---|---|---|---|
+| **SMS provider** | **Twilio** (V1) → migrate to **Telnyx** (V2 for cost) | Twilio has best DX, docs, 10DLC tooling. Telnyx is 40-60% cheaper per message at scale. | Twilio: $0.0079/msg. Telnyx: $0.004/msg |
+| **Orchestration** | **Customer.io** | Better SMS-specific features than Knock for conversational flows. Workflow builder, A/B testing, segmentation. | $100-300/mo |
+| **Conversational state** | **Custom-built** | No off-the-shelf tools exist. Build a lightweight state machine tracking: last question asked, pending fields, turn count. | Engineering only |
+| **Number type** | **10DLC** (local numbers) | Industry standard for A2P. More trusted than toll-free, much cheaper than short codes. | See below |
+
+### 10DLC Registration Details
+
+| Item | Cost | Timeline |
+|---|---|---|
+| Brand registration (one-time) | $4 (standard) or $40 (enhanced vetting) | 1-5 business days |
+| Campaign registration (one-time) | $15 per campaign (Insurance use case) | 3-10 business days |
+| Local number per agency | $1.15/mo (Twilio) | Instant |
+| **Total per-agency one-time** | ~$20-55 | |
+| **Total per-agency monthly** | ~$11/mo (number + campaign surcharge) | |
+| Initial throughput | ~15 msg/sec (good trust score) | Improves over time |
+
+### Quiet Hours by State (Safe Window)
+
+| Day | Safe Sending Window |
+|---|---|
+| Monday-Saturday | **9:00 AM - 8:00 PM** local time |
+| Sunday | **12:00 PM - 8:00 PM** local time |
+
+*TX is the most restrictive (no calls/texts before noon on Sunday). FL and OH have no specific state restrictions beyond TCPA federal rules. CA follows TCPA.*
+
+### Key Findings
+
+- **Twilio vs Telnyx**: Twilio is ~2x the price per message but has vastly better documentation, SDK quality, and 10DLC registration tooling. Start with Twilio for speed, plan migration to Telnyx when volume exceeds 20K messages/month.
+- **MMS**: Twilio MMS is $0.02/segment outbound + carrier fees. Worth it for sending dec page example images. Inbound MMS (customer photos) is $0.01/msg — essential for the dec page photo flow.
+- **Conversational state management**: Universally custom-built. No off-the-shelf tools. Redis-backed state machine with phone number → lead mapping is the standard pattern. Max 2-3 conversational turns via SMS before pushing to smart form.
+- **Insurance platforms**: EZLynx, HawkSoft have basic SMS but no API/embed options. Podium and Heymarket are viable but don't integrate with our data model. Build on Twilio directly.
+- **TCPA**: Capture consent during the initial call (voice agent logs it) or on web form (checkbox). Store consent record with timestamp, source, and purpose. Honor STOP immediately. Keep consent records for 5+ years.
+
+### Cost Estimate
+
+| Scale | Monthly Cost |
+|---|---|
+| Launch (2,000 msgs/mo, 5 agencies) | $225-$460 |
+| Growth (10,000 msgs/mo, 20 agencies) | $500-$900 |
+| Scale (50,000 msgs/mo, 100 agencies) | $1,000-$1,460 |
+
+*Includes provider fees, orchestration, number costs. Excludes engineering time.*
+
+### Implementation Timeline: 9-13 weeks
+
+| Weeks | Milestone |
+|---|---|
+| 1-2 | Twilio account setup, 10DLC brand + campaign registration, first local number |
+| 3-4 | Basic outbound SMS (post-call follow-up with portal link), Customer.io workflow setup |
+| 5-7 | Two-way SMS: conversational state machine, LLM reply parsing (shared with email) |
+| 8-9 | MMS inbound handling (photo → dec page parsing pipeline), opt-out management |
+| 10-11 | Per-agency number provisioning flow, bilingual message templates |
+| 12-13 | Integration testing, quiet hours enforcement, compliance audit, analytics |

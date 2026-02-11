@@ -194,3 +194,71 @@ A single branded link/page that serves as the customer's "hub" for completing th
 3. **OCR / Document AI for insurance**: Compare Google Document AI vs AWS Textract vs Azure Form Recognizer vs Tesseract + LLM for semi-structured insurance document parsing. Accuracy benchmarks, pricing, setup complexity.
 4. **Insurance-specific parsing vendors**: Deep dive on Canopy Connect's dec page parsing, Fenris, Planck, Indico Data, and any other vendors. What do they parse, accuracy claims, pricing model, integration complexity.
 5. **LLM-based document extraction**: What's the current state of using GPT-4 Vision / Claude vision for insurance document extraction? Any published benchmarks or case studies? Prompt engineering patterns for structured extraction from dec pages.
+
+---
+
+## 7. Research Findings Summary
+
+*See [[research_dec_page_ocr]] for full details.*
+
+### Build vs Buy Verdict: Build LLM Vision Pipeline
+
+**Recommended approach**: Direct LLM Vision (GPT-4o or Claude Sonnet 4.5) with schema-first prompts and a validation layer. This beats traditional OCR + template approaches for our multi-carrier, multi-state use case.
+
+| Option | Cost/Doc | Year 1 Total | Accuracy | Maintenance |
+|---|---|---|---|---|
+| **LLM Vision (recommended)** | $0.02-$0.06 | $35K-$65K | 90-97% | Prompt tuning |
+| Sensible (backup buy) | $0.50 | $30K-$42K | 90-95% | Schema maintenance |
+| Canopy DecSight | $2-$5 | $56K-$136K | 90-95%+ | Vendor-managed |
+| AWS Textract + LLM | $0.14+ | $50K-$80K | 92-97% | Pipeline maintenance |
+
+### Dec Page Field Coverage
+
+**Auto dec pages** contain ~25-30 extractable fields: carrier, policy number, dates, named insured, address, vehicles (VIN, year/make/model), drivers (name, DOB, DL#), coverage table (BI, PD, comp, collision, UM/UIM), deductibles, and premium.
+
+**Home dec pages** contain ~25-35 extractable fields: carrier, policy number, dates, insured, property address, dwelling details, Coverage A-D limits, deductibles, endorsements, premium.
+
+### Accuracy by Field Type (LLM Vision)
+
+| Field | Expected Accuracy | Risk Level |
+|---|---|---|
+| Carrier name, policy number | 97-99% | Low |
+| Named insured, address | 96-99% | Low |
+| Dates (effective/expiration) | 97-99% | Low |
+| Vehicle year/make/model | 97-99% | Low |
+| **VIN (17 chars)** | **90-95%** | **HIGH — critical risk** |
+| Coverage limits | 95-98% | Medium |
+| Premium amounts | 97-99% | Low |
+| **Driver license #** | **90-95%** | **HIGH** |
+
+**VIN mitigation strategy**: VIN check digit validation (position 9) catches ~90% of single-char errors → NHTSA decode API confirms validity → cross-reference with year/make/model → push low-confidence VINs to smart form for customer confirmation.
+
+### Carrier Format Variation
+
+Layouts vary wildly across carriers, but nearly all follow a consistent **logical structure**: header/policy block → vehicle or property schedule → coverage table → premium summary. This structural consistency is why LLM-based extraction works despite visual variation. No two carriers look the same, but the LLM understands the semantic structure.
+
+### Key Prompt Engineering Patterns
+
+1. **Schema-first prompting**: Provide exact JSON schema with field types and constraints upfront
+2. **Two-pass extraction**: Pass 1 reads all text, Pass 2 structures into schema (separates OCR from interpretation)
+3. **Carrier-aware hints**: Detecting carrier from logo/header and providing layout hints improves accuracy 5-10%
+4. **Confidence-annotated output**: Ask LLM to rate confidence per field → route low-confidence to human review
+
+### Accuracy Targets
+
+| Phase | Field-Level | Document-Level | Human Review Rate |
+|---|---|---|---|
+| V1 (MVP) | 90%+ | 80%+ | 30-40% flagged |
+| V2 (3 months) | 95%+ | 90%+ | 15-20% flagged |
+| V3 (6 months) | 97%+ | 95%+ | 5-10% flagged |
+
+*At V1, 80% document-level accuracy means 20% need some correction — still dramatically faster than 100% manual entry. Combined with the smart form for customer confirmation, effective accuracy approaches 99%.*
+
+### Implementation Timeline: 4-8 weeks
+
+| Weeks | Milestone |
+|---|---|
+| 1-2 | Design extraction schema (map to PL Rater fields), build upload pipeline (S3, preprocessing), prototype with 10-20 sample dec pages |
+| 3-4 | Build validation layer (VIN check digit, date, coverage range), confidence scoring, test on 50+ pages across 10+ carriers |
+| 5-6 | Human review UI (side-by-side doc + extracted data), PL Rater schema mapping |
+| 7-8 | Integration with smart form and portal, accuracy tuning, carrier-specific prompt hints for top 5 carriers |

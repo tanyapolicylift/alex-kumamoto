@@ -164,3 +164,45 @@ This is the agency-facing question: when a producer looks at a lead, how do they
 3. Best practices for insurance-industry email outreach to consumers — deliverability tips, subject line patterns, open rate benchmarks.
 4. How do other insurtech platforms (Bind, Hippo, Lemonade, Bold Penguin) handle post-lead email follow-up for data collection?
 5. What's the state of the art for LLM-based email reply parsing in structured data extraction? Any off-the-shelf tools or is this custom?
+
+---
+
+## 7. Research Findings Summary
+
+*See [[research_email]] for full details.*
+
+### Recommended Stack
+
+| Layer | Vendor | Why | Cost |
+|---|---|---|---|
+| **Transactional sending** | **Postmark** | Best deliverability reputation, dedicated IP included at Scale plan ($85/mo for 50K emails), inbound parse at $0 extra. 98%+ inbox placement. | $15-85/mo |
+| **Orchestration** | **Knock** | Usage-based pricing ($0.005/notification), multi-channel (email + SMS + in-app), programmable workflows via API, good for our scale. | $0-250/mo |
+| **Templates** | **React Email** | Dev-controlled, version-controlled, responsive. Open source. | Free |
+| **Reply parsing** | **Custom LLM pipeline** | No off-the-shelf tools exist for insurance-specific email reply parsing. Build with GPT-4o-mini or Claude Haiku — same pipeline shared with SMS. | ~$5-20/mo in LLM costs |
+| **Address validation** | **Postmark DKIM/SPF wizard** | Simplifies per-agency DNS setup. | Included |
+
+### Key Findings
+
+- **Postmark vs SendGrid**: Postmark has 50% better inbox placement in independent tests. SendGrid is cheaper at high volume but has reputation issues with shared IPs. Postmark is the clear winner for transactional email at our scale.
+- **Orchestration**: Knock is preferred over Customer.io for V1 — usage-based pricing means we pay nothing until volume grows, vs Customer.io's $100/mo minimum. Both support email + SMS + programmable workflows.
+- **Inbound parse**: Postmark's inbound parse is free and webhook-based. Perfect for receiving customer replies and routing to our LLM parsing pipeline.
+- **Insurance email benchmarks**: Insurance transactional emails see 40-60% open rates (vs 20-25% for marketing). Subject lines with agency name + specific ask perform best.
+- **Reply parsing is custom**: No vendor does this. We build a shared LLM service that takes free-text email/SMS replies + the lead's MissingDataProfile and extracts structured fields. Estimated 2-3 weeks to build.
+
+### Cost Estimate
+
+| Scale | Monthly Cost |
+|---|---|
+| Launch (1,000 emails/mo) | $20-45 |
+| Growth (10,000 emails/mo) | $85-300 |
+| Scale (50,000 emails/mo) | $250-750 |
+
+### Implementation Timeline: 6-10 weeks
+
+| Weeks | Milestone |
+|---|---|
+| 1-2 | Postmark setup, DNS configuration, React Email templates |
+| 3-4 | Knock integration, workflow definitions, dynamic content from MissingDataProfile |
+| 5-6 | Inbound parse setup, LLM reply parsing pipeline (shared with SMS) |
+| 7-8 | Per-agency from-address config, deliverability testing |
+| 9-10 | Integration testing, bilingual templates, analytics |
