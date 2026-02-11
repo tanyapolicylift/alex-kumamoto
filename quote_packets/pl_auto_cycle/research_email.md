@@ -1,478 +1,867 @@
-# Research: Email Platform Options for Post-Lead Follow-Up Automation
+# Research: Email Integration for Post-Lead Follow-Up Automation (BYOD vs Transactional)
 
 References: [[spec_email]], [[cycle_spec]], [[cycle_prd]]
 
 ---
 
 **Date**: 2026-02-10
-**Purpose**: Evaluate transactional email providers, multi-channel orchestration platforms, insurance email best practices, and LLM-based reply parsing to inform build-vs-buy decisions for our automated post-lead follow-up email system.
+**Author**: Alex
+**Purpose**: Evaluate the "Bring Your Own Domain" (BYOD) approach -- sending/receiving emails through the producer's actual inbox via email API abstraction layers (Nylas, Microsoft Graph, Gmail API) -- versus traditional transactional email providers (Postmark, SendGrid). Determine the best architecture for automated post-lead follow-up emails in our insurance agency platform.
 
-**Use Case Summary**: After a customer calls an insurance agency for a personal auto or home quote but doesn't provide all needed data, we automatically send emails asking them to complete a smart form or upload their current policy declaration page. We also need to parse customer email replies to extract structured data fields (VIN, DOB, vehicle info, etc.).
-
----
-
-## 1. Transactional Email Providers Comparison
-
-### Pricing Comparison (5K-50K emails/month range)
-
-| Provider | Free Tier | ~10K emails/mo | ~50K emails/mo | Cost at 50K/mo |
-|---|---|---|---|---|
-| **Amazon SES** | 3,000 msgs/mo (first 12 mo) | $1.00 | $5.00 | **$5/mo** |
-| **Postmark** | 100 emails/mo (testing) | $15/mo | $50/mo | **$50/mo** |
-| **Resend** | 3,000 emails/mo | $20/mo (includes 50K) | $20/mo | **$20/mo** |
-| **SendGrid** | 100 emails/day | $19.95/mo (Essentials) | ~$19.95-89.95/mo | **$20-90/mo** |
-| **Mailgun** | 100 emails/day (trial) | $15/mo (Basic) | $35/mo (Foundation) | **$35/mo** |
-
-**Key pricing notes**:
-- Amazon SES is by far the cheapest at $0.10 per 1,000 emails, but provides minimal tooling (no logs dashboard, no template editor, no reputation monitoring out of the box).
-- Resend offers the best value at our scale: $20/mo covers up to 50K emails with a generous free tier of 3K/mo for development.
-- Postmark's pricing recently improved: Pro features (including inbound processing) are now available at the 10K/mo level for $16.50/mo, down from $60.50/mo.
-
-### Deliverability Reputation and Tools
-
-| Provider | Deliverability Reputation | Built-in Monitoring | Dedicated IP Available |
-|---|---|---|---|
-| **Postmark** | Industry-best. 14+ years focused exclusively on transactional email. Sub-second delivery times, near-zero spam rates. | Yes - reputation dashboard built in | Yes (higher tiers) |
-| **Resend** | Good but newer (founded 2023). Growing track record. | Basic analytics | Not yet |
-| **SendGrid** | Strong historically, but reputation has declined since Twilio acquisition. Mixed reviews on deliverability for smaller senders sharing IP pools. | Yes - reputation dashboard, Google Postmaster integration | Yes ($60+/mo) |
-| **Amazon SES** | Good if properly configured. Requires manual reputation management. | SES Dashboard + CloudWatch, but limited | Yes (extra cost) |
-| **Mailgun** | Solid. Good for transactional use cases. | Optimize add-on ($35+/mo extra) for inbox placement testing | Yes (Scale plan, $90/mo) |
-
-**Winner for deliverability**: Postmark, decisively. For an insurance use case where emails mention "insurance," "quote," and "policy" (all words that can trigger spam filters), Postmark's reputation and strict separation of transactional vs. marketing streams is a significant advantage.
-
-### Inbound Email Parse Capabilities
-
-This is critical for our use case - we need to receive and parse customer replies via webhook.
-
-| Provider | Inbound Parse | How It Works | Attachment Support | Pricing for Inbound |
-|---|---|---|---|---|
-| **SendGrid** | Yes - Inbound Parse Webhook | POST parsed email fields (headers, text, html, from, to, attachments) as multipart/form-data to your URL. 30MB max message size. Retries until 2xx response. | Yes | Included in plan |
-| **Postmark** | Yes - Inbound Processing | POST parsed email as JSON to your webhook URL. Auto-generated or custom inbound addresses. Spam scoring included. 10 retries with growing intervals. | Yes | Included (requires Pro tier, $16.50+/mo at 10K) |
-| **Mailgun** | Yes - Inbound Routes | Full parsing to UTF-8 JSON. Multiple route rules for complex routing logic. | Yes | Included in Foundation+ plans |
-| **Resend** | Yes (added 2025) | Parses incoming emails to JSON, stores attachments, sends payload to webhook. Attachments API returns metadata + download URLs. | Yes | Included in plan |
-| **Amazon SES** | Yes - SES Receiving / Mail Manager | Routes inbound email to S3, SNS, Lambda, or WorkMail. Mail Manager (newer) offers more advanced routing. | Yes | $0.10/1,000 emails received + Mail Manager fees |
-
-**Key finding**: All five providers now support inbound email parsing. SendGrid and Postmark have the most mature, battle-tested inbound parse implementations. Resend added inbound in 2025 and it was their most-requested feature.
-
-### Template Support
-
-| Provider | Template Engine | Dynamic Content | Developer Experience |
-|---|---|---|---|
-| **Postmark** | Mustache templates (built-in editor) | Yes - variables, conditionals | Mature but dated. Mustache feels old vs. modern alternatives. |
-| **Resend** | React Email integration | Yes - full React component model | Best-in-class DX. Write email templates as React components. First-class Next.js SDK. |
-| **SendGrid** | Handlebars templates + visual editor | Yes - variables, conditionals, iterations | Good visual editor for non-developers. API-driven template management. |
-| **Mailgun** | Built-in template storage + Handlebars | Yes - variables | Adequate. Less polished than SendGrid's editor. |
-| **Amazon SES** | Basic templating (Handlebars-like) | Yes - limited | Minimal. Most teams render HTML server-side and send raw HTML through SES. |
-
-**Recommendation for our use case**: Since we need dynamic content generation from our MissingDataProfile (which fields are missing, bilingual rendering, conditional sections), we should render HTML server-side regardless of provider. React Email (works with any provider, not just Resend) or MJML are the best options for building our templates.
-
-### Webhook Reliability for Tracking
-
-All five providers support webhooks for delivery, opens, clicks, bounces, and spam complaints. Key differences:
-
-| Provider | Webhook Events | Retry Policy | Reliability Notes |
-|---|---|---|---|
-| **Postmark** | Delivery, Bounce, Open, Click, Spam Complaint, Subscription Change | 10 retries with growing intervals | Very reliable. Dedicated transactional focus means less noise. |
-| **SendGrid** | Delivered, Bounce, Open, Click, Spam Report, Unsubscribe, Group Unsubscribe | Retries for several hours | Generally reliable. Some users report occasional delays in high-volume scenarios. |
-| **Resend** | Sent, Delivered, Opened, Clicked, Bounced, Complained | Webhook retries | Newer system. Less track record but improving. |
-| **Mailgun** | Delivered, Opened, Clicked, Bounced, Complained, Unsubscribed, Stored | Retries with backoff | Solid. Good event API for querying historical events. |
-| **Amazon SES** | Send, Delivery, Bounce, Complaint, Open, Click (via SNS or EventBridge) | SNS retry policy | Requires more setup (SNS topics, Lambda handlers). Robust once configured. |
-
-### Summary Scorecard
-
-| Criteria | Postmark | Resend | SendGrid | Mailgun | Amazon SES |
-|---|---|---|---|---|---|
-| **Pricing (our scale)** | B+ | A | B+ | B | A+ |
-| **Deliverability** | A+ | B+ | B | B+ | B (if configured well) |
-| **Inbound Parse** | A | B+ (newer) | A | A | B (more complex setup) |
-| **Developer Experience** | B+ | A+ | B | B | C+ |
-| **Template Support** | B | A+ | B+ | B | C |
-| **Webhook Reliability** | A | B+ | A- | A- | B+ |
-| **Maturity / Track Record** | A+ | C+ (founded 2023) | A | A | A+ |
-
-**Top recommendation for our transactional email provider**: **Postmark** for deliverability-critical insurance emails, or **Resend** if developer experience and modern tooling are the priority. Given that we're in insurance (where deliverability is paramount and "insurance"/"quote"/"policy" keywords can trigger spam filters), Postmark is the safer choice for V1.
-
-**Runner-up**: SendGrid remains a solid default if we want the largest ecosystem of integrations and tutorials.
-
-**Budget option**: Amazon SES if we want to minimize cost and are willing to build more infrastructure ourselves.
+**Use Case Summary**: After a customer calls an insurance agency for a personal auto or home quote but doesn't provide all needed data, we automatically send emails asking them to complete a smart form or upload their current policy declaration page. The key question: should these emails come from our infrastructure (e.g., `quotes@abcinsurance.com` via Postmark) or from the producer's actual inbox (e.g., `john@abcinsurance.com` via Nylas/Graph API)?
 
 ---
 
-## 2. Multi-Channel Orchestration Platforms
+## 1. Email API Abstraction Layers (BYOD Approach)
 
-### Overview
+### 1.1 Nylas (Primary Candidate)
 
-These platforms sit above the transactional email provider and handle the logic of when, what, and how to send across channels (email, SMS, push, in-app).
+[Nylas](https://www.nylas.com/) provides a unified REST API for integrating with email, calendar, and contacts across Google Workspace, Microsoft 365, and IMAP providers.
 
-### Detailed Comparison
+#### Current Product Offerings (v3 API)
 
-#### Customer.io
+Nylas v3 is the current generation API, which introduced significant improvements over v2:
 
-- **What it is**: Messaging automation platform for product-led companies. Handles email, SMS, push, in-app, webhooks.
-- **Pricing**: Essentials plan starts at **$100/month** for up to 5,000 profiles and 1M emails/month. Overage: $0.009/extra profile, $0.12/1,000 extra emails. Premium plan is ~$1,000/month. Startup program available (up to 12 months free through YC, Techstars, Seedcamp partnerships for companies with <$10M funding).
-- **Workflow logic**: Visual workflow builder with if/then branching, delays, wait conditions, channel fallback, A/B testing.
-- **SMS**: Requires setting up your own Twilio account. Customer.io orchestrates the sends but you pay Twilio separately for SMS delivery.
-- **Developer experience**: Strong API-first design. Event-driven triggers. Good documentation. Segment/CDP integrations.
-- **Template management**: Built-in drag-and-drop editor + code editor. Liquid templating for dynamic content.
-- **Custom events**: Yes - fully event-driven. Send any custom event from your backend to trigger workflows.
-- **Fit for us**: Good fit if we want a full-featured orchestration layer. The $100/month floor is reasonable. The Twilio SMS integration means we'd manage two billing relationships for multi-channel.
+- **Unified Email API**: Send, receive, read, search, and organize emails across all major providers through a single API.
+- **Threads API**: Retooled for v3, gives fine-grained control over detecting collections of messages and managing conversations.
+- **Webhooks**: Improved in v3 -- webhook payloads now contain the full object that triggered the notification (up to 1 MB), eliminating the need for follow-up API calls. Notification types include `message.created`, `message.updated`, `message.opened`, `message.link_clicked`, `thread.replied`.
+- **Scheduled Send**: Native "Send Later" -- post a message with a timestamp and Nylas handles delivery at the exact time.
+- **Bounce Detection**: Real-time notifications when emails bounce.
+- **Message Tracking**: Open tracking (via transparent pixel), link click tracking, and thread reply tracking. Available in production apps only.
+- **Attachment Handling**: Full support for sending and receiving attachments. Download via `GET /v3/grants/{grant_id}/attachments/{id}/download`.
+- **Smart Compose**: AI-powered email drafting (less relevant for our automated use case).
 
-#### Knock
+#### Pricing Tiers
 
-- **What it is**: Developer-first notification infrastructure. Cross-channel (email, SMS, push, in-app, Slack, Teams).
-- **Pricing**: Usage-based. **$0.005 per message** on the Pro plan. Free tier available for development. No per-profile charge. You only pay for messages actually sent.
-- **Workflow logic**: Workflow engine with branching, batching, digest, delay, and channel routing. Preference management built in.
-- **SMS**: Native SMS support (partners with Twilio/Telnyx under the hood, or bring your own).
-- **Developer experience**: Excellent. CLI tool, version control for workflows, environments (dev/staging/prod), works from Cursor or Claude Code. Management API for programmatic control.
-- **Template management**: Centralized template management with autocomplete and partials. Manages templates in one location.
-- **Custom events**: Yes - API-driven. Trigger workflows from any backend event.
-- **Fit for us**: Strong fit. Developer-first, usage-based pricing is ideal for startup scale. At 5K emails + 5K SMS per month, cost would be ~$50/month. Very cost-effective. The preference management and batching features are useful for managing per-lead follow-up cadences.
+As of early 2026, Nylas offers four tiers under its Full Platform plan:
 
-#### Courier
-
-- **What it is**: Notification orchestration platform with visual workflow builder. Supports email, SMS, push, in-app, Slack, Teams.
-- **Pricing**: Free tier of **10,000 notifications/month** across all channels. Pro plan at **$0.005 per notification**. Enterprise is custom.
-- **Workflow logic**: Visual "Journeys" builder for no-code routing, fallback logic, batching, and digest. Cross-channel orchestration.
-- **SMS**: Native SMS support via integrations with Twilio, Vonage, etc.
-- **Developer experience**: Good API, SDKs for multiple languages, pre-built UI components for React/iOS/Android/Flutter.
-- **Template management**: Visual designer + code editor. Brand management for multi-tenant (useful for our multi-agency setup).
-- **Custom events**: Yes - event-driven triggers via API.
-- **Fit for us**: Good fit, especially the multi-tenant brand management (one template, different agency branding). Free tier covers our initial volume. Very similar to Knock in positioning.
-
-#### Braze
-
-- **What it is**: Enterprise customer engagement platform. Full marketing automation + transactional messaging.
-- **Pricing**: **Six-figure annual contracts** ($100K+ minimum). Not startup-friendly.
-- **Workflow logic**: Canvas Flow - sophisticated cross-channel journey orchestration with real-time branching.
-- **SMS**: Native SMS support, advanced.
-- **Developer experience**: Steep learning curve. Powerful but complex.
-- **Template management**: Full-featured content management. Personalization with Liquid.
-- **Custom events**: Yes - rich event model, user profiles, real-time segmentation.
-- **Fit for us**: **Not a fit for V1.** Way too expensive and complex for our current scale. Revisit if/when we're processing millions of leads/month.
-
-#### OneSignal
-
-- **What it is**: Developer-first engagement platform. Push notifications, email, SMS, in-app messaging.
-- **Pricing**: Generous free tier (unlimited mobile push, 10K web push and emails). Growth plan starts at **$9-19/month** + usage ($0.012/MAU).
-- **Workflow logic**: Customer Journeys (automations) available in paid tiers. Basic if/then logic.
-- **SMS**: Yes, supported in Growth+ plans.
-- **Developer experience**: Good SDKs and API. Strong documentation for push notifications.
-- **Template management**: Basic email editor. Less sophisticated than Customer.io or Knock.
-- **Custom events**: Yes - custom tags and data attributes for targeting.
-- **Fit for us**: Better suited for consumer apps where push notifications are primary. Our use case is email + SMS to insurance customers (not app users). OneSignal's strength in push doesn't align with our needs.
-
-### Orchestration Platform Comparison Table
-
-| Criteria | Customer.io | Knock | Courier | Braze | OneSignal |
-|---|---|---|---|---|---|
-| **Monthly cost at our scale** | $100/mo minimum | ~$50/mo (usage) | Free-$50/mo | $100K+/yr | $9-19/mo |
-| **Email + SMS** | Yes (SMS via Twilio) | Yes (native) | Yes (native) | Yes (native) | Yes |
-| **Workflow logic** | Excellent | Excellent | Good | Best-in-class | Basic |
-| **API-first** | Yes | Yes (best) | Yes | Partial | Yes |
-| **Multi-tenant support** | Limited | Good (environments) | Good (brands) | Good | Limited |
-| **Developer experience** | A | A+ | A | B (complex) | B+ |
-| **Startup-friendly pricing** | B+ (startup program) | A+ | A+ (free tier) | F | A |
-| **Custom event triggers** | A | A | A | A | B+ |
-
-### Orchestration Recommendation
-
-**Primary recommendation: Knock** - Best balance of developer experience, usage-based pricing, and workflow capabilities. At our scale, costs stay well under $100/month. The CLI and version-controlled workflows align with engineering best practices. Preference management is useful for letting customers control notification frequency.
-
-**Alternative: Courier** - Very similar to Knock with the added benefit of multi-tenant brand management, which is valuable for our multi-agency white-label requirement. The free tier of 10K notifications/month covers our initial launch.
-
-**If we want a more marketing-oriented tool: Customer.io** - Better if we anticipate needing sophisticated segmentation, A/B testing, and lifecycle marketing beyond transactional follow-ups. The $100/month minimum is manageable.
-
-**Skip: Braze** (too expensive), **OneSignal** (push-centric, not our use case).
-
----
-
-## 3. Insurance Industry Email Best Practices
-
-### Open Rate Benchmarks
-
-| Email Type | Average Open Rate | Source |
+| Tier | Cost per Connected Account (CA) / Month | Notes |
 |---|---|---|
-| **Transactional emails (cross-industry)** | 80-85% | Mailgun |
-| **Insurance marketing emails** | 21-27% (varies by source) | Mailchimp / HubSpot benchmarks |
-| **All-industry marketing average (2025)** | 43.46% | MailerLite 2025 benchmarks |
-| **Insurance click-to-open rate** | 3.19% (one of the lowest across industries) | Netcore |
+| **Entry** | ~$3.29/CA/month | Basic email, calendar, contacts |
+| **Core** | ~$4.59/CA/month | Adds message tracking, scheduled send |
+| **Plus** | ~$5.29/CA/month | Premium features, higher rate limits |
+| **Custom** | Contact sales | Enterprise pricing, volume discounts |
 
-**Key insight**: Transactional emails (triggered by a specific customer action, like requesting a quote) have **3-4x higher open rates** than marketing emails. Our post-call follow-up emails are transactional in nature (the customer initiated the quote request), so we should expect open rates in the **60-80% range** if properly executed. The challenge is click-through: insurance has one of the lowest click-to-open rates at 3.19%, meaning we need very clear, compelling CTAs.
+A "connected account" (CA) is each end-user email account connected through Nylas. If we connect 50 producer inboxes, that's 50 CAs.
 
-### Subject Line Patterns That Work for Data Collection Follow-Ups
+**Cost projections for our use case**:
 
-Based on insurance email marketing research and general email best practices:
-
-**Effective patterns**:
-
-| Pattern | Example | Why It Works |
+| Scale | Connected Accounts | Monthly Nylas Cost (Core tier) |
 |---|---|---|
-| **Question format** | "Quick question about your auto quote" | Questions can increase opens by up to 50% |
-| **Personalization + specificity** | "Alex, we're almost done with your quote" | Personalized emails have 82% higher open rate |
-| **Brevity (1-4 words)** | "Your quote update" | 1-word subject lines boost reply rate by 87% (Salesloft) |
-| **Urgency without spam words** | "One step left for your quote" | Creates action without triggering spam filters |
-| **Reference to the call** | "Following up on your call with [Agent]" | Ties to a real interaction, builds trust |
+| Launch (5 agencies, 2 producers each) | 10 | ~$46/month |
+| Growth (20 agencies, 3 producers each) | 60 | ~$275/month |
+| Scale (50 agencies, 4 producers each) | 200 | ~$918/month |
+| Large scale (200 agencies) | 600+ | ~$2,754/month (likely negotiable) |
 
-**Patterns to AVOID**:
+**Key pricing note**: At scale, Nylas becomes a significant line item. EmailEngine ($995/year flat, unlimited accounts) becomes more cost-effective at ~30+ connected accounts.
 
-| Avoid | Why |
+Sources: [Nylas Pricing](https://www.nylas.com/pricing/), [Nylas Pricing Guide (Zeeg)](https://zeeg.me/en/blog/post/nylas-api-pricing)
+
+#### Send and Receive Capabilities
+
+**Sending**: When you call `POST /v3/grants/{grant_id}/messages/send`, Nylas connects directly to the provider (Gmail, Outlook) and sends the message *as the user*. The provider sees the activity as the user sending a message, not from an external service. **The email appears in the user's Sent folder automatically.** This is the core differentiator vs. transactional ESPs.
+
+**Receiving**: Nylas syncs incoming messages and fires `message.created` webhooks in real time. We receive the full message payload including body, headers, attachments, and thread context.
+
+**Thread tracking**: The Threads API lets us follow the full conversation thread. If our system sends an automated message and the customer replies, the reply is part of the same thread. If the producer then jumps in manually, that message is also in the thread. We can read the entire conversation history.
+
+Sources: [Sending Messages with Nylas](https://developer.nylas.com/docs/v3/email/send-email/), [Nylas Messages API](https://developer.nylas.com/docs/v3/email/)
+
+#### OAuth Integration
+
+Nylas uses OAuth 2.0 for authenticating user accounts:
+
+**Google Workspace**:
+- Scopes needed: `https://www.googleapis.com/auth/gmail.modify` (read/write/send), `https://www.googleapis.com/auth/gmail.send` (send only). Nylas also supports the more limited `gmail.metadata` scope for read-only scenarios.
+- The producer clicks through a Google consent screen during onboarding.
+- Google Workspace admins can pre-approve the Nylas app for their domain, eliminating per-user consent.
+
+**Microsoft 365**:
+- Requires Entra ID (Azure AD) app registration.
+- Scopes: `Mail.ReadWrite`, `Mail.Send`, `offline_access`.
+- Admin consent can be granted org-wide by a Microsoft 365 admin, or individual users can consent if the org's policy allows it.
+- Microsoft issues new refresh tokens with each access token request. Nylas leverages this to extend token lifespans.
+
+**Token management**:
+- Access tokens expire after 1 hour.
+- Refresh tokens don't expire unless revoked.
+- Nylas's "Hosted OAuth with API Key" method handles token refresh automatically after initial setup. Your app stores the grant ID, access token, and refresh token. Nylas manages the refresh cycle.
+- If a token becomes invalid (user revokes, admin changes policy), Nylas fires a `grant.expired` webhook so you can prompt re-authentication.
+
+Sources: [Nylas Authentication](https://developer.nylas.com/docs/v3/auth/), [Google Provider Guide](https://developer.nylas.com/docs/dev-guide/provider-guides/google/), [Token Lifetimes](https://support.nylas.com/hc/en-us/articles/16115127208221)
+
+#### Webhook Support for Inbound Emails
+
+Nylas v3 webhooks deliver JSON payloads containing the full message object. Key triggers:
+
+| Trigger | Description |
 |---|---|
-| "FREE quote" or "SAVE money on insurance" | Spam trigger words. "Free," "save," "guarantee," "cash," "discount" are heavily scrutinized. |
-| ALL CAPS in subject line | Triggers spam filters |
-| Excessive punctuation ("Act now!!!") | Spam filter trigger. Max 3 punctuation marks per subject line. |
-| Misleading "RE:" or "FW:" prefixes | Violates trust and can violate CAN-SPAM |
-| Long subject lines (>60 characters) | Gets truncated on mobile; lower open rates |
+| `message.created` | New message received (inbound reply) |
+| `message.updated` | Message flags changed (read/unread) |
+| `message.opened` | Recipient opened a tracked message |
+| `message.link_clicked` | Recipient clicked a tracked link |
+| `thread.replied` | New reply in a tracked thread |
+| `message.bounce_detected` | Email bounced |
+| `grant.expired` | OAuth token needs re-authentication |
 
-**Recommended subject lines for our use case**:
+If a payload exceeds 1 MB, Nylas truncates the body and appends `.truncated` to the trigger name.
 
-1. Initial follow-up: `"Almost done with your [auto/home] quote"` or `"[Agent Name] - your quote is almost ready"`
-2. Reminder 1: `"Quick update needed for your quote"` or `"One thing left for your [auto/home] quote"`
-3. Reminder 2: `"Still working on your quote?"` or `"[First Name], can we finish your quote?"`
+Source: [Nylas Webhooks](https://developer.nylas.com/docs/v3/notifications/webhooks/)
 
-### Deliverability Tips Specific to Insurance
+#### Rate Limits
 
-1. **Domain authentication is non-negotiable**: Set up SPF, DKIM, and DMARC for every sending domain. For white-labeled agency domains, this must be part of the onboarding flow.
+Nylas itself does not impose strict sending rate limits, but the underlying providers do:
 
-2. **Avoid insurance spam trigger words in subject lines**: Words like "insurance," "policy," "premium," "coverage," and "claim" are not inherently blocked but are scrutinized more heavily by spam filters when combined with promotional language. Use them sparingly and naturally.
+| Provider | Daily Sending Limit | Per-Message Recipient Limit | Notes |
+|---|---|---|---|
+| **Google Workspace** | 2,000 emails/day per user | 100 recipients via API per message | 3,000 total recipients/day; 2,000 external recipients/day. Exceeding triggers 24-hour lockout. |
+| **Microsoft 365** | 10,000 messages/day (E3/E5) | 500 recipients per message | More generous than Google. Lower tiers may have lower limits. |
+| **Gmail (free)** | 500 emails/day | 100 recipients per message | Not relevant for business use. |
 
-3. **Separate transactional from marketing streams**: Use a dedicated subdomain or email stream for transactional emails (e.g., `quotes@agency.com`) separate from any marketing emails. Postmark enforces this separation by design.
+**For our use case**: A single producer sending 20-50 follow-up emails per day is well within limits. At 2,000/day per Google Workspace user, we'd need to send ~80 follow-ups per hour for 24 hours to hit the cap. This is not a concern at our current scale.
 
-4. **Warm up new domains gradually**: When onboarding a new agency with a white-labeled from-address, don't send hundreds of emails on day one. Ramp up over 2-4 weeks: start with 50/day, increase to 100, then 200, etc.
+Sources: [Gmail Sending Limits](https://support.google.com/a/answer/166852), [Gmail API Quota](https://developers.google.com/workspace/gmail/api/reference/quota)
 
-5. **Include physical address and clear sender identification**: Even for transactional emails, include the agency's physical address and clear identification. This builds trust and satisfies CAN-SPAM requirements.
+#### Reliability / Uptime
 
-6. **Mobile-first HTML design**: 60%+ of insurance-related emails are opened on mobile. Keep emails short, use large CTA buttons, and ensure the smart form link is prominent and tappable.
+- Nylas publishes status pages for [v2](https://status-v2.nylas.com/) and [v3](https://status-v3.nylas.com/).
+- StatusGator has tracked 449+ incidents over ~4 years. The last acknowledged outage as of this writing was December 30, 2025 ("Small number of API Calls returning 400 JSON input errors for Microsoft").
+- Nylas does not publish a formal SLA percentage on their public website, but enterprise contracts typically include SLA terms.
+- Overall: reliable for a managed service, but you should build retry logic and graceful degradation (e.g., queue emails if Nylas is temporarily unreachable).
 
-7. **Send frequency**: 2-3 emails maximum per quote follow-up. A 92% retention rate is observed with 2-3 emails per month. More than that risks unsubscribes and spam complaints.
+Sources: [Nylas v3 Status](https://status-v3.nylas.com/), [StatusGator Nylas](https://statusgator.com/services/nylas)
 
-8. **Timing**: Send the initial follow-up within 1 hour of the call (while the interaction is fresh). Reminders at 72 hours and 5-7 days.
+#### Compliance and Security
 
-### Insurtech Case Studies and Patterns
+- **SOC 2 Type II** certified (security, availability, confidentiality). Report available under NDA.
+- **GDPR** compliant. CCPA, Privacy Shield, HIPAA/HITECH, FINRA support.
+- **Data residency**: Two regions (US and Europe), completely isolated. You choose on the Nylas Dashboard.
+- **Encryption**: AES-256 at rest, TLSv1.2+ in transit.
+- **Data storage**: Nylas does sync and store email metadata and content to provide its API. The extent depends on configuration (e.g., the `gmail.metadata` scope stores less). This is an important consideration for insurance data.
 
-While specific email follow-up sequences from insurtechs are not publicly documented in detail, here's what we know about their approaches:
+Sources: [Nylas Security](https://www.nylas.com/security/), [Nylas Data Residency](https://developer.nylas.com/docs/dev-guide/platform/data-residency/)
 
-| Company | Approach | Relevance to Us |
-|---|---|---|
-| **Hippo Insurance** | End-to-end process automation. Customers can get a quote in under 60 seconds. Minimal follow-up needed because their pre-fill (from public data sources) is so comprehensive. | Aspiration: reduce the need for follow-up by pre-filling more data upfront. But for personal auto with multiple vehicles/drivers, some follow-up will always be needed. |
-| **Lemonade** | Fully digital, AI-driven (chatbot "Maya"). Eliminates middlemen. Quote process is self-serve with in-app follow-up, not email. | Different model (direct-to-consumer, no agent). Less relevant to our agency-based model. |
-| **Bold Penguin** | Quoting software for agents/brokers. Storefront Pro for online quote submission. Focused on commercial, not personal lines. | Similar audience (agents), but commercial-focused. Their approach of enabling a digital storefront for lead capture is comparable to our smart form concept. |
-| **Bind Insurance** | On-demand insurance model. Digital-first with app-based interactions. | Novel model but not comparable to our agency follow-up use case. |
+#### Insurance Industry Relevance
 
-**Key takeaway**: Most successful insurtechs minimize the need for email follow-up by aggressively pre-filling data (from DMV records, property data, credit reports). Our strategy of pre-filling from the voice call + data enrichment, then using email for the remaining gaps, aligns with this trend. The email follow-up is a "last mile" solution, not the primary data collection mechanism.
+Nylas specifically markets to fintech and insurance. Their blog discusses insurance use cases including:
+- Automating bi-directional engagement across email providers
+- Email parsing for real-time policy personalization
+- Central communication hub for claims communication
+- Nowsite case study mentions insurance brokers as key users
+
+No publicly available dedicated insurance case study, but the platform is clearly used in the vertical.
+
+Sources: [Nylas Insurance Solutions](https://www.nylas.com/blog/fintech-insurance-digital-innovation/), [Nylas Case Studies](https://www.nylas.com/case-studies/)
 
 ---
 
-## 4. LLM-Based Email Reply Parsing
+### 1.2 Alternatives to Nylas
 
-### State of the Art
+#### Microsoft Graph API (Direct)
 
-LLM-based structured data extraction from free-text is mature and production-ready as of 2025-2026. The key approaches:
+Bypass Nylas and integrate directly with Microsoft 365 via [Microsoft Graph](https://learn.microsoft.com/en-us/graph/api/resources/mail-api-overview).
 
-#### Approach 1: OpenAI Structured Outputs (Recommended)
+**Capabilities**:
+- Send email as user: `POST /users/{id}/sendMail` -- email appears in user's Sent folder.
+- Read email: `GET /users/{id}/messages` -- full access to inbox, attachments, threads.
+- Webhooks: Subscribe to `messages` resource changes for real-time notifications.
+- Attachment handling: Full CRUD for attachments.
 
-OpenAI's Structured Outputs feature constrains model output to exactly match a developer-supplied JSON schema. On complex JSON schema benchmarks, GPT-4o with Structured Outputs scores **100% accuracy**.
+**Authentication**:
+- Requires registering an app in Microsoft Entra ID (Azure AD).
+- **Delegated permissions**: User signs in via OAuth, app acts on their behalf. Requires `Mail.ReadWrite`, `Mail.Send`.
+- **Application permissions**: App acts without user sign-in. Requires `Mail.Send` application permission + admin consent. More powerful but raises security concerns (app can send as *any* user in the org).
+- Admin consent can be granted tenant-wide by a Global Admin or Privileged Role Administrator.
 
-**How it works for our use case**:
+**Pros**: Free (no per-account cost), full control, first-party API, high reliability.
 
-```
-Input: "Hi, my VIN is 1HGBH41JXMN109186 and my wife's birthday is March 15, 1985.
-        We have a 2022 Toyota Camry."
+**Cons**: Only works for Microsoft 365 users. You'd need a separate integration for Google Workspace agencies. Higher implementation complexity -- you handle token management, rate limiting, retry logic, webhook subscriptions yourself. Microsoft's documentation is vast but can be hard to navigate.
 
-Schema: {
-  "vin": string | null,
-  "date_of_birth": string (ISO date) | null,
-  "vehicle_year": int | null,
-  "vehicle_make": string | null,
-  "vehicle_model": string | null,
-  "spouse_date_of_birth": string (ISO date) | null
-}
+**Integration effort**: 2-4 weeks for a production-ready implementation with proper error handling, token refresh, and webhook management.
 
-Output: {
-  "vin": "1HGBH41JXMN109186",
-  "date_of_birth": null,
-  "vehicle_year": 2022,
-  "vehicle_make": "Toyota",
-  "vehicle_model": "Camry",
-  "spouse_date_of_birth": "1985-03-15"
-}
-```
+Sources: [Graph Mail API](https://learn.microsoft.com/en-us/graph/api/resources/mail-api-overview), [Send Mail on Behalf of User](https://learn.microsoft.com/en-us/graph/outlook-send-mail-from-other-user), [Graph Permissions](https://learn.microsoft.com/en-us/graph/permissions-reference)
 
-**Advantages**: Near-perfect schema adherence. No post-processing needed. Works with any LLM provider that supports structured output (OpenAI, Anthropic, etc.).
+#### Google Gmail API (Direct)
 
-#### Approach 2: Pydantic + LangChain/LlamaIndex
+Bypass Nylas and integrate directly with Google Workspace via the [Gmail API](https://developers.google.com/gmail/api).
 
-Use Pydantic models to define the expected output schema, then use LangChain or LlamaIndex to orchestrate the extraction. This provides type safety, validation, and a framework for handling edge cases.
+**Capabilities**:
+- Send email as user: `users.messages.send` -- email appears in user's Sent folder.
+- Read email: `users.messages.get`, `users.messages.list`.
+- Incoming email notifications: Via Google Cloud Pub/Sub push notifications. Gmail pushes change notifications to a Pub/Sub topic; your app subscribes.
+- Thread tracking: Gmail natively uses thread IDs.
+- Attachment handling: Download attachments via `users.messages.attachments.get`.
 
-**Advantages**: More control over validation logic. Can add custom validators (e.g., VIN checksum validation, date range checks). Good for production systems with complex schemas.
+**Authentication**:
+- OAuth 2.0 via Google Cloud Console app registration.
+- Scopes: `gmail.send`, `gmail.modify`, `gmail.readonly`.
+- Google Workspace admins can pre-approve apps via the Admin Console.
 
-#### Approach 3: Claude / Anthropic Tool Use
+**Pros**: Free (no per-account cost), native Gmail thread model, good documentation.
 
-Anthropic's Claude supports tool use (function calling) which can be used for structured extraction. Define tools that match your field schema, and Claude will "call" them with extracted values.
+**Cons**: Only works for Google Workspace users. Pub/Sub setup adds complexity. You handle token management yourself. Rate limits are quota-unit based (250 units/user/second, `messages.send` = 100 units). The 2,000 emails/day sending limit applies.
 
-**Advantages**: High accuracy. Good at understanding context and ambiguity. Can handle multi-language input (useful for Spanish-speaking customers).
+**Integration effort**: 2-3 weeks for a production-ready implementation. Slightly simpler than Graph API due to more straightforward auth flow.
 
-### Off-the-Shelf Tools vs Custom
+Sources: [Gmail API](https://developers.google.com/workspace/gmail/api/reference/quota), [Gmail Sending Limits](https://support.google.com/a/answer/166852)
 
-| Tool | Type | Pricing | Best For |
-|---|---|---|---|
-| **Airparser** | SaaS email parser | $29-249/month (100-12,000 documents) | Non-technical teams. Zapier/Make integrations. Pre-built email parsing with LLM. 99% accuracy claimed. |
-| **Parsio** | SaaS email parser | Similar to Airparser | Email and document parsing. Template-based + AI extraction. |
-| **LlamaIndex** | Open-source framework | Free (+ LLM API costs) | Developers building custom extraction pipelines. |
-| **LangChain** | Open-source framework | Free (+ LLM API costs) | Developers building complex LLM applications with chains and agents. |
-| **Google LangExtract** | Open-source library | Free (+ LLM API costs) | Structured extraction with source grounding and visualization. |
+#### Postmark / SendGrid with Custom SMTP (Transactional ESP)
 
-**Assessment for our use case**: Off-the-shelf email parsers like Airparser are designed for generic use cases (parsing invoices, receipts, form submissions). Our use case is more specific: extracting insurance-domain fields (VIN, DOB, driver info, vehicle details) from free-text email replies, matched against a per-lead MissingDataProfile.
+Traditional transactional email providers can send "on behalf of" a custom domain by configuring DKIM and SPF DNS records.
 
-**Recommendation: Build custom, using structured output APIs.** The extraction logic is straightforward (a single LLM call with a schema), but the domain context (knowing which fields are missing for this specific lead, validating VINs, understanding insurance-specific terms) requires custom code. The LLM call itself is a few lines of code; the value is in the pipeline around it (routing, validation, error handling, confidence scoring).
+**How it works**: The agency adds DNS records (CNAME for DKIM, TXT for SPF) pointing to the ESP. Emails are sent from the ESP's infrastructure but authenticated against the agency's domain. The "From" address can be `john@abcinsurance.com`.
 
-### Best Practices for Prompt Engineering
+**Key difference from BYOD**: The email does *not* appear in the producer's Sent folder. The producer has no visibility into what was sent unless they check our dashboard. The email was technically sent by Postmark/SendGrid's servers, not from the producer's mailbox.
 
-For extracting fields like VIN, DOB, and vehicle info from customer email replies:
+**Deliverability**: Good, but requires domain warm-up for new sending domains. The agency's existing domain reputation doesn't directly transfer because the email is sent from a different IP/infrastructure.
 
-1. **Provide the specific missing fields in the prompt**: Don't ask the LLM to extract "everything." Tell it exactly which fields are missing for this lead and ask it to look for those specifically. This dramatically improves accuracy.
+**Pros**: Full control over sending infrastructure, built-in analytics, higher volume limits, no OAuth complexity, easier to manage at scale.
 
-2. **Include field format specifications**: "VIN is a 17-character alphanumeric string. Date of birth should be in YYYY-MM-DD format. Vehicle year is a 4-digit number between 1980 and 2027."
+**Cons**: No Sent folder visibility, feels less personal, requires DNS setup per agency, domain warm-up needed, producer has no context if customer calls about the email.
 
-3. **Handle ambiguity explicitly**: "If the customer mentions multiple vehicles, extract all of them as an array. If a field is mentioned but unclear, set confidence to 'low'."
+#### Mailgun
 
-4. **Include the original email context**: "This customer called [Agency Name] about a [auto/home] quote. They were asked to provide: [list of missing fields]. Their reply is below."
+[Mailgun](https://www.mailgun.com/) is a transactional email service with strong inbound routing.
 
-5. **Use confidence scoring**: Ask the LLM to return a confidence score for each extracted field. Fields with low confidence should be flagged for human review rather than auto-populated.
+- **Pricing**: Foundation plan at $35/month for 50,000 emails, supports 1,000 custom domains.
+- **Inbound routing**: Flexible regex-based routing rules. Routes inbound emails to webhooks.
+- **SMTP relay**: Can relay emails through custom domains with proper DKIM/SPF.
+- **Same limitation as Postmark/SendGrid**: Sends from Mailgun's infrastructure, not the producer's inbox. No Sent folder visibility.
 
-6. **Validate post-extraction**: VIN checksum validation, date range sanity checks, vehicle make/model against a known database. Don't trust the LLM blindly.
+Source: [Mailgun Pricing](https://www.mailgun.com/pricing/)
 
-7. **Share the parsing pipeline with SMS**: As noted in the spec, email reply parsing and SMS reply parsing should use the same service. The input format differs (email body vs SMS body) but the extraction logic is identical.
+#### EmailEngine (Self-Hosted Nylas Alternative)
 
-### Estimated Accuracy
+[EmailEngine](https://emailengine.app/) is a self-hosted email API that provides REST access to Gmail, Outlook, and IMAP mailboxes.
 
-Based on current LLM capabilities (GPT-4o, Claude Opus/Sonnet):
+- **Pricing**: $995/year flat license, unlimited mailboxes and instances. No per-account cost.
+- **Capabilities**: Send/receive, webhooks (near-instant), attachment handling, HTML templates, delivery tracking. Supports Gmail API, Microsoft Graph, and IMAP/SMTP natively.
+- **Data privacy**: Email never leaves your network. Ideal for GDPR, HIPAA, or fintech constraints.
+- **Self-hosted**: You manage the infrastructure (server, uptime, updates).
+- **Break-even vs Nylas**: ~30 connected accounts. Below that, Nylas is cheaper; above that, EmailEngine saves money.
+- **14-day free trial** available.
 
-| Field Type | Expected Accuracy | Notes |
-|---|---|---|
-| VIN (explicit) | 99%+ | If customer types/pastes it. May need checksum validation. |
-| Date of birth | 95%+ | Multiple formats ("3/15/85", "March 15 1985", "03-15-1985"). LLMs handle all. |
-| Vehicle year/make/model | 95%+ | Common fields, well-understood by LLMs. |
-| Driver name | 90%+ | Can be ambiguous ("my husband John" vs "John Smith"). |
-| Address | 85-90% | Free-text addresses are messy. May need geocoding validation. |
-| Free-text ambiguous info | 70-85% | "I think my deductible is around 500" - confidence scoring is critical here. |
+**Pros**: Dramatically cheaper at scale, full data control, no vendor dependency on Nylas.
+
+**Cons**: You own the infrastructure and uptime. Requires DevOps capacity. Less polished developer experience than Nylas. Community support vs. Nylas's enterprise support.
+
+**Assessment for our use case**: Strong option if we reach 50+ connected accounts and want to control costs. Not ideal for V1 launch when we need to move fast, but worth considering for V2.
+
+Sources: [EmailEngine vs Nylas](https://learn.emailengine.app/docs/comparison/emailengine-vs-nylas), [EmailEngine Docs](https://learn.emailengine.app/docs)
+
+#### Unipile
+
+[Unipile](https://www.unipile.com/) is a unified messaging API covering email, LinkedIn, WhatsApp, Instagram, Messenger, Telegram, and X.
+
+- **Pricing**: Starts at EUR 49/month (~$55) including 10 connected accounts. Additional accounts ~$5-5.50 each.
+- **Email support**: Gmail, Outlook, IMAP. Send, receive, organize, track, thread management.
+- **SOC 2 Type II** certified (as of October 2025).
+- **99.9% uptime SLA**.
+- **No usage limits** on messages sent/received.
+
+**Pros**: Multi-channel beyond email (LinkedIn messaging could be useful for prospecting). Cheaper per-account than Nylas. SOC 2 certified.
+
+**Cons**: Younger company, less established than Nylas. Email is one of many channels rather than their core focus. The LinkedIn/WhatsApp features are not relevant to our current use case.
+
+**Assessment**: Worth a POC if we want to save on per-account costs vs. Nylas. The multi-channel angle is interesting but not critical for V1.
+
+Sources: [Unipile Pricing](https://www.unipile.com/pricing-api/), [Unipile Email API](https://www.unipile.com/communication-api/email-api/)
 
 ---
 
-## 5. Build vs Buy Recommendation
+### 1.3 Comparison Matrix
 
-### Recommended Architecture
+| Criteria | **Nylas** | **MS Graph (Direct)** | **Gmail API (Direct)** | **ESP (Postmark/SendGrid)** | **EmailEngine** | **Unipile** |
+|---|---|---|---|---|---|---|
+| **Integration complexity** | Low (1-2 weeks). Unified API for all providers. | Medium (2-4 weeks). Microsoft only. Must handle auth, webhooks, retries. | Medium (2-3 weeks). Google only. Pub/Sub setup. | Low (1 week). Well-documented, battle-tested SDKs. | Medium (2-3 weeks). Self-hosted setup + API integration. | Low-Medium (1-2 weeks). Similar to Nylas. |
+| **Cost per account/month** | $3.29-5.29/CA | Free | Free | Free (pay per email: ~$0.001-0.002/email) | $995/year flat (unlimited) | ~$5.50/CA |
+| **Send-as (from producer's address)** | Yes, fully. Email appears in Sent folder. | Yes, fully. Email appears in Sent folder. | Yes, fully. Email appears in Sent folder. | Partial. From address can be customized, but email does NOT appear in Sent folder. | Yes, fully. Email appears in Sent folder. | Yes, fully. Email appears in Sent folder. |
+| **Inbound email handling** | Webhooks with full payload. Attachments accessible via API. | Webhook subscriptions (change notifications). Must fetch full message separately. | Pub/Sub notifications. Must fetch full message separately. | Inbound parse webhook. Full message as JSON/multipart. | Near-instant webhooks. Full payload. | Webhooks. Full payload. |
+| **Thread tracking** | Native Threads API. Full conversation history. | Thread via `conversationId`. Good support. | Native `threadId`. Excellent support. | No native thread tracking. Must implement via `In-Reply-To` / `References` headers. | Thread support via message references. | Thread management supported. |
+| **Deliverability** | Excellent. Uses producer's established domain and IP reputation. No warm-up. | Excellent. Same as Nylas -- sends from producer's actual mailbox. | Excellent. Same as Nylas -- sends from producer's actual mailbox. | Good, but requires domain warm-up. DNS setup per agency. Shared IP reputation unless dedicated IP. | Excellent. Same as Nylas -- sends from actual mailbox. | Excellent. Same as Nylas -- sends from actual mailbox. |
+| **Producer visibility** | Full. Sent folder + inbox replies visible in their normal email client. | Full. Same as Nylas. | Full. Same as Nylas. | None. Producer doesn't see sent emails or replies unless they check our dashboard. | Full. Same as Nylas. | Full. Same as Nylas. |
+| **Scalability** | 1000s of accounts. Per-account cost scales linearly. | Unlimited accounts. Free. But must handle Microsoft-only limitation. | Unlimited accounts. Free. But must handle Google-only limitation. | Unlimited. Cost scales per email, not per account. Most scalable option. | Unlimited accounts on flat license. Infrastructure scales with your servers. | 1000s of accounts. Per-account cost scales linearly (cheaper than Nylas). |
+| **OAuth complexity** | Low. Nylas handles token refresh. You store grant ID. | Medium. You manage Entra ID app registration, token refresh, admin consent. | Medium. You manage Google Cloud Console, token refresh, pub/sub. | None. API key or SMTP credentials. | Medium. You configure per-provider OAuth apps. EmailEngine manages tokens. | Low. Similar to Nylas. |
+| **Maintenance burden** | Low. Managed service. | Medium. You maintain auth, webhooks, error handling for Microsoft. | Medium. You maintain auth, pub/sub, error handling for Google. | Low. Managed service. | High. You own the infrastructure (server, updates, monitoring). | Low. Managed service. |
+| **Email tracking (opens/clicks)** | Yes. Built-in pixel tracking and link rewriting. | No built-in tracking. Must implement yourself. | No built-in tracking. Must implement yourself. | Yes. Built-in open/click tracking, detailed analytics. | No built-in tracking. Must implement yourself. | Limited tracking capabilities. |
+| **Provider coverage** | Google, Microsoft, IMAP (covers ~99% of business email) | Microsoft only | Google only | Any domain (you control DNS) | Google, Microsoft, IMAP | Google, Microsoft, IMAP |
 
-Given our scale (starting with ~5 partner agencies, growing to 50+, ~5K-50K emails/month initially):
+---
 
-```
-[Our Backend]
-    --> [Orchestration Layer: Knock or Courier]
-        --> [Transactional Email: Postmark]
-        --> [SMS: Twilio] (already in SMS spec)
-    <-- [Inbound Parse: Postmark Inbound Webhook]
-        --> [Our LLM Parsing Service]
-            --> [OpenAI/Claude Structured Output API]
-```
+## 2. Tradeoffs: BYOD vs Transactional Sender
 
-### What to Buy
+### 2.1 BYOD (Nylas / Graph API / Gmail API)
 
-| Component | Recommendation | Cost Estimate | Why Buy |
-|---|---|---|---|
-| **Transactional email sending** | Postmark | $15-50/month | Commodity service. Best deliverability for insurance. Inbound parse included. |
-| **Multi-channel orchestration** | Knock or Courier | $0-50/month | Workflow logic, channel routing, preferences, batching are complex to build. These tools are purpose-built. |
-| **SMS delivery** | Twilio | Per-message pricing | Already planned per SMS spec. |
-| **Email template framework** | React Email (open source) | Free | Build templates as React components. Works with any ESP. |
-| **LLM API for parsing** | OpenAI or Anthropic | ~$0.01-0.05/parse | Structured output for field extraction from replies. |
+**Pros**:
 
-**Estimated monthly cost at launch (5 agencies, ~5K emails/month)**: $65-115/month total for external services.
+1. **Emails come from the producer's actual address** (`john@abcinsurance.com`). The customer sees a real person they spoke with, not a generic system email.
 
-### What to Build
+2. **Lands in the producer's Sent folder**. The producer has full visibility into every automated email sent on their behalf. If a customer calls and says "I got an email from you," the producer can see it in their Sent folder and respond intelligently.
 
-| Component | Effort Estimate | Why Build |
+3. **Customer replies go to the producer's inbox**. The producer can jump in manually at any time. They can seamlessly take over the conversation without the customer knowing it was automated.
+
+4. **Uses established domain reputation**. No domain warm-up needed. The agency's domain has years of email history, proper SPF/DKIM/DMARC, and a clean reputation. Deliverability is excellent from day one.
+
+5. **Feels personal, not automated**. A customer receiving an email from `john@abcinsurance.com` with a normal email signature is far more likely to engage than one from `noreply@quotesystem.com`.
+
+6. **Thread coherence**. Automated messages and manual producer messages live in the same thread. The customer sees one coherent conversation.
+
+7. **No DNS setup per agency**. The agency doesn't need to add any DNS records for white-labeling. We just connect their existing inbox via OAuth.
+
+**Cons**:
+
+1. **Dependent on producer's email provider**. Must be Google Workspace or Microsoft 365 (or IMAP). If the agency uses a niche provider (GoDaddy email, Rackspace, etc.), IMAP/SMTP may work but with reduced functionality (no thread tracking, less reliable webhooks).
+
+2. **Rate limits**. Gmail caps at 2,000 emails/day per user. Microsoft is more generous (~10,000/day). For our use case (20-50 follow-ups per producer per day), this is not a concern, but it becomes relevant if a high-volume agency has one producer handling hundreds of leads.
+
+3. **OAuth token management**. Tokens expire and need refreshing. If a producer changes their password, revokes app access, or their admin changes security policies, the integration breaks. We need monitoring and re-auth flows. Nylas mitigates this with managed token refresh and `grant.expired` webhooks.
+
+4. **Per-account cost with Nylas**. At $3.29-5.29/CA/month, Nylas costs add up. 200 connected accounts = ~$660-1,058/month. This can be mitigated by switching to EmailEngine at scale.
+
+5. **Limited deliverability analytics**. Nylas provides open/click tracking via pixel/link rewriting, but it's less comprehensive than a dedicated ESP's analytics. No built-in bounce rate dashboards, deliverability scores, or inbox placement testing.
+
+6. **Inherited deliverability issues**. If the producer's domain has a poor reputation (e.g., they've been sending spam from their personal email), we inherit that. No way to control or improve it.
+
+7. **Admin consent required**. For Microsoft 365, an org admin may need to approve the app. For Google Workspace, the admin may need to whitelist the Nylas app. This adds friction to onboarding.
+
+8. **Nylas stores email data**. Nylas syncs and caches email metadata and content on their servers. For insurance communications containing PII (names, DOB, VIN), this is a compliance consideration. Data residency options (US/EU) help but don't eliminate the concern.
+
+### 2.2 Transactional Sender (Postmark / SendGrid)
+
+**Pros**:
+
+1. **Full control over sending infrastructure**. We decide which IPs, which domains, which sending patterns.
+
+2. **Built-in analytics**. Open rates, click rates, bounce rates, spam complaints, delivery times -- all in a dashboard. Invaluable for optimizing our follow-up sequences.
+
+3. **Higher volume limits**. No per-user daily cap. Postmark and SendGrid can handle millions of emails/month.
+
+4. **Mature inbound parse**. Both Postmark and SendGrid have battle-tested inbound email parsing via webhooks. Full message body, headers, attachments delivered as JSON.
+
+5. **No dependency on producer's email provider**. Works regardless of whether the agency uses Gmail, Outlook, or any other email service.
+
+6. **Easier to manage at scale**. One integration, one set of API keys, one monitoring dashboard. No OAuth tokens to manage per-producer.
+
+7. **Cost-effective**. Postmark costs ~$15-50/month for our volume. No per-account charge. Dramatically cheaper than Nylas at scale.
+
+**Cons**:
+
+1. **No Sent folder visibility**. The producer has no idea what emails were sent on their behalf unless they check our dashboard. If a customer says "I got your email," the producer is caught off-guard.
+
+2. **Requires DNS setup per agency**. Each agency needs to add DKIM/SPF DNS records for their domain. This is a friction point in onboarding -- many small agency owners are not technical.
+
+3. **Domain warm-up needed**. New sending domains need gradual volume ramp-up (50/day -> 100/day -> 200/day over 2-4 weeks). If we onboard 10 agencies at once, each needs its own warm-up period.
+
+4. **May feel impersonal**. Even with a custom "From" address, subtle cues (email headers, `via postmarkapp.com` shown by some clients) can make it feel automated.
+
+5. **Customer replies are tricky**. If we set the "Reply-To" to the producer's address, replies go to the producer -- but the producer has no context (they didn't send the email). If we route replies to a system inbox (for parsing), the producer is out of the loop.
+
+6. **Separate conversation threads**. If the producer wants to follow up manually, they start a new thread (they can't reply to the automated email because it's not in their Sent folder). The customer sees a fragmented conversation.
+
+### 2.3 Hybrid Approach
+
+**Recommended hybrid**: Use BYOD for customer-facing emails and transactional ESP for internal system notifications.
+
+| Email Type | Approach | Rationale |
 |---|---|---|
-| **Dynamic email content generator** | 1-2 weeks | Generates email body from MissingDataProfile. Our domain logic - which fields to ask about, how to phrase them, bilingual rendering. |
-| **LLM reply parsing service** | 1-2 weeks | Single service that takes email/SMS reply text + MissingDataProfile, returns extracted fields with confidence scores. Shared across email and SMS channels. Uses OpenAI/Claude structured output under the hood. |
-| **Inbound email webhook handler** | 3-5 days | Receives parsed email from Postmark webhook, extracts reply text (strips signatures/quoted text), routes to LLM parser. Detects and routes attachments to dec page parsing pipeline. |
-| **Communication job state machine** | 1-2 weeks | Tracks: email sent, opened, clicked, replied, data extracted, form completed. Decides next action (send reminder, escalate to producer, mark complete). If using Knock/Courier, some of this is handled by their workflow engine. |
-| **Per-agency email configuration** | 3-5 days | Store DKIM/SPF config per agency. Onboarding flow for DNS setup. From-address management. |
-| **Attachment routing** | 2-3 days | Detect attachments in inbound emails. Route PDFs/images to dec page OCR pipeline. |
+| **Quote follow-up emails to customers** | BYOD (Nylas/Graph) | Must feel personal. Producer visibility is critical. Customer replies should land in producer's inbox. |
+| **Reminder emails to customers** | BYOD (Nylas/Graph) | Same thread as initial follow-up. Producer visibility maintained. |
+| **Internal notifications to producers** ("New lead assigned", "Customer submitted form") | Transactional ESP (Postmark) | No need for Sent folder visibility. System-to-user notifications. High deliverability. |
+| **System alerts** ("OAuth token expired", "Weekly digest") | Transactional ESP (Postmark) | Operational emails from our system identity. |
 
-### What's Hybrid (Could Go Either Way)
+This hybrid gives us the best of both worlds: personal, high-deliverability customer communication through the producer's inbox, and reliable system notifications through our own infrastructure.
 
-| Component | Option A: Buy | Option B: Build | Recommendation |
+**Integration architecture**:
+```
+Customer-facing emails:
+  [Our Backend] --> [Nylas API] --> [Producer's Gmail/Outlook] --> Customer
+
+Internal notifications:
+  [Our Backend] --> [Postmark API] --> Producer's inbox (from noreply@oursystem.com)
+
+Inbound replies:
+  Customer --> [Producer's Gmail/Outlook] --> [Nylas webhook] --> [Our Backend] --> [LLM Parser]
+```
+
+---
+
+## 3. Nylas Deep Dive
+
+### 3.1 Pricing Details
+
+| Component | Cost |
+|---|---|
+| **Base platform (Core tier)** | ~$4.59/connected account/month |
+| **14-day free trial** | Full functionality |
+| **Free tier** | Available (limited features, for development) |
+| **Volume discounts** | Available on Custom tier (contact sales) |
+| **Annual billing discount** | ~$1.35/CA/month (annual) vs. ~$3.30/CA/month (monthly) -- significant savings |
+
+**Important**: Annual billing reduces per-CA cost by ~60%. At 100 CAs, this means ~$135/month (annual) vs. ~$330/month (monthly).
+
+### 3.2 v3 API Capabilities
+
+**Send email**:
+```
+POST /v3/grants/{grant_id}/messages/send
+{
+  "to": [{"name": "Customer Name", "email": "customer@email.com"}],
+  "subject": "Almost done with your auto quote",
+  "body": "<html>...</html>",
+  "tracking_options": {
+    "opens": true,
+    "links": true,
+    "thread_replies": true,
+    "label": "quote-followup-123"
+  }
+}
+```
+- Email is sent from the connected account's address.
+- Appears in the user's Sent folder.
+- Tracking options enable open/click/reply webhooks.
+
+**Read messages**:
+```
+GET /v3/grants/{grant_id}/messages?in=INBOX&limit=10
+```
+- Returns messages with full body, headers, attachment metadata.
+
+**Threads**:
+```
+GET /v3/grants/{grant_id}/threads/{thread_id}
+```
+- Returns all messages in a thread. Useful for checking if a customer has already replied.
+
+**Webhooks**:
+```
+POST /v3/webhooks
+{
+  "trigger_types": ["message.created", "message.opened", "thread.replied"],
+  "webhook_url": "https://our-api.com/webhooks/nylas",
+  "notification_email_addresses": ["ops@ourcompany.com"]
+}
+```
+
+**Scheduled send**:
+```
+POST /v3/grants/{grant_id}/messages/send
+{
+  "to": [...],
+  "subject": "...",
+  "body": "...",
+  "send_at": 1707580800  // Unix timestamp
+}
+```
+- Nylas holds the message and sends at the exact specified time.
+
+### 3.3 Authentication Flow for Agency Onboarding
+
+**Step-by-step onboarding**:
+
+1. Producer visits our app and clicks "Connect Email."
+2. Our app redirects to Nylas's Hosted OAuth URL:
+   ```
+   https://api.us.nylas.com/v3/connect/auth?
+     client_id=NYLAS_CLIENT_ID&
+     redirect_uri=https://our-app.com/oauth/callback&
+     response_type=code&
+     provider=google  (or microsoft)
+   ```
+3. Producer sees their provider's consent screen (Google or Microsoft).
+4. After consent, Nylas redirects back to our callback URL with an authorization code.
+5. We exchange the code for a grant ID, access token, and refresh token.
+6. The producer's inbox is now connected. We can send and receive on their behalf.
+
+**Time to connect**: ~30 seconds for the producer. No DNS changes, no technical setup.
+
+**Admin consent (Microsoft 365)**: If the agency's IT admin pre-approves our Nylas app in Entra ID, individual producers skip the consent screen entirely. This is the ideal path for multi-producer agencies.
+
+**Admin consent (Google Workspace)**: The Workspace admin can add our Nylas app to the "Trusted apps" list, pre-granting the required scopes for all users in the domain.
+
+**Non-Google/Microsoft providers**: Nylas supports IMAP/SMTP as a fallback. The producer enters their email server credentials (host, port, username, password). This works for GoDaddy, Rackspace, etc. but with reduced functionality (no thread tracking, no native Pub/Sub).
+
+### 3.4 Email Tracking
+
+- **Open tracking**: Nylas injects a transparent 1x1 pixel. Fires `message.opened` webhook.
+- **Click tracking**: Nylas rewrites HTML links to track clicks. Fires `message.link_clicked` webhook with `link_index` and `click_id`.
+- **Thread reply tracking**: Fires `thread.replied` when a new message appears in a tracked thread.
+- **Limitations**: Ad blockers and CDNs can block the tracking pixel. Apple Mail Privacy Protection pre-loads images, inflating open rates. Link tracking doesn't work for links with embedded credentials (e.g., private Google Forms).
+- **Not available in Sandbox** -- requires production app.
+
+**Assessment**: Nylas tracking is sufficient for our V1 needs. We'll know if a customer opened the email and clicked the smart form link. For more advanced deliverability analytics (inbox placement rates, spam folder rates), we'd need a separate tool like Google Postmaster Tools.
+
+### 3.5 Attachment Handling
+
+- **Outbound**: Attach files to outgoing emails via the Send API. Supports any file type up to provider limits (Gmail: 25 MB, Outlook: 25 MB).
+- **Inbound**: When a customer replies with an attachment (e.g., a photo of their dec page), the `message.created` webhook includes attachment metadata. Download via:
+  ```
+  GET /v3/grants/{grant_id}/attachments/{attachment_id}/download
+  ```
+- **Use case**: Customer emails a photo of their declaration page. We receive the webhook, download the attachment, route it to our OCR/extraction pipeline.
+
+### 3.6 Template Support
+
+Nylas does not have a built-in template engine. You render your HTML email body before passing it to the Send API. This aligns with our plan to use React Email for template rendering:
+
+```
+[React Email template] --> [Server-side render to HTML] --> [Nylas Send API with HTML body]
+```
+
+This gives us full control over dynamic content (missing fields, bilingual rendering, agency branding) without being constrained by Nylas's template limitations.
+
+### 3.7 Failure Modes
+
+| Failure | What Happens | Mitigation |
+|---|---|---|
+| **OAuth token expires** | API calls return 401. `grant.expired` webhook fired. | Auto-refresh via Nylas. If refresh fails, prompt producer to re-authenticate. |
+| **Producer's mailbox is full** | Send fails with provider-specific error. | Detect error, alert producer via alternative channel (SMS, in-app notification). Queue email for retry. |
+| **Gmail rate limit hit** | 429 error from Gmail via Nylas. | Implement exponential backoff. Spread sends across time. Alert if a single producer is hitting limits. |
+| **Nylas outage** | API calls timeout or return 5xx. | Queue emails in our system. Retry with backoff. Fall back to direct Graph/Gmail API if critical. |
+| **Producer revokes app access** | `grant.expired` webhook. All API calls fail. | Alert producer in-app. Re-authentication required. |
+| **Admin removes consent (Microsoft)** | All grants for that org fail. | Alert agency admin. Re-consent required. |
+
+### 3.8 Competitors Comparison (Features We Need)
+
+| Feature | **Nylas** | **EmailEngine** | **Unipile** | **Direct API (Graph + Gmail)** |
+|---|---|---|---|---|
+| Send-as with Sent folder | Yes | Yes | Yes | Yes |
+| Inbound webhooks | Yes (real-time) | Yes (near-instant) | Yes | Must build (Pub/Sub for Google, subscriptions for Microsoft) |
+| Thread tracking | Native API | Via message references | Supported | Native per provider |
+| Open/click tracking | Built-in | Not built-in | Limited | Not built-in |
+| Scheduled send | Built-in | Not built-in | Unknown | Not built-in (must build) |
+| Attachment download | API endpoint | API endpoint | API endpoint | API endpoint per provider |
+| Token management | Managed | Self-managed (EmailEngine handles) | Managed | Self-managed |
+| Multi-provider (Google + Microsoft) | Single API | Single API | Single API | Two separate integrations |
+| Pricing at 100 accounts (annual) | ~$135/month | ~$83/month ($995/year) | ~$550/month | $0 |
+| Infrastructure burden | None (managed) | Self-hosted server | None (managed) | None (but more code to maintain) |
+
+---
+
+## 4. Implementation Considerations for Insurance Use Case
+
+### 4.1 Agency Email Onboarding Flow
+
+**Ideal flow (Google Workspace or Microsoft 365)**:
+1. Agency admin signs up on our platform.
+2. Admin is prompted to "Connect your agency's email."
+3. If Microsoft 365: Admin grants org-wide consent in Entra ID. All producers are then pre-approved.
+4. If Google Workspace: Admin adds our app to trusted apps. All producers are then pre-approved.
+5. Each producer clicks "Connect my inbox" and goes through OAuth (which auto-completes if admin pre-approved).
+6. Takes ~1 minute per producer. No DNS changes.
+
+**Fallback flow (non-Google/Microsoft provider)**:
+1. Producer enters IMAP/SMTP credentials.
+2. Reduced functionality (no native thread tracking, less reliable notifications).
+3. Consider recommending these agencies migrate to Google Workspace or Microsoft 365.
+
+**What if the agency uses GoDaddy, Rackspace, or another provider?**
+- IMAP/SMTP fallback works but is a degraded experience.
+- For V1, we may choose to require Google Workspace or Microsoft 365 as a prerequisite.
+- Market data: ~70% of small businesses use either Google Workspace or Microsoft 365. Most insurance agencies will be covered.
+
+### 4.2 Multi-Producer Support
+
+An agency with 5-10 producers needs each inbox connected separately. Each producer goes through OAuth individually (unless admin pre-approved the org).
+
+**Data model**:
+```
+Agency
+  |-- Producer 1 (Nylas Grant ID: abc123)
+  |-- Producer 2 (Nylas Grant ID: def456)
+  |-- Producer 3 (Nylas Grant ID: ghi789)
+```
+
+When a lead comes in assigned to Producer 2, we send the follow-up email using Producer 2's grant. Replies are routed to Producer 2's inbox and our webhook.
+
+**Cost implication**: An agency with 5 producers = 5 connected accounts = ~$23/month on Nylas Core (annual). This cost should be factored into our agency pricing.
+
+### 4.3 Reply Handling (Dual-Read Scenario)
+
+When a customer replies to our automated follow-up:
+
+1. The reply lands in the **producer's inbox** (visible in Gmail/Outlook).
+2. Nylas fires a `message.created` webhook to **our backend**.
+3. Both the producer and our system now have the reply.
+
+**How to handle**:
+- Our system processes the reply (LLM extraction of insurance data fields).
+- We do **not** mark the email as read via Nylas. The producer sees it as unread in their inbox and can respond manually if needed.
+- If our LLM successfully extracts all requested data, we update the lead record and potentially send a confirmation email (via the producer's inbox) thanking the customer.
+- If the reply contains a question or something we can't parse, we flag it for the producer's attention (via in-app notification or a separate system email).
+
+**Key design decision**: Our system is a "silent observer" of the inbox. We read and process replies but don't mark them as read or archive them. The producer's inbox experience is unchanged.
+
+### 4.4 Automation vs Manual Handoff
+
+**Detection rules for "needs human attention"**:
+
+| Signal | Action |
+|---|---|
+| Reply contains extracted data fields (VIN, DOB, vehicle info) | Auto-process. Update lead record. Send confirmation. |
+| Reply contains an attachment (likely dec page photo) | Auto-process attachment via OCR pipeline. If extraction succeeds, update lead. If not, flag for producer. |
+| Reply contains a question ("What coverage do I need?", "How much will this cost?") | Flag for producer. Send in-app notification. Do not auto-respond. |
+| Reply is unrelated ("Please remove me from your list", "Wrong number") | Flag for producer. If opt-out detected, stop all automated emails for this contact. |
+| Reply is ambiguous or low-confidence extraction | Flag for producer with extracted data + confidence scores. Producer reviews and confirms. |
+| No reply after full follow-up sequence | Mark lead as "unresponsive" in our system. Notify producer. |
+
+**Implementation**: The LLM parsing service returns a `classification` field alongside extracted data:
+```json
+{
+  "classification": "data_response" | "question" | "opt_out" | "unrelated" | "ambiguous",
+  "extracted_fields": { ... },
+  "confidence": 0.92,
+  "needs_human_review": false
+}
+```
+
+### 4.5 Thread Management
+
+**Challenge**: If our system sends an automated email and the producer later wants to add to the conversation manually, the thread must stay coherent.
+
+**How it works with Nylas BYOD**:
+- Our automated email is sent from the producer's inbox. It gets a `thread_id` and `message_id`.
+- If the customer replies, the reply is in the same thread.
+- If the producer opens their email client and replies manually, their reply is also in the same thread.
+- Our system sees all messages in the thread via the Threads API. We can track the full conversation.
+
+**This is a major advantage over the transactional ESP approach**, where the producer would need to start a new thread because the original email isn't in their Sent folder.
+
+### 4.6 CAN-SPAM Compliance
+
+**Who is the "sender" when sending through the producer's inbox?**
+
+Under CAN-SPAM, the "sender" is the person whose product, service, or website is advertised in the email. In our case, the sender is the insurance agency/producer, not our technology platform.
+
+**Requirements still apply**:
+1. **Accurate header information**: The "From" address is the producer's real address. Header info is accurate. No issue.
+2. **Non-deceptive subject lines**: Our automated subject lines must accurately describe the email content. "Almost done with your auto quote" is fine.
+3. **Identification as an ad** (if applicable): Our emails are transactional (triggered by the customer's quote request), not unsolicited marketing. Transactional emails are largely exempt from CAN-SPAM's advertising requirements.
+4. **Physical address**: Include the agency's physical address in the email footer.
+5. **Opt-out mechanism**: Must include a way for the customer to opt out of future emails. Even though these are transactional, including an unsubscribe link is best practice.
+
+**Our responsibility**: As the technology provider initiating the sends, we share responsibility. Both we and the agency must ensure compliance. Our terms of service should require agencies to maintain CAN-SPAM compliance.
+
+**Key difference from transactional ESP**: When sending via the producer's inbox, CAN-SPAM compliance is clearer because the email genuinely comes from the producer. There's no ambiguity about who the sender is.
+
+Sources: [CAN-SPAM Compliance Guide](https://cookie-script.com/privacy-laws/can-spam-act), [Email Compliance Guide](https://wpmailsmtp.com/email-compliance-guide-to-can-spam-gdpr-and-more/)
+
+---
+
+## 5. Orchestration Layer
+
+### 5.1 Do We Still Need an Orchestration Platform?
+
+**With BYOD, the answer is: maybe, but differently.**
+
+Traditional orchestration platforms (Customer.io, Knock, Courier) assume they control the sending channel. They integrate with an ESP (Postmark, SendGrid) and send emails through it. They don't natively support "send this email through the user's connected inbox via Nylas."
+
+**What we need from orchestration**:
+1. **Timing logic**: Send initial follow-up 1 hour after call. Reminder #1 at 72 hours. Reminder #2 at 5-7 days.
+2. **Conditional logic**: If customer opened email but didn't click, send reminder. If customer submitted form, stop sequence. If customer replied, evaluate response.
+3. **Channel fallback**: If email follow-up gets no response, fall back to SMS.
+4. **State tracking**: Track where each lead is in the follow-up sequence.
+
+**Option A: Use Customer.io / Knock with custom webhook action**
+
+Both Customer.io and Knock support "webhook" actions in their workflows. Instead of sending an email directly, the workflow step fires a webhook to our backend, which then sends the email via Nylas.
+
+```
+[Customer.io/Knock Workflow]
+  Step 1: Wait 1 hour after "call_completed" event
+  Step 2: Fire webhook to our API: POST /send-followup
+  Step 3: Wait 72 hours
+  Step 4: Check: did customer respond? (via custom event)
+  Step 5 (if no response): Fire webhook: POST /send-reminder-1
+  ...
+```
+
+**Pros**: We get the visual workflow builder, timing engine, and state management. Customer.io/Knock handles the "when" logic; our backend handles the "how" (Nylas).
+
+**Cons**: Adding an orchestration layer on top of Nylas adds another vendor, another integration point, and another potential failure mode. The webhook approach means we lose some native email features (delivery confirmation from the orchestrator's perspective).
+
+**Option B: Build custom orchestration**
+
+Since our sending mechanism is fundamentally different (Nylas, not ESP), we may be better served by a custom state machine:
+
+```
+Lead State Machine:
+  [call_completed]
+    --> wait(1 hour) --> [send_initial_followup via Nylas]
+    --> wait(72 hours) --> check_response
+      --> if responded: [process_response]
+      --> if opened_not_clicked: [send_reminder_1 via Nylas]
+      --> if no_open: [send_reminder_1 via Nylas]
+    --> wait(5 days) --> check_response
+      --> if responded: [process_response]
+      --> if no_response: [send_sms_fallback via Twilio]
+    --> wait(3 days) --> [mark_unresponsive]
+```
+
+**Pros**: Full control. No extra vendor. Tightly integrated with Nylas events (opens, clicks, replies). Simpler architecture.
+
+**Cons**: Building a reliable, scalable workflow engine with delay/scheduling, retry logic, and state persistence is non-trivial. Estimated 2-3 weeks of engineering.
+
+### 5.2 Recommendation
+
+**For V1: Build custom orchestration.** Here's why:
+
+1. Our workflow is relatively simple (3-step email sequence with SMS fallback). It doesn't justify the complexity of integrating an orchestration platform that doesn't natively support our sending mechanism.
+
+2. The core "when to send" logic is a state machine with timed transitions. This is straightforward to build with a job queue (BullMQ, Temporal, or even cron + database).
+
+3. Nylas webhooks give us all the signals we need (opened, clicked, replied, bounced) to drive transitions.
+
+4. We avoid the awkward "orchestration platform calls webhook which calls Nylas" chain.
+
+**For V2/V3**: If our workflows become more complex (A/B testing subject lines, multi-branch conditional logic, dozens of workflow variations), revisit Customer.io or Knock with webhook actions.
+
+### 5.3 SMS Integration Coexistence
+
+Our SMS channel (via Twilio, as planned in the SMS spec) is a separate sending mechanism from email. In a custom orchestration layer, SMS is just another action:
+
+```
+if lead_state == "no_email_response_after_reminders":
+    send_sms(lead, twilio_client)
+```
+
+If we later adopt an orchestration platform, both Nylas (via webhook) and Twilio (via native integration) can coexist. Customer.io and Knock both have native Twilio integrations for SMS.
+
+---
+
+## 6. Recommendations
+
+### 6.1 Primary Approach: BYOD via Nylas (V1) with EmailEngine Migration Path (V2)
+
+**Rationale**:
+- The BYOD approach is fundamentally superior for our use case. Emails from the producer's real inbox, with Sent folder visibility and seamless reply handling, create a dramatically better experience for both producers and customers.
+- Nylas is the fastest path to production. Unified API, managed token refresh, built-in tracking, and scheduled send. 1-2 weeks to integrate.
+- EmailEngine becomes the cost-optimization play once we exceed ~50 connected accounts. Same BYOD benefits, but at a flat $995/year regardless of account count.
+
+### 6.2 Vendor Choices
+
+| Component | V1 Choice | V2 Consideration | Rationale |
 |---|---|---|---|
-| **Orchestration workflow** | Knock/Courier workflow engine | Custom state machine in our backend | **Buy** (Knock/Courier). Building workflow engines with retry logic, delay scheduling, and channel fallback is surprisingly complex. |
-| **Email template editing** | Postmark/SendGrid visual editor | React Email + our own preview system | **Build** with React Email. We need too much dynamic content for a visual editor to handle. |
-| **Deliverability monitoring** | Postmark dashboard + Google Postmaster | Custom dashboards | **Buy** (Postmark's built-in tools). Build custom alerting only if we need cross-agency aggregate views. |
+| **Customer-facing email** | Nylas (Core tier) | EmailEngine (self-hosted) | Nylas for speed to market. EmailEngine for cost optimization at scale. |
+| **Internal notifications** | Postmark | Keep Postmark | Best deliverability for transactional email. $15-50/month. |
+| **SMS** | Twilio | Keep Twilio | Already planned per SMS spec. |
+| **Orchestration** | Custom state machine (BullMQ/Temporal) | Customer.io or Knock (if workflows get complex) | Simple workflow doesn't justify orchestration platform overhead. |
+| **Email templates** | React Email (open source) | Keep React Email | Maximum flexibility for dynamic, bilingual content. |
+| **Reply parsing** | Custom (OpenAI/Claude structured output) | Keep custom | Domain-specific insurance field extraction. Shared with SMS parsing. |
+| **Deliverability monitoring** | Nylas tracking + Google Postmaster Tools | Keep | Sufficient for V1. |
 
-### Implementation Timeline
+### 6.3 Cost Model at Different Scales
+
+#### V1: Nylas
+
+| Scale | Agencies | Connected Accounts | Nylas (Core, annual) | Postmark | Twilio SMS | LLM Parsing | **Total/month** |
+|---|---|---|---|---|---|---|---|
+| **Launch** | 5 | 10 | ~$14 | $15 | ~$10 | ~$5 | **~$44** |
+| **Growth** | 20 | 50 | ~$68 | $30 | ~$40 | ~$20 | **~$158** |
+| **Traction** | 50 | 150 | ~$203 | $50 | ~$100 | ~$50 | **~$403** |
+| **Scale** | 200 | 600 | ~$810 | $75 | ~$400 | ~$150 | **~$1,435** |
+
+*Nylas annual billing assumed at ~$1.35/CA/month.*
+
+#### V2: EmailEngine (at scale)
+
+| Scale | Agencies | Connected Accounts | EmailEngine | Postmark | Twilio SMS | LLM Parsing | Server Costs | **Total/month** |
+|---|---|---|---|---|---|---|---|---|
+| **Traction** | 50 | 150 | ~$83 | $50 | ~$100 | ~$50 | ~$50 | **~$333** |
+| **Scale** | 200 | 600 | ~$83 | $75 | ~$400 | ~$150 | ~$100 | **~$808** |
+| **Large Scale** | 500 | 1,500 | ~$83 | $100 | ~$1,000 | ~$300 | ~$200 | **~$1,683** |
+
+*EmailEngine is $995/year = ~$83/month regardless of account count. Server costs for hosting EmailEngine.*
+
+**The crossover point**: At ~50 connected accounts, EmailEngine becomes cheaper than Nylas. By 200 accounts, the savings are substantial (~$730/month).
+
+### 6.4 Implementation Timeline
 
 | Phase | Scope | Duration | Dependencies |
 |---|---|---|---|
-| **Phase 1: Core sending** | Postmark integration, email templates (React Email), dynamic content from MissingDataProfile, webhook tracking | 2-3 weeks | MissingDataProfile service must be defined |
-| **Phase 2: Inbound parsing** | Postmark inbound webhook, LLM reply parsing service, attachment routing | 2-3 weeks | Can start in parallel with Phase 1 |
-| **Phase 3: Orchestration** | Knock/Courier integration, workflow definitions (initial send + 2 reminders), channel fallback logic (email -> SMS) | 1-2 weeks | Phases 1 & 2 complete |
-| **Phase 4: Agency onboarding** | Per-agency DNS setup flow, white-labeled from-addresses, domain warm-up automation | 1-2 weeks | Phase 1 complete |
-| **Total V1** | | **6-10 weeks** | |
+| **Phase 1: Nylas Integration** | OAuth flow, Nylas account connection, send email endpoint, webhook receiver for inbound messages | 1.5-2 weeks | Nylas account setup, API keys |
+| **Phase 2: Email Templates** | React Email templates for initial follow-up, reminders. Dynamic content from MissingDataProfile. Bilingual support. | 1-2 weeks | Can start in parallel with Phase 1 |
+| **Phase 3: Custom Orchestration** | Lead follow-up state machine (BullMQ/Temporal). Timed sends, conditional logic, SMS fallback trigger. | 1.5-2 weeks | Phase 1 complete for Nylas integration |
+| **Phase 4: Inbound Processing** | Reply parsing (LLM structured output), attachment routing to OCR pipeline, classification (data/question/opt-out) | 1.5-2 weeks | Phase 1 webhook receiver complete |
+| **Phase 5: Postmark for Internal** | Postmark integration for system notifications (new lead, form submitted, token expired) | 3-5 days | Independent of other phases |
+| **Phase 6: Producer Onboarding UI** | OAuth consent flow in our app, connected accounts dashboard, re-auth prompts | 1 week | Phase 1 complete |
+| **Total V1** | | **6-9 weeks** | |
 
-### Cost Projections by Scale
+### 6.5 Key Risks and Mitigations
 
-| Scale | Emails/mo | Orchestration | Email Provider | LLM Parsing | Total/mo |
-|---|---|---|---|---|---|
-| **Launch** (5 agencies) | ~5,000 | $0-25 (free tiers) | $15 (Postmark) | ~$5 | **~$20-45** |
-| **Growth** (20 agencies) | ~20,000 | $50-100 | $30 (Postmark) | ~$20 | **~$100-150** |
-| **Scale** (50+ agencies) | ~50,000 | $100-250 | $50-75 (Postmark) | ~$50 | **~$200-375** |
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| **Nylas outage disrupts sending** | Low-Medium | High | Queue emails locally. Retry with backoff. Build circuit breaker. Consider direct Graph/Gmail API as emergency fallback. |
+| **OAuth token expires, producer doesn't re-auth** | Medium | Medium | `grant.expired` webhook triggers in-app notification + SMS alert to producer. Grace period queues emails. |
+| **Agency uses non-Google/Microsoft email** | Medium | Low | IMAP/SMTP fallback. For V1, may require Google Workspace or Microsoft 365 as a prerequisite. |
+| **Gmail rate limit hit** | Low | Low | At 20-50 emails/day per producer, well below 2,000/day limit. Monitor and alert if approaching. |
+| **Nylas pricing increases** | Medium | Medium | EmailEngine migration path is our hedge. Direct API integration is the ultimate fallback. |
+| **Nylas stores PII (compliance concern)** | Low | Medium | Use Nylas US data residency. Review DPA. Consider EmailEngine (self-hosted) for data-sensitive agencies. |
+| **Producer's domain has poor reputation** | Low | Medium | Check domain reputation during onboarding (MxToolbox, Google Postmaster). Warn producer if issues found. |
+| **Customer confused by automated email from producer** | Low | Low | Use clear, non-deceptive subject lines. Natural email tone. Producer's real signature. If customer asks "Did you send this?", the producer can see it in their Sent folder and say "Yes." |
 
----
+### 6.6 Decision Summary
 
-## 6. Final Recommendations Summary
+**We recommend BYOD via Nylas for V1.** The benefits of sending from the producer's actual inbox -- Sent folder visibility, established domain reputation, seamless reply handling, personal feel -- are overwhelming for our insurance use case. The per-account cost is manageable at launch and can be optimized with EmailEngine at scale.
 
-### The Stack
+The transactional ESP approach (Postmark/SendGrid) remains valuable for internal system notifications but is **not recommended** for customer-facing follow-up emails due to the lack of producer visibility and the awkward reply-handling dynamic.
 
-1. **Transactional email provider**: **Postmark** - Best deliverability for insurance, mature inbound parse, transparent pricing. Consider Resend as a future migration if developer experience becomes a bottleneck.
-
-2. **Orchestration**: **Knock** (primary recommendation) or **Courier** (if multi-tenant branding is critical from day one). Both offer usage-based pricing that scales with us. Skip Customer.io unless we need marketing automation features.
-
-3. **Email templates**: **React Email** (open source) - Build templates as React components, render server-side, send through Postmark. Maximum flexibility for dynamic content and bilingual support.
-
-4. **Reply parsing**: **Custom-built** using OpenAI Structured Outputs or Claude tool use. Shared service with SMS reply parsing. Estimated 1-2 weeks to build.
-
-5. **Skip for V1**: Braze (too expensive), OneSignal (push-centric), Airparser/Parsio (too generic for our domain-specific needs), building our own orchestration engine (buy instead).
-
-### Key Risk Mitigations
-
-- **Deliverability risk**: Use Postmark's dedicated transactional stream. Warm up agency domains gradually. Monitor with Google Postmaster Tools.
-- **Low click-through risk**: Insurance has 3.19% CTOR. Mitigate with clear, single-purpose CTAs, mobile-optimized design, and personalized content.
-- **LLM parsing accuracy risk**: Implement confidence scoring and human-in-the-loop review for low-confidence extractions. Validate VINs, dates, and addresses post-extraction.
-- **Vendor lock-in risk**: The orchestration layer (Knock/Courier) abstracts the email provider. Switching from Postmark to Resend or SendGrid is a configuration change, not an architectural one.
+**The hybrid architecture** (Nylas for customer emails, Postmark for system notifications) gives us the best of both worlds and is the recommended path forward.
 
 ---
 
 ## Sources
 
-- [Postmark Pricing](https://postmarkapp.com/pricing)
-- [Postmark Inbound Processing](https://postmarkapp.com/developer/user-guide/inbound)
-- [Postmark Transactional Email Comparison](https://postmarkapp.com/blog/transactional-email-providers)
-- [Resend Pricing](https://resend.com/pricing)
-- [Resend Inbound Emails](https://resend.com/blog/inbound-emails)
-- [Resend vs Postmark Comparison](https://www.sequenzy.com/versus/resend-vs-postmark)
-- [SendGrid Inbound Parse Webhook Docs](https://www.twilio.com/docs/sendgrid/for-developers/parsing-email/inbound-email)
-- [Mailgun Inbound Routing](https://www.mailgun.com/features/inbound-email-routing/)
+### Nylas
+- [Nylas Pricing](https://www.nylas.com/pricing/)
+- [Nylas Pricing Guide (Zeeg)](https://zeeg.me/en/blog/post/nylas-api-pricing)
+- [Nylas Email API](https://www.nylas.com/products/email-api/)
+- [Nylas v3 API Guide (Zeeg)](https://zeeg.me/en/blog/post/nylas-api)
+- [Nylas Messages API Docs](https://developer.nylas.com/docs/v3/email/)
+- [Nylas Send Email Docs](https://developer.nylas.com/docs/v3/email/send-email/)
+- [Nylas Authentication Docs](https://developer.nylas.com/docs/v3/auth/)
+- [Nylas Google Provider Guide](https://developer.nylas.com/docs/dev-guide/provider-guides/google/)
+- [Nylas Webhooks Docs](https://developer.nylas.com/docs/v3/notifications/webhooks/)
+- [Nylas Notification Schemas](https://developer.nylas.com/docs/v3/notifications/notification-schemas/)
+- [Nylas Message Tracking](https://developer.nylas.com/docs/v3/email/message-tracking/)
+- [Nylas Security](https://www.nylas.com/security/)
+- [Nylas Data Residency](https://developer.nylas.com/docs/dev-guide/platform/data-residency/)
+- [Nylas Token Lifetimes](https://support.nylas.com/hc/en-us/articles/16115127208221)
+- [Nylas v3 Status](https://status-v3.nylas.com/)
+- [Nylas Insurance Solutions Blog](https://www.nylas.com/blog/fintech-insurance-digital-innovation/)
+- [Nylas Case Studies](https://www.nylas.com/case-studies/)
+
+### Microsoft Graph API
+- [Graph Mail API Overview](https://learn.microsoft.com/en-us/graph/api/resources/mail-api-overview)
+- [Graph Send Mail on Behalf](https://learn.microsoft.com/en-us/graph/outlook-send-mail-from-other-user)
+- [Graph Permissions Reference](https://learn.microsoft.com/en-us/graph/permissions-reference)
+- [Graph Admin Consent](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent)
+
+### Gmail API
+- [Gmail API Usage Limits](https://developers.google.com/workspace/gmail/api/reference/quota)
+- [Gmail Sending Limits (Google Workspace)](https://support.google.com/a/answer/166852)
+- [Gmail Sending Limits Guide (Smartlead)](https://www.smartlead.ai/blog/gmail-sending-limits)
+
+### EmailEngine
+- [EmailEngine vs Nylas](https://learn.emailengine.app/docs/comparison/emailengine-vs-nylas)
+- [EmailEngine Docs](https://learn.emailengine.app/docs)
+
+### Unipile
+- [Unipile Pricing](https://www.unipile.com/pricing-api/)
+- [Unipile Email API](https://www.unipile.com/communication-api/email-api/)
+
+### Mailgun
 - [Mailgun Pricing](https://www.mailgun.com/pricing/)
-- [Amazon SES Pricing](https://aws.amazon.com/ses/pricing/)
-- [Customer.io Pricing Review](https://encharge.io/customer-io-pricing/)
-- [Knock Pricing](https://knock.app/pricing)
-- [Knock vs Courier Comparison](https://velt.dev/blog/knock-vs-courier-notification-api-2025)
-- [Courier Pricing](https://www.courier.com/pricing)
-- [OneSignal Pricing](https://www.capterra.com/p/163452/OneSignal/pricing/)
-- [Mailchimp Email Benchmarks by Industry](https://mailchimp.com/resources/email-marketing-benchmarks/)
-- [MailerLite 2025 Email Benchmarks](https://www.mailerlite.com/blog/compare-your-email-performance-metrics-industry-benchmarks)
-- [Insurance Email Marketing Best Practices (Campaign Monitor)](https://www.campaignmonitor.com/resources/guides/email-marketing-for-insurance-agents/)
-- [Insurance Email Marketing Examples (Moosend)](https://moosend.com/blog/insurance-email-marketing-examples/)
-- [Email Deliverability Best Practices 2026 (Pushwoosh)](https://www.pushwoosh.com/blog/email-deliverability-spam-avoidance-tips/)
-- [OpenAI Structured Outputs](https://platform.openai.com/docs/guides/structured-outputs)
-- [Airparser Email Parser](https://airparser.com/email-parser/)
-- [Google LangExtract](https://github.com/google/langextract)
-- [LlamaIndex Structured Data Extraction](https://docs.llamaindex.ai/en/stable/use_cases/extraction/)
-- [Email Platform Comparison (SuprSend)](https://www.suprsend.com/post/selecting-an-email-delivery-platform-key-players-compared-2025)
-- [Transactional Email Services Reviewed (EmailToolTester)](https://www.emailtooltester.com/en/blog/best-transactional-email-service/)
+- [Mailgun Inbound Routing](https://www.mailgun.com/features/inbound-email-routing/)
+
+### Nylas Alternatives
+- [Best Nylas Alternatives 2026 (OneCal)](https://www.onecal.io/blog/the-best-nylas-alternatives)
+- [Best Nylas Alternatives (Zeeg)](https://zeeg.me/en/blog/post/nylas-alternatives)
+
+### Compliance
+- [CAN-SPAM Compliance Guide](https://cookie-script.com/privacy-laws/can-spam-act)
+- [Email Compliance Guide (WPMailSMTP)](https://wpmailsmtp.com/email-compliance-guide-to-can-spam-gdpr-and-more/)
+
+### Orchestration
+- [Knock](https://knock.app/)
+- [Customer.io](https://customer.io/)
+- [Knock vs Marketing Automation Comparison](https://knock.app/blog/marketing-automation-notification-infra-comparison)
