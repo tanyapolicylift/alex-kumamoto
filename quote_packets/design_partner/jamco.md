@@ -234,6 +234,140 @@ Alex stated: *"We are working with Hawksoft on this. They've let us know that th
 
 ---
 
+# Specific Agentic Use Cases
+*How will Quote Packet "Agent Mode" work for JAMCO? Mapped to the three core agent actions, grounded in Romeo and Jose's described workflow.*
+
+## Agent Action: Generate Tasks (Subagents)
+
+### Pre-fill
+
+**After voice agent call completes:**
+The agent has captured name, DOB, phone (and possibly email, vehicle year/make/model). It should immediately spawn a pre-fill task:
+
+- **Fenris Prefill** — From name + DOB + address, Fenris returns predicted vehicles (with VINs), household drivers, current carrier. This directly addresses the fields Romeo listed as required at [@6:34] without requiring the customer to provide them verbally. Particularly valuable because Romeo confirmed the voice agent gets an incomplete picture of "vehicle make model, license number, VIN" [@18:26 context].
+- **NHTSA VIN Decode** — If any VIN or year/make/model was captured, immediately decode to get full vehicle details (safety features, body type, engine). This supplements Hawksoft's existing VIN lookup [@7:56] and provides data even before Romeo opens Hawksoft.
+- **Address Validation (USPS/Smarty)** — Standardize and validate the garaging address captured on the call.
+
+**Guardrail recommendation: Autonomous.** Pre-fill is non-customer-facing and only populates internal fields. No reason to gate this behind HITL.
+
+### Enrich
+
+**After pre-fill completes:**
+The agent evaluates the MissingDataProfile and spawns enrichment tasks for remaining gaps:
+
+- **Canopy Connect** — If email was captured, generate and queue a Canopy Connect link for the customer. This would pull the exact prior policy data that JAMCO currently only gets on the second touch via dec page request. Could collapse the two-touch process Romeo described at [@10:36]: *"Once they kind of like, hey, this is something that we are interested in, we normally right at the bat, ask for their declarations page just to make sure we... do apples to apples."*
+- **NHTSA batch decode** — If Fenris returned multiple predicted vehicles with VINs, decode all of them in parallel.
+- **Hawksoft VIN supplement** — If VINs are captured and the Hawksoft API becomes available, the agent could pre-populate the Hawksoft record directly, mirroring the native VIN lookup Romeo showed during the screen share [@15:59].
+
+**Guardrail recommendation: Autonomous for data lookups (NHTSA, Fenris, address validation). HITL for Canopy Connect link generation** — because this requires customer-facing action (sending the link) and the agency may want to control timing. Jose explicitly described wanting control over when customer outreach happens.
+
+### Follow-up
+
+**When the agent determines follow-up is needed (missing fields remain after pre-fill + enrichment):**
+
+The agent spawns follow-up tasks across channels. This directly maps to Romeo's stated interest: *"I think it's going to be helpful if we use the follow-up as a way of calling them or texting them or emailing them."* [@20:58]
+
+**Scenario A: Tech-forward customer (5+ missing fields)**
+- Agent generates an SMS with the branded portal link, sent within minutes of the initial call ending. Portal includes smart form (pre-filled with known data) + dec page upload.
+- If email was captured, agent also generates a BYOD email (via Romeo's inbox) with the same CTAs, personalized in JAMCO's voice.
+- Jose specifically requested this exact capability: *"Will you be able to provide basically like a link that we could email or text to them so that they can actually input all their data?"* [@24:33]
+
+**Scenario B: Only 1-2 fields missing (e.g., VIN, DL#)**
+- Agent generates a conversational SMS asking for the specific missing field(s).
+- Example: "Hi [Name], thanks for calling JAMCO Insurance! To finish your auto quote, we just need the VIN for your 2019 Honda Civic — you can find it on your registration or inside the driver's door. Reply here or tap this link: [portal]"
+
+**Scenario C: Customer uploaded a dec page but parsing had low-confidence fields**
+- Agent generates a follow-up asking the customer to confirm specific extracted values.
+- Jose was excited about this exact flow: *"If they were to provide the deck page, would we be able to upload it and then you guys would parse it and take all the data out?"* [@24:33]
+
+**Scenario D: 72-hour reminder**
+- If no response to initial follow-up, agent generates a reminder with different phrasing, referencing the call and listing the top 2-3 missing fields.
+- If no response to 2 emails, fall back to SMS.
+
+**Guardrail recommendation: Configurable per agency.**
+- JAMCO is likely a candidate for **HITL on first follow-up** (Romeo and Jose emphasized that the customer should feel they're talking to a real person [@20:58, @16:46]), with **autonomous reminders** after the first touch.
+- Jose could toggle specific follow-up types to autonomous once he's comfortable with the messaging templates.
+
+## Agent Action: Change Status
+
+The agent evaluates the quote packet against JAMCO-specific readiness thresholds and transitions status automatically:
+
+### Status: "Ready for TurboRater"
+**Trigger:** All fields from Romeo's required checklist [@6:34] are captured: driver names, DOBs, DL numbers, current carrier, coverage limits, vehicles, coverages per vehicle, tickets/accidents, payment info, expiration date.
+
+Romeo confirmed this threshold explicitly: *"Once we have that initial information, that should be sufficient in order for us to rate it directly to the carriers or, you know, using Turbo Raider."* [@8:24]
+
+**Agent behavior:** Change status to "Ready for TurboRater." This signals to Romeo that the packet has enough data to bridge to the rater — no more waiting for customer responses.
+
+### Status: "Ready for Apples-to-Apples"
+**Trigger:** Dec page received and parsed (either via upload, Canopy Connect, or customer email reply with attachment). Coverage limits from dec page now available for comparison.
+
+This maps to the second-touch process: *"We normally right at the bat, ask for their declarations page just to make sure we... do apples to apples."* [@10:36]
+
+**Agent behavior:** Change status to "Ready for Apples-to-Apples." Attach parsed dec page data alongside the initial quote data so Romeo can compare and adjust.
+
+### Status: "Ready for Human Follow-up"
+**Trigger:** Customer is in the old-school segment (no portal engagement, no SMS replies, no dec page uploaded after 72+ hours). OR: Customer replied with a question or expressed confusion.
+
+Romeo's reasoning: *"Some clients are sort of old school and they are afraid of kind of providing those information, especially to an AI... I think they would pretty much be comfortable speaking to someone that really is a person."* [@20:58]
+
+**Agent behavior:** Change status to "Needs Personal Touch." The packet stops automated follow-up and routes to Romeo for a human phone call.
+
+### Status: "Awaiting Finalization" (HITL-only boundary)
+**Trigger:** Quote has been presented to customer, customer expressed interest. Ready for MVR, binding.
+
+This is the boundary Romeo drew clearly: *"It's something that we don't want to kind of add to automation just so at least we have that personal touch in order for them to feel like, hey, we're running an actual finalization of your policy."* [@16:46]
+
+**Agent behavior:** Status change only. All subsequent actions are human-driven. No automated outreach beyond this point.
+
+## Agent Action: Notify Producer
+
+### Notification: "New lead — packet auto-populated"
+**Trigger:** Voice agent call completes AND pre-fill/enrichment subagents finish.
+**Routing:** Notify **Romeo** directly (not Jose). Jose flagged this as a specific pain point — he currently has to manually forward email notifications: *"Whenever we get the... chat or somebody on AI and it sends us the email, you know, with the notification, I need to forward that to somebody else so that they can open it up."* [@27:03]
+**Content:** "New auto quote lead: [Name]. Packet is [X]% complete. [N] fields still missing — follow-up [sent/pending]. View packet →"
+
+### Notification: "Packet complete — ready for rater"
+**Trigger:** All required fields captured (status changed to "Ready for TurboRater").
+**Routing:** Romeo (primary), Jose (CC if configured).
+**Content:** "Quote packet for [Name] is complete and ready for TurboRater. All [16] required fields captured. View packet →"
+**Urgency:** High. This is the moment Romeo can immediately open Hawksoft, pull up the data, and bridge to TurboRater.
+
+### Notification: "Dec page received — ready for comparison"
+**Trigger:** Dec page parsed successfully.
+**Routing:** Romeo.
+**Content:** "Dec page received from [Name]. Prior carrier: [Carrier]. Parsed [N] fields (coverage limits, VINs, drivers). Review and compare → "
+**Urgency:** Medium. This enables the apples-to-apples comparison that is currently the second-touch bottleneck.
+
+### Notification: "Customer needs personal touch"
+**Trigger:** Status changed to "Needs Personal Touch" (old-school segment detected, or customer asked a question the agent couldn't handle).
+**Routing:** Romeo.
+**Content:** "[Name] hasn't engaged with digital follow-up after [72h]. May prefer a phone conversation. Here's what we have so far: [summary]. Call them →"
+**Urgency:** Medium.
+
+### Notification: "Tech-forward customer self-completed"
+**Trigger:** Customer completed the smart form AND uploaded a dec page, all through the portal with zero human interaction.
+**Routing:** Romeo (high priority).
+**Content:** "[Name] self-completed their quote packet via the portal — 100% fields captured including dec page. Ready for TurboRater and apples-to-apples immediately. This customer is moving fast — consider prioritizing. View packet →"
+**Urgency:** High. These are the fast-movers that Alex described: *"I don't want to tell you 40 fields of information over the phone. I would like to just type it out because I'm a fast typer, or I would like to upload a deck page and you take care of it."* (validated by Jose [@26:15])
+
+## HITL Guardrail Configuration (JAMCO-Specific)
+
+Based on Romeo and Jose's stated preferences, recommended default guardrails:
+
+| Action | Recommended Guardrail | Evidence |
+|--------|----------------------|----------|
+| Pre-fill (Fenris, NHTSA, address) | **Autonomous** | Non-customer-facing. Pure data. |
+| Enrich (Canopy Connect link) | **HITL** | Customer-facing action; agency wants control over outreach timing |
+| First follow-up SMS/email | **HITL initially → Autonomous once templates approved** | Romeo: "they're talking to a person that's going to assist them" [@20:58] |
+| Reminder follow-ups | **Autonomous** | Lower stakes; customer already engaged |
+| Status changes | **Autonomous** | Non-customer-facing internal routing |
+| Notifications | **Autonomous** | Always send; never suppress |
+| Finalization / binding outreach | **Always HITL** | Romeo: "we don't want to kind of add to automation... that personal touch" [@16:46] |
+| Dec page parsing + confidence review | **Autonomous with flag** | Parse automatically; flag low-confidence fields for Romeo to confirm before use |
+
+---
+
 # Key Quotes
 
 1. **Romeo Ocampo [@6:34]** -- On the auto data collection checklist:

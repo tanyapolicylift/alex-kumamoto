@@ -348,6 +348,172 @@ These enrichment sources reduce the number of fields the customer needs to provi
 
 ---
 
+# Specific Agentic Use Cases
+*How will Quote Packet "Agent Mode" work for Ley Insurance? Mapped to the three core agent actions, grounded in Kyle's described workflow and his unique position as an owner-operator with a high-conversion video proposal step.*
+
+## Agent Action: Generate Tasks (Subagents)
+
+### Pre-fill
+
+**After any ToF interaction (voice agent, chat, web form):**
+Kyle currently has zero enrichment in his pipeline — he confirmed he has never used data enrichment providers: *"Um, no"* [@8:30]. Every field today is either handwritten from a phone call or pulled from InsureGrid. Pre-fill is therefore the single highest-leverage new capability for Ley Insurance.
+
+- **Fenris Prefill** — From just name + address (which Kyle captures on every first call), Fenris returns predicted vehicles, VINs, household drivers, and property data. This eliminates the need for Kyle to ask many of the fields on his paper quote sheet. Particularly powerful because Kyle confirmed he is *"physically writing it down"* [@25:06] — replacing pen-and-paper with automated pre-fill for 60-70% of fields.
+- **NHTSA VIN Decode** — When the customer mentions vehicle year/make/model on the call but not the full VIN. The agent decodes to get full VIN, safety features, body type, fuel type. Kyle currently has no VIN lookup tool (unlike JAMCO, which has Hawksoft's native lookup).
+- **Phone transcription → pre-fill** — For calls Kyle takes personally (the majority), the agent can transcribe the call recording and extract structured fields. Kyle's phone system records every call but the data is stranded: *"our phone is recording them, but they can't, the phone can't talk back to Hawksoft until a profile has been built in Hawksoft"* [@25:22]. The agent's pre-fill task bridges this gap: transcription → structured extraction → pre-populated quote packet → bootstrap the Hawksoft profile.
+
+**Guardrail recommendation: Autonomous.** Kyle has no current enrichment pipeline, so any pre-fill is net-new value with no risk of conflicting with existing workflows. Non-customer-facing.
+
+### Enrich
+
+**After pre-fill completes — the agent evaluates gaps and spawns targeted enrichment:**
+
+- **InsureGrid auto-send** — The agent generates and sends an InsureGrid link to every new lead via SMS. This is the single most impactful enrichment action for Kyle because:
+  - InsureGrid is $100/month flat with unlimited pulls — **zero marginal cost** per lead [@26:00]
+  - Kyle already sends InsureGrid manually on a per-customer basis [@6:20]
+  - 75-80% of prospects agree to use it [@7:00], and of those, 100% actually complete it [@7:40]
+  - **The agent automates what Kyle already does manually, at the exact moment of highest engagement (right after the call), at zero additional cost.**
+  - The agent should use Kyle's own framing language: position InsureGrid as a *coverage accuracy* tool — *"we're not missing any coverages because we don't want to miss anything, but we also don't want to provide something that you don't necessarily need"* [@6:20]
+
+- **InsureGrid failure fallback** — If InsureGrid fails (Allstate, State Farm — *"specifically Allstate and sometimes State Farm, they either don't are unable to return"* [@9:06]), the agent should automatically spawn an alternative enrichment path:
+  - Send the customer a dec page upload link (photo/PDF via portal or MMS)
+  - Trigger LLM Vision parsing on any uploaded document
+  - This replaces Kyle's current fallback of quoting with personal presets: *"I'm going to quote your insurance how I would quote my own personal insurance"* [@9:36] — which works but produces a less accurate initial quote
+
+- **Home enrichment** (if customer mentions home or is flagged for bundling via "own or rent" question):
+  - County property records: year built, sq ft, construction type, bathrooms (Kyle: *"bathrooms... seems to be a huge factor"* [@17:19])
+  - FEMA flood zone from address
+  - CAL FIRE wildfire risk (if CA)
+  - This pre-fills many of the home fields Kyle described as intensive: *"Home quote sheet's a little bit more intensive. It's going to ask about smoke detectors, fire extinguishers, wood stoves in the home, pools, trampolines, the year of the roof"* [@17:00]
+
+**Guardrail recommendation:**
+- **InsureGrid auto-send: HITL initially → Autonomous once Kyle approves messaging.** This is customer-facing and Kyle has specific framing preferences. Once the template is approved, it should run on every lead automatically.
+- **Data lookups (NHTSA, Fenris, property records): Autonomous.** Non-customer-facing.
+- **InsureGrid fallback (dec page upload link): Autonomous.** The alternative channel fires only when InsureGrid already failed — no downside risk.
+
+### Follow-up
+
+**The agent generates follow-up outreach across SMS and email, using Kyle's specific messaging framework.**
+
+**Scenario A: Immediate post-call follow-up (primary flow)**
+Agent sends an SMS within minutes of the initial call:
+1. Trust-building messaging per Kyle's framework: *"We represent 30 different carriers... we're going to compare your insurance to the rest of the market"* [@22:07]
+2. InsureGrid link
+3. Portal link for remaining fields
+4. Kyle explicitly confirmed this approach: follow-up via *"text or email"* [@23:58]
+
+**Scenario B: Internet lead (low close rate today)**
+Kyle's internet leads provide minimal data and convert poorly: *"our close rate for internet submissions is very low"* [@2:17]. The agent can materially improve this:
+1. Immediately send SMS with trust messaging + InsureGrid link + smart form portal link
+2. Kyle wishes the web form captured more: *"it would be cool if someone, they go to request a quote. But we had all, like they were able to enter all of that data"* [@0:47]
+3. The smart form IS that "enter all of that data" experience Kyle described wanting
+
+**Scenario C: InsureGrid completed — remaining gaps**
+After InsureGrid returns the dec page, the agent evaluates what's still missing (likely DL#, SSN, occupation, household members not on current policy). Agent sends a short follow-up:
+- "Thanks for connecting your insurance — we got your policy details! We just need your driver's license number and [1-2 other fields] to finalize your quote. Tap here: [short form]"
+
+**Scenario D: No engagement after 72 hours**
+- Reminder SMS with different phrasing, reference the call, name the top 2 missing fields
+- If no engagement after 2nd SMS → BYOD email with more detail
+- After 3 total attempts → escalate to Kyle for personal phone call
+
+**Guardrail recommendation: HITL for initial messaging template approval, then Autonomous.**
+Kyle was very specific about messaging tone and content [@22:07, @22:40, @23:15]. Once he approves the templates, the agent should run follow-ups autonomously because Kyle is currently doing all of this manually — automation directly frees his time to create video proposals (his highest-ROI activity).
+
+## Agent Action: Change Status
+
+The agent evaluates the quote packet against Ley-specific readiness thresholds. Kyle gave an explicit minimum field list at [@20:36].
+
+### Status: "Ready for PLRater"
+**Trigger:** All of Kyle's explicitly required fields captured: name, address, DOB, marital status, DL#, VINs, household drivers.
+**Evidence:** Kyle at [@20:36]: *"Things personally we need are name, address, date of birth, married, single, driver's license number... and the VIN, and the vehicles, the VINs."*
+
+**Agent behavior:** Change status to "Ready for PLRater." This signals that Kyle (or staff) can enter the data into PLRater and begin quoting across carriers. This is the key inflection point — from here, Kyle can generate quotes and create his video proposal.
+
+### Status: "Ready for Video Proposal"
+**Trigger:** Quote packet is complete AND quotes have been generated in PLRater (or the agent detects that sufficient data exists for multi-carrier quoting).
+**Why this matters:** Kyle's 85% close rate on video proposals makes this the most valuable status transition in his funnel: *"I can pretty much guarantee if I'm doing a video quote, I'm going to sell it"* [@2:52]. Every hour shaved getting to this status directly translates to revenue.
+
+**Agent behavior:** Change status to "Ready for Video Proposal." Notify Kyle with high urgency (see Notify section).
+
+### Status: "Ready for Preset Quote"
+**Trigger:** InsureGrid failed (Allstate/State Farm) AND dec page upload was sent as fallback AND 48+ hours with no dec page received from customer.
+**Evidence:** Kyle's fallback: *"I'm going to quote your insurance how I would quote my own personal insurance"* [@9:36].
+
+**Agent behavior:** Change status to "Ready for Preset Quote." Attach whatever partial data exists and flag that prior coverage details are missing. Kyle proceeds with his preset approach rather than waiting indefinitely.
+
+### Status: "Needs Personal Call"
+**Trigger:** Customer hasn't engaged with any digital follow-up after 72+ hours. OR: Customer replied with a question. OR: Customer refused InsureGrid and appears price-cautious.
+**Evidence:** ~20-25% of prospects refuse InsureGrid because they're *"strictly price-oriented"* [@7:00]. Kyle doesn't push hard — *"we don't really try that hard on those"* — but they still deserve a personal touch.
+
+**Agent behavior:** Change status to "Needs Personal Call." Halt all automated outreach. Route to Kyle for a direct phone call.
+
+### Status: "Low Priority — Risk Flag"
+**Trigger:** Risk screening criteria met: roof year > 30 years OR 2+ DUI convictions detected.
+**Evidence:** Kyle at [@19:12]: *"things that we don't necessarily... go after are, you know, crappy houses, roofs, you know, roofs over 30 years old. And autos with, you know, the guy has just two DUIs."*
+
+**Agent behavior:** Change status to "Low Priority — Risk Flag." Don't suppress the lead entirely (Kyle said *"we have a market for everything"*) but deprioritize it below other active packets.
+
+## Agent Action: Notify Producer
+
+### Notification: "New lead — packet auto-populated from call"
+**Trigger:** Phone call ends AND transcription + pre-fill + enrichment completes.
+**Routing:** Kyle (primary producer and owner).
+**Content:** "New auto quote lead: [Name], [Address]. Packet is [X]% complete from call transcription + enrichment. [N] fields still missing. InsureGrid link [sent/pending]. View packet →"
+**Urgency:** Standard.
+**Why it matters:** This replaces Kyle's current flow of handwriting a quote sheet, scanning it, and manually creating a Hawksoft profile. The notification arrives with structured data already populated — Kyle can go straight to PLRater entry.
+
+### Notification: "InsureGrid completed — dec page received"
+**Trigger:** Customer completed InsureGrid, dec page data returned and parsed.
+**Routing:** Kyle.
+**Content:** "Dec page received for [Name] via InsureGrid. Prior carrier: [Carrier]. Coverages, VINs, and drivers extracted. Packet now [X]% complete. [Remaining gaps: DL#, occupation]. View packet →"
+**Urgency:** Medium-High. This is the data Kyle needs for an accurate apples-to-apples quote.
+
+### Notification: "Packet complete — ready for video proposal"
+**Trigger:** All required fields captured. Status changed to "Ready for PLRater" or "Ready for Video Proposal."
+**Routing:** Kyle (high priority).
+**Content:** "Quote packet for [Name] is complete. All required fields captured (name, address, DOB, marital status, DL#, VINs, household drivers, prior coverage). Ready for PLRater entry and video proposal. View packet →"
+**Urgency:** **High.** This is the moment Kyle should drop everything and create the video proposal. With an 85% close rate, complete packets are the agency's highest-value work items.
+
+### Notification: "High-intent internet lead"
+**Trigger:** An internet form lead (normally low close rate) has completed InsureGrid AND/OR the smart form within 24 hours of submission.
+**Routing:** Kyle (high priority).
+**Content:** "Internet lead [Name] is showing high intent — they completed [InsureGrid / smart form / both] within [X hours] of submitting your web form. Packet is [X]% complete. This is unusual for internet leads — consider prioritizing. View packet →"
+**Urgency:** **High.** Kyle's internet leads normally have a "very low" close rate [@2:17]. A lead that self-serves through the digital tools is signaling genuine intent and should be fast-tracked.
+
+### Notification: "Cautious lead — may need personal approach"
+**Trigger:** Customer refused InsureGrid OR refused optional fields (SSN, etc.) OR sent a message expressing concern about sharing information.
+**Routing:** Kyle.
+**Content:** "[Name] appears cautious about sharing information — [declined InsureGrid / declined SSN / expressed concern]. They may respond better to a personal phone call. Here's what we have so far: [summary]. Automation paused."
+**Urgency:** Standard.
+**Evidence:** Kyle's SSN heuristic: *"if someone has a problem giving it, I know they're going to be a little bit more challenging to deal with"* [@10:18]. The agent operationalizes Kyle's gut instinct into a systematic flag.
+
+### Notification: "Risk flag — deprioritize"
+**Trigger:** Risk screening criteria detected (roof >30 years, 2+ DUIs).
+**Routing:** Kyle.
+**Content:** "Lead [Name] flagged for risk: [roof year: 1990 / 2 DUI convictions]. Per your screening preferences, this has been marked low priority. You have a market for it if you choose to pursue. View packet →"
+**Urgency:** Low.
+
+## HITL Guardrail Configuration (Ley-Specific)
+
+Kyle is an owner-operator who is also the primary producer. His time is his most constrained resource — and his highest-ROI activity is creating video proposals (85% close rate). Guardrails should optimize for maximizing Kyle's time on video proposals while ensuring customer-facing communications match his voice and trust-building approach.
+
+| Action | Recommended Guardrail | Evidence |
+|--------|----------------------|----------|
+| Pre-fill (Fenris, NHTSA, transcription) | **Autonomous** | Kyle has zero enrichment today; any pre-fill is net-new value. Non-customer-facing. |
+| InsureGrid auto-send | **HITL initially → Autonomous** | Customer-facing but Kyle already sends these manually. Approve template once, then let it run on every lead. Zero marginal cost. |
+| InsureGrid failure fallback (dec page upload link) | **Autonomous** | Lower stakes — only fires when primary path failed. |
+| Home enrichment (property records, FEMA, etc.) | **Autonomous** | Non-customer-facing data lookups. |
+| First follow-up SMS/email | **HITL initially → Autonomous** | Kyle has very specific messaging requirements [@22:07, @22:40, @23:15]. Approve templates, then autonomous. |
+| Reminder follow-ups | **Autonomous** | Kyle is time-constrained; reminders should not require his approval every time. |
+| Status changes | **Autonomous** | Internal routing logic. Non-customer-facing. |
+| Notifications | **Autonomous (always send)** | Kyle needs to know when packets are ready; never suppress. |
+| Carrier quoting / PLRater entry | **Always HITL** | Kyle manually quotes each carrier for accuracy: *"we go in there and we manually do this"* [@23:15]. This is consultative work. |
+| Video proposal creation | **Always HITL** | Kyle's core sales skill. The agent gets him there faster; it does not replace him. |
+| Binding / finalization | **Always HITL** | Kyle conducts personal conversations at this stage. |
+
+---
+
 # Key Quotes
 
 1. **On consumer expectations:**
