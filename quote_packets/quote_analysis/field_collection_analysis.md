@@ -86,22 +86,22 @@ Our AI agents (voice + chat) successfully collect **contact info and basic inten
 
 ### What We Collect (Combined Calls + Chats, n=37)
 
-| Field | Calls (n=34) | Chats (n=3) | Description |
-|-------|-------------|-------------|-------------|
-| **phoneNumber** | **100%** | 67% | Always captured on calls (caller ID) |
-| **driver** (name string) | **88%** | 67% | Combined driver name |
-| **firstName** | **82%** | 67% | |
-| **lastName** | **85%** | 67% | |
-| **driverBirthDate** | **65%** | 67% | Collected majority of time |
-| **ownership** (own/finance/lease) | 47% | 0% | Under half the time |
-| **email** | 44% | 67% | Better on chat |
-| **claimsHistory** | 44% | 67% | Usually just "No" as free text |
-| **primaryUse** | 44% | 0% | Pleasure/commute/business |
-| **vehicleMake** | 44% | 67% | |
-| **vehicleModel** | 41% | 67% | |
-| **vehicleYear** | 41% | 67% | |
-| **licenseNumber** | 41% | 0% | |
-| **vin** | **15%** | 0% | Very rarely collected |
+| Field                             | Calls (n=34) | Chats (n=3) | Description                          |
+| --------------------------------- | ------------ | ----------- | ------------------------------------ |
+| **phoneNumber**                   | **100%**     | 67%         | Always captured on calls (caller ID) |
+| **driver** (name string)          | **88%**      | 67%         | Combined driver name                 |
+| **firstName**                     | **82%**      | 67%         |                                      |
+| **lastName**                      | **85%**      | 67%         |                                      |
+| **driverBirthDate**               | **65%**      | 67%         | Collected majority of time           |
+| **ownership** (own/finance/lease) | 47%          | 0%          | Under half the time                  |
+| **email**                         | 44%          | 67%         | Better on chat                       |
+| **claimsHistory**                 | 44%          | 67%         | Usually just "No" as free text       |
+| **primaryUse**                    | 44%          | 0%          | Pleasure/commute/business            |
+| **vehicleMake**                   | 44%          | 67%         |                                      |
+| **vehicleModel**                  | 41%          | 67%         |                                      |
+| **vehicleYear**                   | 41%          | 67%         |                                      |
+| **licenseNumber**                 | 41%          | 0%          |                                      |
+| **vin**                           | **15%**      | 0%          | Very rarely collected                |
 
 ### What PL Rater Requires (But We DON'T Collect)
 

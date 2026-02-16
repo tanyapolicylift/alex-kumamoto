@@ -4,6 +4,30 @@ References: [[cycle_spec]], [[cycle_brainstorm]], [[cycle_prd]], [[context_plrat
 
 ---
 
+## Owners
+* Simple Portal UX: Martin driving
+	* Wireframes/designs
+* Alex/Martin/Raghav driving discovery on Agent willingness to use
+
+## Key Discovery Information
+### Kyle Ley
+Core Info that MUST be retrieved to quote
+- Name
+- Address
+- Date of birth
+- Marital status (“married, single”)
+- Driver’s license number (for each driver)
+- VIN for each vehicle
+- Other driving adults in the household (implied when he says he needs all driving adults)
+
+Would prefer that we follow with personalized messages that:
+* Build trust and assure prospect that they are in good hands (we have 30 carriers and will get you the best rate you don't need to go elsewhere)
+* An insuregrid link (retrieves Dec page) - most preferred way to fill
+	* Kyle pays flat subscription (cheap, like low hundreds per month) and can get as many Insuregrid links as he wants
+
+* If customer seems cagey about providing info like SSN, Kyle will default to "prefills" with most info to just get A quote
+
+
 ## Purpose
 
 These are the **customer-facing input surfaces** where end-customers provide the remaining quote data that wasn't captured during the initial interaction. They share a common delivery mechanism (a link sent via SMS/email or presented mid-interaction) and a common goal (get structured data into our system). This spec covers the three modalities, how they connect, and how they're introduced to the customer.

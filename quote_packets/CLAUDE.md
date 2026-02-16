@@ -4,14 +4,17 @@
 
 The following files are locked and must NOT be modified without explicit user direction:
 
-- `v1_adr.md`
-- `v1_prd.md`
+- `prototyping/v1_adr.md`
+- `prototyping/v1_prd.md`
+- `prototyping/v1.1_voice_adr.md`
 - `context_general.md`
-- `context_commercial_ca_workers_comp.md`
 - `context_plrater_home_auto.md`
 - `images/` (all contents)
 
 Treat these as read-only reference material.
+
+## Ignore
+`commercial_archive` directory saves original research done on commercial-side quote packets which are not out of scope. You should ignore this directory when building context and examining the `quote_packets` 
 
 ## Creating New Files
 

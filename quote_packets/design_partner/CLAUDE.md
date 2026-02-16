@@ -1,0 +1,2 @@
+# Design Partner - Workspace Instructions
+`template.md` shows the rough template generated for each Design Partner. The focus of each Design Partner files is to generate deeply-detailed context and profile to aid in solution implementation of the quote packets project.

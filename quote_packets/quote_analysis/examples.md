@@ -34,25 +34,25 @@ Caller requested auto insurance and provided vehicle and driver details over a 3
 
 Caller provided driver and vehicle info for a financed Honda Civic over a ~4-minute call.
 
-| Field | Value |
-|---|---|
-| **Channel** | Phone call |
-| **Agency** | FOCO Insurance Services |
-| **Duration** | 3 min 48 sec |
-| **Score** | 4 |
-| **First Name** | *(not provided)* |
-| **Last Name** | Herrera |
-| **Phone** | +1 (909) 789-8127 |
-| **Email** | *not collected* |
-| **DOB** | 07/16/1958 |
-| **Vehicle Year** | 2014 |
-| **Vehicle Make** | Honda |
-| **Vehicle Model** | Civic |
-| **Ownership** | Financed |
-| **Primary Use** | Commute |
-| **VIN** | *not collected* |
-| **License Number** | *not collected* |
-| **Claims History** | No |
+| Field              | Value                 |
+| ------------------ | --------------------- |
+| **Channel**        | Phone call            |
+| **Agency**         | FO Insurance Services |
+| **Duration**       | 3 min 48 sec          |
+| **Score**          | 4                     |
+| **First Name**     | Carlos                |
+| **Last Name**      | Herrera               |
+| **Phone**          | +1 (909) 789-8127     |
+| **Email**          | *not collected*       |
+| **DOB**            | 07/16/1958            |
+| **Vehicle Year**   | 2014                  |
+| **Vehicle Make**   | Honda                 |
+| **Vehicle Model**  | Civic                 |
+| **Ownership**      | Financed              |
+| **Primary Use**    | Commute               |
+| **VIN**            | *not collected*       |
+| **License Number** | *not collected*       |
+| **Claims History** | No                    |
 
 ---
 

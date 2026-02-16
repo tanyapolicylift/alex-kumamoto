@@ -4,6 +4,9 @@ References: [[cycle_spec]], [[cycle_brainstorm]], [[cycle_prd]], [[context_plrat
 
 ---
 
+## Owners
+* Raghav - owning negotiations with private parties
+* Alex/Martin - own exploration with customers to specific sites/use cases
 ## Purpose
 
 Data enrichment is the practice of **automatically filling in quote-required fields from external data sources** rather than asking the customer. Every field we can enrich is one fewer question on the form, one fewer SMS follow-up, and a faster cycle. This spec covers two categories:
