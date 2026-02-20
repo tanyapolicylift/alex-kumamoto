@@ -11,6 +11,55 @@
 
 ---
 
+# Quote Packet Template
+*Portal field prioritization for `jamco_personal_auto_ca`. Primary fields are shown to the customer first (below "Or enter data manually" in the portal). After submitting primary fields, the customer is optionally prompted to fill secondary fields. Fields marked multi-entity support "Add another driver" / "Add another vehicle" flows.*
+
+## Primary Fields (Shown First)
+
+These are the fields Romeo explicitly listed as the minimum required to rate through TurboRater, plus the one field Jose identified as a deal-breaker if missing: current coverage limits. Without these, the agency either can't quote or quotes at minimums and loses the deal.
+
+| Field | Entity Type | Multi-Entity | Reasoning |
+|-------|------------|--------------|-----------|
+| **Full Name** | Applicant | No | Core identifier. First thing Romeo asks on every call [@6:34]. Required for Hawksoft client profile creation. |
+| **Date of Birth** | Applicant + Driver | Yes — per driver | Romeo: *"We ask for the date of births"* [@6:34]. Required for every driver in household. Primary rating factor. Maps to Hawksoft → TurboRater bridge. |
+| **Mailing Address** | Applicant | No | Determines garaging and rating territory. Captured during Romeo's screen share walkthrough of Hawksoft [@16:03]. Portal should use address autocomplete. |
+| **Driver's License #** | Driver | Yes — per driver | Romeo explicitly listed [@6:34]. Not reliably captured by voice agent (AI fatigue concern [@20:58]). One of the portal's highest-value fields. |
+| **Year / Make / Model** | Vehicle | Yes — per vehicle | Romeo collects verbally for each car [@6:34]. Core vehicle identification. |
+| **VIN** | Vehicle | Yes — per vehicle | Hawksoft does VIN lookup to supplement vehicle data [@7:56]. Validate via NHTSA check digit. If customer doesn't have VIN, Year/Make/Model is acceptable — Hawksoft can decode from there. |
+| **Current Carrier** | Prior Coverage | No | Romeo asks on every first call [@6:34]. Critical for competitive positioning and prior insurance verification. |
+| **Current Coverage Limits** | Prior Coverage | No | **The deal-breaker field.** Jose/Raghav: *"If we don't have this, we quote minimums and lose the deal"* [@2:07]. This is JAMCO's single most important portal field — without it, the initial quote is not competitive. BI limits at minimum; full coverage table ideal. |
+| **Current Premium** | Prior Coverage | No | Romeo asks on first call [@6:34]. Customers are price-sensitive — knowing their current premium lets JAMCO position competitively. |
+| **Additional Drivers** | Driver | Yes — "Add another driver" button | Romeo collects all household drivers on the initial call [@6:34]. Each added driver requires at minimum Name + DOB + DL#. |
+
+## Secondary Fields (Shown After Initial Submit)
+
+These fields improve quote accuracy, enable apples-to-apples comparison, and support the finalization step — but the initial TurboRater run can proceed without them. Shown as optional step after primary submission.
+
+| Field | Entity Type | Multi-Entity | Reasoning |
+|-------|------------|--------------|-----------|
+| **Per-Vehicle Coverages** | Vehicle | Yes — per vehicle | Deductibles (comp, collision), roadside, towing, rental — Romeo asks these on the initial call [@10:36]. Improves quote accuracy but TurboRater can default if missing. |
+| **Tickets / Accidents / Claims (3yr)** | History | No | Romeo collects as screening mechanism [@6:34]. Affects carrier eligibility and surcharges. Free-text or structured date/description. |
+| **Policy Expiration / Renewal Date** | Prior Coverage | No | Romeo: included in his explicit checklist [@6:34]. Determines urgency and shopping window. |
+| **Monthly Payment Amount** | Prior Coverage | No | Romeo asks on first call [@6:34]. Helps with competitive positioning on monthly cost. |
+| **Payment Method** | Prior Coverage | No | *"Any automatic EFD, or are they using any kind of payment financing"* [@6:34]. Affects payment plan options presented. |
+| **Gender** | Driver | Yes — per driver | Rating factor. Required for TurboRater driver record. |
+| **Relationship to Applicant** | Driver | Yes — per driver | Required for TurboRater driver record (spouse, child, other). |
+| **Garaging Address** | Vehicle | Yes — per vehicle | Only if different from mailing address. Inferred from Hawksoft screen walkthrough [@16:03]. |
+| **Vehicle Usage** | Vehicle | Yes — per vehicle | Romeo confirmed: *"of course like the usage"* [@16:46]. Commute / Pleasure / Business. |
+| **Household Members / Additional Insureds** | Driver | Yes — per driver | Discussed during Hawksoft screen share [@16:03]. May include non-driving household members for excluded driver assessment. |
+| **Desired Liability Limits** | Coverage | No | TurboRater defaults to current if known. Low priority for portal — Romeo and team set these during the consultative finalization step [@16:46]. |
+| **Phone** | Applicant | No | Likely already captured from voice agent call. Shown in portal only if missing. |
+| **Email** | Applicant | No | Likely already captured. Needed for quote presentation (JAMCO presents quotes via email [@9:03]). |
+
+### Multi-Entity UX Notes
+
+- **Drivers:** Start with applicant (Name + DOB + DL# pre-filled if captured from voice call). "Add another driver" button adds a new driver card. Romeo collects all household drivers on the first call — prompt: "Who else in your household drives?" Each driver needs at minimum Name + DOB + DL#.
+- **Vehicles:** Start with one vehicle card (Year/Make/Model + VIN). "Add another vehicle" button. VIN is preferred (Hawksoft does VIN lookup [@7:56]) but Year/Make/Model is an acceptable fallback. Prompt: "How many vehicles do you want to insure?"
+- **Dec page as shortcut:** For JAMCO, the dec page uploader is the highest-value portal feature. Jose called it unique and his #1 unprompted request: *"If they were to provide the deck page, would we be able to upload it and then you guys would parse it and take all the data out?"* [@24:33]. A successfully parsed dec page resolves current carrier, coverage limits, premium, VINs, DL#s, and drivers — potentially filling ALL primary fields in one shot and collapsing the two-touch process into a single touch. The "Upload your insurance documents" section should be prominently featured above the manual entry fields.
+- **Old-school vs tech-forward:** ~80% of JAMCO's customers are old-school and may not complete the portal at all. The portal is highest-value for the ~20% tech-forward segment who *"would like to just type it out because I'm a fast typer, or I would like to upload a deck page and you take care of it"* [@26:15]. For old-school customers, Romeo will continue collecting data by phone and the portal serves as a supplemental follow-up channel.
+
+---
+
 # Technology Stack
 
 **AMS:** Hawksoft
@@ -76,24 +125,24 @@ Quotes are **not** presented on the initial call. They are emailed after the cal
 
 ## Auto -- Fields Mentioned (from Romeo's explicit list at [@6:34] and [@10:36])
 
-| Field | Required / Optional | Notes |
-|-------|---------------------|-------|
-| Driver name(s) -- all drivers in household | Required | First thing asked |
-| Date of birth (each driver) | Required | |
-| Driver's license number (each driver) | Required | |
-| Current carrier | Required | Used for apples-to-apples comparison |
-| Current coverage limits (BI, etc.) | Required | Without this, they quote at minimums and "lose the deal" (Raghav framing at [@2:07]) |
-| Current premium | Required | Customers are price-sensitive |
-| Vehicles -- year, make, model for each | Required | |
-| VIN | Important | Hawksoft does a VIN lookup to supplement; enrichment opportunity |
-| Coverages per vehicle (deductibles, roadside, towing) | Required | Asked on initial call [@10:36] |
-| Tickets / accidents / claims history | Required | Screening criterion |
-| Monthly payment amount | Required | |
-| Payment method (EFT / financing) | Required | |
-| Policy expiration / renewal date | Required | |
-| Garaging address | Required | Inferred from Hawksoft screen walkthrough [@16:03] |
-| Household members / additional insureds | Required | Discussed during screen share [@16:03] |
-| Vehicle usage | Required | Romeo confirmed: *"We have the... of course like the usage"* [@16:46] |
+| Field                                                 | Required / Optional | Notes                                                                                |
+| ----------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------ |
+| Driver name(s) -- all drivers in household            | Required            | First thing asked                                                                    |
+| Date of birth (each driver)                           | Required            |                                                                                      |
+| Driver's license number (each driver)                 | Required            |                                                                                      |
+| Current carrier                                       | Required            | Used for apples-to-apples comparison                                                 |
+| Current coverage limits (BI, etc.)                    | Required            | Without this, they quote at minimums and "lose the deal" (Raghav framing at [@2:07]) |
+| Current premium                                       | Required            | Customers are price-sensitive                                                        |
+| Vehicles -- year, make, model for each                | Required            |                                                                                      |
+| VIN                                                   | Important           | Hawksoft does a VIN lookup to supplement; enrichment opportunity                     |
+| Coverages per vehicle (deductibles, roadside, towing) | Required            | Asked on initial call [@10:36]                                                       |
+| Tickets / accidents / claims history                  | Required            | Screening criterion                                                                  |
+| Monthly payment amount                                | Required            |                                                                                      |
+| Payment method (EFT / financing)                      | Required            |                                                                                      |
+| Policy expiration / renewal date                      | Required            |                                                                                      |
+| Garaging address                                      | Required            | Inferred from Hawksoft screen walkthrough [@16:03]                                   |
+| Household members / additional insureds               | Required            | Discussed during screen share [@16:03]                                               |
+| Vehicle usage                                         | Required            | Romeo confirmed: *"We have the... of course like the usage"* [@16:46]                |
 
 **Fields where enrichment would help most:** VIN lookup (already partially handled by Hawksoft), vehicle details (make/model/year from VIN), household members, garaging address. Alex noted these are areas where the voice agent collects an incomplete picture. [@18:26]
 
