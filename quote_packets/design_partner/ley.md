@@ -27,14 +27,20 @@ These are the fields Kyle explicitly listed as minimum required to generate a qu
 
 | Field | Entity Type | Multi-Entity | Reasoning |
 |-------|------------|--------------|-----------|
+| | **Applicant** | | |
 | **Full Name** | Applicant | No | Core identifier. Kyle collects first on every call. Required for PLRater Client Info tab. |
-| **Date of Birth** | Applicant + Driver | Yes — per driver | Primary rating factor. Kyle: *"date of birth"* in his explicit required list [@20:36]. Each additional driver also requires DOB. |
+| **Date of Birth** | Applicant | No | Primary rating factor. Kyle: *"date of birth"* in his explicit required list [@20:36]. |
 | **Mailing Address** | Applicant | No | Determines rating territory and garaging location. Kyle explicitly listed [@20:36]. Portal should use address autocomplete. |
+| **Phone** | Applicant | No | Core contact field. May already be captured from call — shown in portal only if missing. |
+| **Email** | Applicant | No | Needed for InsureGrid link delivery, follow-up communications, and video proposal delivery. |
 | **Marital Status** | Applicant | No | *"We have to know if they're married or single"* [@18:00]. Directly impacts rate and triggers spouse driver addition. |
+| | **Driver** *(per driver)* | | |
+| **Full Name** | Driver | Yes — per driver | *"If there's any other driving adults living in that house"* [@18:00]. "Add another driver" button adds a new driver card. |
+| **Date of Birth** | Driver | Yes — per driver | Required for every additional driver. Each added driver requires Name + DOB + DL# at minimum. |
 | **Driver's License #** | Driver | Yes — per driver | Kyle explicitly listed [@20:36]. Not voice-capturable — this is one of the portal's highest-value fields. Required for MVR pull. |
+| | **Vehicle** *(per vehicle)* | | |
 | **VIN** | Vehicle | Yes — per vehicle | *"And the VIN, and the vehicles, the VINs"* [@20:48]. Not voice-capturable. Validate via NHTSA check digit. If customer doesn't have VIN, fall back to Year/Make/Model. |
 | **Year / Make / Model** | Vehicle | Yes — per vehicle | Core vehicle identification. Voice-capturable as fallback when VIN not available. NHTSA decode supplements from VIN. |
-| **Additional Drivers** | Driver | Yes — "Add another driver" button | *"If there's any other driving adults living in that house"* [@18:00]. Each added driver requires Name + DOB + DL# at minimum. |
 
 ## Secondary Fields (Shown After Initial Submit)
 
@@ -42,19 +48,25 @@ These fields improve quote accuracy, unlock discounts, and enable cross-sell but
 
 | Field | Entity Type | Multi-Entity | Reasoning |
 |-------|------------|--------------|-----------|
-| **Occupation** | Driver | Yes — per driver | *"A lot of insurance companies rate on your occupation... the factory worker is not getting the same rate as a teacher"* [@16:08]. Discount eligibility (teacher discounts). Maps to PLRater Client Info tab. |
+| | **Applicant** | | |
 | **Own or Rent Home** | Applicant | No | Triggers multi-policy opportunity + homeowner discount on auto: *"owning or renting a home then wouldn't branch off"* [@16:08]. Key cross-sell signal for home bundling. |
+| **SSN** | Applicant | No | Used by carriers for credit-based insurance scores. Also Kyle's informal lead qualification signal [@10:18]. Sensitive — many customers balk. Optional in V1 portal. |
+| | **Driver** *(per driver)* | | |
+| **Occupation** | Driver | Yes — per driver | *"A lot of insurance companies rate on your occupation... the factory worker is not getting the same rate as a teacher"* [@16:08]. Discount eligibility (teacher discounts). Maps to PLRater Client Info tab. |
 | **Gender** | Driver | Yes — per driver | Rating factor in most states. Required for PLRater Drivers tab. |
 | **Relationship to Applicant** | Driver | Yes — per driver | Required for PLRater Drivers tab (spouse, child, other). |
 | **College Student / Vehicle at College** | Driver | Yes — per driver | Discount for child away at college 100+ miles: *"Is your son at college? Is the vehicle at college?"* [@16:00]. Only shown if driver is age 16-25. |
-| **SSN** | Applicant | No | Used by carriers for credit-based insurance scores. Also Kyle's informal lead qualification signal [@10:18]. Sensitive — many customers balk. Optional in V1 portal. |
+| | **Vehicle** *(per vehicle)* | | |
 | **Vehicle Usage** | Vehicle | Yes — per vehicle | Commute / Pleasure / Business. Affects rate. |
 | **Annual Mileage** | Vehicle | Yes — per vehicle | Rating factor for many carriers. |
 | **Garaging Address** | Vehicle | Yes — per vehicle | Only if different from mailing address. *"Is the vehicle at college?"* scenario [@16:00]. |
+| | **Prior Coverage** | | |
 | **Current Carrier** | Prior Coverage | No | For apples-to-apples comparison. May already be captured via InsureGrid or voice call. |
 | **Policy Expiration Date** | Prior Coverage | No | Timing — determines urgency and prior coverage verification. |
 | **Prior Coverage Duration** | Prior Coverage | No | "How long with current carrier" — loyalty/stability indicator. |
+| | **History** | | |
 | **Accidents / Violations (3yr)** | History | No | Screening criterion. Kyle flags 2+ DUIs as low priority [@19:12]. Free-text or structured date/description. |
+| | **Coverage** | | |
 | **Desired Liability Limits** | Coverage | No | PLRater defaults; Kyle customizes per customer. Low priority for portal — Kyle prefers to set these himself during the consultative step. |
 
 ### Multi-Entity UX Notes

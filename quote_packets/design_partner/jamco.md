@@ -20,16 +20,23 @@ These are the fields Romeo explicitly listed as the minimum required to rate thr
 
 | Field | Entity Type | Multi-Entity | Reasoning |
 |-------|------------|--------------|-----------|
+| | **Applicant** | | |
 | **Full Name** | Applicant | No | Core identifier. First thing Romeo asks on every call [@6:34]. Required for Hawksoft client profile creation. |
-| **Date of Birth** | Applicant + Driver | Yes — per driver | Romeo: *"We ask for the date of births"* [@6:34]. Required for every driver in household. Primary rating factor. Maps to Hawksoft → TurboRater bridge. |
+| **Date of Birth** | Applicant | No | Romeo: *"We ask for the date of births"* [@6:34]. Primary rating factor. Maps to Hawksoft → TurboRater bridge. |
 | **Mailing Address** | Applicant | No | Determines garaging and rating territory. Captured during Romeo's screen share walkthrough of Hawksoft [@16:03]. Portal should use address autocomplete. |
+| **Phone** | Applicant | No | Core contact field. May already be captured from voice agent call — shown in portal only if missing. |
+| **Email** | Applicant | No | Needed for quote presentation — JAMCO presents quotes via email [@9:03]. Also needed for follow-up and portal link delivery. |
+| | **Driver** *(per driver)* | | |
+| **Full Name** | Driver | Yes — per driver | Romeo collects all household drivers on the initial call [@6:34]. "Add another driver" button adds a new driver card. |
+| **Date of Birth** | Driver | Yes — per driver | Required for every driver in household. Each added driver requires Name + DOB + DL# at minimum. |
 | **Driver's License #** | Driver | Yes — per driver | Romeo explicitly listed [@6:34]. Not reliably captured by voice agent (AI fatigue concern [@20:58]). One of the portal's highest-value fields. |
+| | **Vehicle** *(per vehicle)* | | |
 | **Year / Make / Model** | Vehicle | Yes — per vehicle | Romeo collects verbally for each car [@6:34]. Core vehicle identification. |
 | **VIN** | Vehicle | Yes — per vehicle | Hawksoft does VIN lookup to supplement vehicle data [@7:56]. Validate via NHTSA check digit. If customer doesn't have VIN, Year/Make/Model is acceptable — Hawksoft can decode from there. |
+| | **Prior Coverage** | | |
 | **Current Carrier** | Prior Coverage | No | Romeo asks on every first call [@6:34]. Critical for competitive positioning and prior insurance verification. |
 | **Current Coverage Limits** | Prior Coverage | No | **The deal-breaker field.** Jose/Raghav: *"If we don't have this, we quote minimums and lose the deal"* [@2:07]. This is JAMCO's single most important portal field — without it, the initial quote is not competitive. BI limits at minimum; full coverage table ideal. |
 | **Current Premium** | Prior Coverage | No | Romeo asks on first call [@6:34]. Customers are price-sensitive — knowing their current premium lets JAMCO position competitively. |
-| **Additional Drivers** | Driver | Yes — "Add another driver" button | Romeo collects all household drivers on the initial call [@6:34]. Each added driver requires at minimum Name + DOB + DL#. |
 
 ## Secondary Fields (Shown After Initial Submit)
 
@@ -37,19 +44,22 @@ These fields improve quote accuracy, enable apples-to-apples comparison, and sup
 
 | Field | Entity Type | Multi-Entity | Reasoning |
 |-------|------------|--------------|-----------|
+| | **Driver** *(per driver)* | | |
+| **Gender** | Driver | Yes — per driver | Rating factor. Required for TurboRater driver record. |
+| **Relationship to Applicant** | Driver | Yes — per driver | Required for TurboRater driver record (spouse, child, other). |
+| **Household Members / Additional Insureds** | Driver | Yes — per driver | Discussed during Hawksoft screen share [@16:03]. May include non-driving household members for excluded driver assessment. |
+| | **Vehicle** *(per vehicle)* | | |
 | **Per-Vehicle Coverages** | Vehicle | Yes — per vehicle | Deductibles (comp, collision), roadside, towing, rental — Romeo asks these on the initial call [@10:36]. Improves quote accuracy but TurboRater can default if missing. |
-| **Tickets / Accidents / Claims (3yr)** | History | No | Romeo collects as screening mechanism [@6:34]. Affects carrier eligibility and surcharges. Free-text or structured date/description. |
+| **Garaging Address** | Vehicle | Yes — per vehicle | Only if different from mailing address. Inferred from Hawksoft screen walkthrough [@16:03]. |
+| **Vehicle Usage** | Vehicle | Yes — per vehicle | Romeo confirmed: *"of course like the usage"* [@16:46]. Commute / Pleasure / Business. |
+| | **Prior Coverage** | | |
 | **Policy Expiration / Renewal Date** | Prior Coverage | No | Romeo: included in his explicit checklist [@6:34]. Determines urgency and shopping window. |
 | **Monthly Payment Amount** | Prior Coverage | No | Romeo asks on first call [@6:34]. Helps with competitive positioning on monthly cost. |
 | **Payment Method** | Prior Coverage | No | *"Any automatic EFD, or are they using any kind of payment financing"* [@6:34]. Affects payment plan options presented. |
-| **Gender** | Driver | Yes — per driver | Rating factor. Required for TurboRater driver record. |
-| **Relationship to Applicant** | Driver | Yes — per driver | Required for TurboRater driver record (spouse, child, other). |
-| **Garaging Address** | Vehicle | Yes — per vehicle | Only if different from mailing address. Inferred from Hawksoft screen walkthrough [@16:03]. |
-| **Vehicle Usage** | Vehicle | Yes — per vehicle | Romeo confirmed: *"of course like the usage"* [@16:46]. Commute / Pleasure / Business. |
-| **Household Members / Additional Insureds** | Driver | Yes — per driver | Discussed during Hawksoft screen share [@16:03]. May include non-driving household members for excluded driver assessment. |
+| | **History** | | |
+| **Tickets / Accidents / Claims (3yr)** | History | No | Romeo collects as screening mechanism [@6:34]. Affects carrier eligibility and surcharges. Free-text or structured date/description. |
+| | **Coverage** | | |
 | **Desired Liability Limits** | Coverage | No | TurboRater defaults to current if known. Low priority for portal — Romeo and team set these during the consultative finalization step [@16:46]. |
-| **Phone** | Applicant | No | Likely already captured from voice agent call. Shown in portal only if missing. |
-| **Email** | Applicant | No | Likely already captured. Needed for quote presentation (JAMCO presents quotes via email [@9:03]). |
 
 ### Multi-Entity UX Notes
 
