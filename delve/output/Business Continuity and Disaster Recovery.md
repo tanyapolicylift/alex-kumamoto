@@ -1,0 +1,72 @@
+<!--
+  CHANGES FROM ORIGINAL:
+  - Modified: "Policy" section — removed per-department BCP/DRP requirement (one unified plan), removed third-party supplier BC/DR contract language, simplified training to reference annual security awareness, simplified role assignment to single designated owner
+  - Modified: "Business Impact Analysis" section — streamlined the factor list to focus on RTO, RPO, and business impact rather than nine enterprise factors
+  - Modified: "Business Continuity Planning" section — simplified required contents, removed personnel relocation and organizational buy-in
+  - Modified: "Disaster Recovery Planning" section — merged into Business Continuity Planning as recovery procedures, removed insurance liaison, recovery cost estimation, and management transition language
+  - Modified: "Role Assignment and Accountability" section — simplified to designating a single BC/DR owner rather than department-level heads
+  - Modified: "Exercise/Testing" section — specified annual cadence, simplified to tabletop exercises with lightweight assessment report
+  - Removed: Third-party supplier BC/DR contract requirements (covered by Vendor Management Policy)
+  - Kept as-is: "Purpose", "Scope", "Terminology", "Backup Policy"
+-->
+
+## Purpose
+
+This policy ensures that the organization can quickly recover from natural and man-made disasters while continuing to support customers and other stakeholders. This document outlines the PolicyLift's policy concerning business continuity measures. These measures, including business continuity and disaster recovery planning, pertain to all critical business operations and service activities undertaken by PolicyLift on behalf of its business/customers.
+
+The objectives are to:
+
+- Successfully control any event that could disrupt PolicyLift's operations
+
+- Maintain the continuity of critical business procedures and services managed by PolicyLift
+
+- Limit the potential influence that any operational disruption could have on PolicyLift and its reputation
+
+
+## Scope
+
+This policy is relevant to all personnel, processes, and systems of PolicyLift necessary to sustain regular business operations and recover from disruptions.
+
+## Terminology
+
+BIA - Business Impact Analysis (BIA) anticipates the outcomes of an interruption to a business function or process and collects data required to formulate recovery tactics.
+
+BCP - Business Continuity Planning is focused on preserving business functions, potentially in a different location or by leveraging alternative tools and procedures after a disaster.
+
+DRP - Disaster Recovery Planning is aimed at reinstating regular business operations following a disaster occurrence.
+
+## Policy
+
+PolicyLift must maintain a unified Business Continuity and Disaster Recovery Plan that covers all critical business operations and services. This plan should include both continuity strategies (how the business keeps operating during a disruption) and recovery procedures (how systems and services are restored to normal).
+
+PolicyLift management should regularly evaluate the impact of potential disasters on business operations as part of the routine business impact analysis.
+
+Before performing a Business Impact Analysis, PolicyLift should carry out a Risk Assessment. BC/DR awareness should be covered as part of PolicyLift's annual security awareness training, ensuring all employees understand the plan and their role during a disruption. The essential team contact list should be updated and maintained regularly.
+
+A designated BC/DR owner (typically the CTO or head of engineering) is responsible for maintaining the plan, scheduling annual tests, and leading the response during an actual incident. All employees should be informed about the business continuity and disaster recovery plan and their responsibilities in achieving the set continuity and recovery goals.
+
+The business continuity and disaster recovery plan should be tested and reviewed at least annually to ensure it remains pertinent.
+
+## Backup Policy
+
+Back-ups should be performed at least weekly for user data using an automated system and replicated to a different availability zone.
+
+Restoration of backups should be periodically tested annually.
+
+Operations personnel must be alerted in case of backup failures. Failures that impact backups of database instances should be investigated and resolved in accordance with the Incident Management Policy/Procedure.
+
+## Role Assignment and Accountability
+
+A designated BC/DR owner must be assigned responsibility for providing guidance and supervision for business continuity and disaster recovery activities, managing the BIA (Business Impact Analysis) and the unified BC/DR plan, keeping management updated on plan readiness, managing annual testing exercises, and leading execution of the plan in the event of an actual or potential disaster.
+
+## Business Impact Analysis
+
+PolicyLift must implement a formal process to establish the criticality of its systems and services and the impact on PolicyLift's business if they are not operational in the event of a disaster. The results of this process should be used to determine business continuity priorities and requirements. The BIA should be reviewed and updated at least annually. At minimum, the business impact analysis should define the recovery time objective (RTO), recovery point objective (RPO), and estimated business impact for each critical system or service.
+
+## Business Continuity and Recovery Planning
+
+A unified Business Continuity and Disaster Recovery Plan is maintained covering the systems and services identified as critical during the BIA. The plan includes: decision-making authority during an outage, team communication procedures, critical system failover and recovery procedures (in priority order), customer notification process, data backup and restoration steps, and emergency contact information.
+
+## Exercise/Testing
+
+An annual test should be performed by authorized personnel to exercise the business continuity and disaster recovery plan. Tests should take the form of tabletop exercises or similar walkthroughs of realistic scenarios. Following each test, a brief assessment report should be created indicating the success of the exercise, key findings, and required corrective actions. The plan should be updated based on the results of these tests.
