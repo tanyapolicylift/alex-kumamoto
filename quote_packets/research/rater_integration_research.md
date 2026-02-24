@@ -27,9 +27,9 @@ We researched three comparative raters used by our design partners to determine 
 
 1. **Orange Partner Program** -- The well-known program for deep AMS360/Sagitta integrations. ~45 partners. Requires extensive legal/security review. This is NOT what most rater integrators use.
 
-2. **PL Rating Integration Partner Program** -- A SEPARATE, less-known program specifically for feeding data into PL Rating. ~30 partners listed at `help.vertafore.com/plrating/content/howto/integration_partners.htm`. This is what Salt, XILO, Feathery, RiskAdvisor, EverQuote, QuoteWizard, NowCerts, and others use. **No PL Rating admin configuration needed on the agency side.**
+2. **PL Rating Integration Partners** -- A SEPARATE listing on Vertafore's help site, specifically for companies feeding data into PL Rating. 32 partners listed at `help.vertafore.com/plrating/content/howto/integration_partners.htm` ([source](https://help.vertafore.com/plrating/content/howto/integration_partners.htm)). This includes Salt, XILO, RiskAdvisor, EverQuote, QuoteWizard, NowCerts, and others. **Note:** Vertafore does not describe this as a formal "program" -- it is a partner listing page.
 
-**The ~28 known PL Rating Integration Partners include:** SALT, XILO, Canopy Connect, RiskAdvisor, EverQuote, QuoteWizard, Feathery, Momentum AMS, NowCerts, and ~19 others.
+**The 32 listed PL Rating Integration Partners include:** SALT, XILO, Canopy Connect, RiskAdvisor, EverQuote, QuoteWizard, AgencyZoom, InsuredMine, NowCerts, HawkSoft, AMS360, Applied EPIC, and ~20 others. (**Note:** Feathery claims a PL Rating integration on their website but is NOT on this list.)
 
 **The technical mechanism ("Temporary State + Claim" pattern):**
 1. Our backend calls Vertafore's **Rating API** with applicant/driver/vehicle/coverage payload
@@ -42,13 +42,12 @@ We researched three comparative raters used by our design partners to determine 
 
 **No file download. No AL3 file. No manual import. Clean server-to-server handoff.**
 
-**Rating API technical details:**
-- Separate API key system (NOT OAuth like AMS360)
-- Swagger/OpenAPI specs available from Vertafore's API Catalog
-- SDK generation available in C# and Java
-- Developer Portal at `developer.vertafore.com`
-- Rating API Reference at `rating-reference.vertafore.com`
-- Referenced in PL Rating 2022 R2 Release Notes as a distinct import type
+**Rating API technical details (verified from Vertafore's own docs):**
+- API Key + Secret Key auth -- NOT OAuth. Vertafore docs state: *"This credential option has been included to support the Vertafore Rating API release"* ([source](https://help.vertafore.com/devportal/content/infographics/apikeys.htm))
+- C# client generated from Swagger CodeGen with PreRatingApi class ([source](https://help.vertafore.com/devportal/content/howto/usingcsharpclient.htm))
+- Developer Portal at `developer.vertafore.com` -- requires VSSO account + *"licensed Vertafore Developer Portal customer"* status ([source](https://help.vertafore.com/devportal/content/getstarted/gettingstarted.htm))
+- Rating API Reference at `rating-reference.vertafore.com` (JS-rendered, requires auth)
+- Bridge Service API at `bridge-rating.vertafore.com` with BridgeCoordinator endpoints (confirmed live but undocumented) ([source](https://bridge-rating.vertafore.com/Help))
 
 **Competitors already doing this:**
 - **Salt** uses a 2-step "Request Client Link" + "Confirm and Sync" flow -- Salt's backend calls the Rating API, gets back a session link, agent clicks to open PLRating with data pre-filled
@@ -308,7 +307,7 @@ Zywave unveiled a **two-way Partner Platform <--> TurboRater integration** with 
 
 ### Integration Difficulty: MODERATE (Server-to-Server via Rating API)
 
-**IMPORTANT CORRECTION:** Initial research labeled PLRating as "HARD / closed ecosystem." Deep investigation reveals this is wrong. Vertafore has a **Rating API** accessible via the **PL Rating Integration Partner program** (separate from the Orange Partner Program). ~30 companies already use this to achieve a seamless 1-2 click flow. PLRating is NOT limited to manual AL3 file import.
+**IMPORTANT CORRECTION:** Initial research labeled PLRating as "HARD / closed ecosystem." Deep investigation reveals this is wrong. Vertafore has a **Rating API** accessible via the **PL Rating Integration Partner program** (separate from the Orange Partner Program). 32 companies already use this to achieve a seamless 1-2 click flow. PLRating is NOT limited to manual AL3 file import.
 
 ### How Competitors ACTUALLY Integrate with PLRating (The Real Story)
 
@@ -366,7 +365,7 @@ Canopy Connect is an **official Orange Partner** (confirmed on Vertafore's partn
 6. PLRating opens with data pre-filled; agent **claims** the submission by being logged in
 7. Agent reviews, fills any gaps, runs quotes
 
-**This is EXACTLY what Salt, Canopy Connect, XILO, Feathery, Momentum AMS, and ~23 other Integration Partners all do.**
+**This is the same pattern Salt, Canopy Connect, XILO, and other Integration Partners use.** 32 companies are listed on Vertafore's Integration Partners page.
 
 **Technical Details:**
 - **Rating API** with its own API key system (separate from AMS360 OAuth)
@@ -380,28 +379,37 @@ Canopy Connect is an **official Orange Partner** (confirmed on Vertafore's partn
 - Partners listed at `help.vertafore.com/plrating/content/howto/integration_partners.htm`
 - Partners marked as "import only" (no "Add-on Product Tab") = they use the Rating API with no agency-side PL Rating configuration needed
 
-**How to apply (PL Rating Integration Partner -- NOT the Orange Partner Program):**
-1. Contact Vertafore about the **PL Rating Integration Partner program** (this is separate from and easier than the Orange Partner Program)
-2. Reference the existing ~30 partners as precedent (Salt, XILO, Feathery, EverQuote, etc.)
-3. Request API key and access to Swagger/OpenAPI documentation
-4. Build integration against test environment using C# or Java SDK (or raw REST)
-5. Deploy to production -- no agency-side PLRating admin configuration required
+**How to get access (what we know vs. what we're guessing):**
+
+The exact path to becoming a PL Rating Integration Partner is **NOT publicly documented**. The integration partners page (`help.vertafore.com/plrating/content/howto/integration_partners.htm`) lists 32 partners but provides **no contact info, enrollment process, or instructions for joining**. What we know comes from stitching together separate sources:
+
+**VERIFIED (directly from sources):**
+- 32 companies are listed as Integration Partners -- so a path clearly exists ([source: PL Rating Integration Partners page](https://help.vertafore.com/plrating/content/howto/integration_partners.htm))
+- The Vertafore Developer Portal requires *"a VSSO account"* and being *"registered as a licensed Vertafore Developer Portal customer"* ([source: Developer Portal Getting Started](https://help.vertafore.com/devportal/content/getstarted/gettingstarted.htm))
+- Developer Portal apps must be developed in Sandbox, then *"with Vertafore approval, you can promote your application to the Live environment"* ([source: same Getting Started page](https://help.vertafore.com/devportal/content/getstarted/gettingstarted.htm))
+- The Rating API uses API Key + Secret Key auth (NOT OAuth): *"This credential option has been included to support the Vertafore Rating API release"* ([source: API Keys page](https://help.vertafore.com/devportal/content/infographics/apikeys.htm))
+- C# client code can be generated from Swagger CodeGen for the Rating API, using a PreRatingApi class ([source: C# Client Guide](https://help.vertafore.com/devportal/content/howto/usingcsharpclient.htm))
+- The Rating API terms at vertafore.com/terms grant a license to *"Customer"* with a signed *"Order"* -- no mention of Orange Partner requirement ([source: Vertafore Terms](https://www.vertafore.com/terms))
+- A Bridge Service API exists at `bridge-rating.vertafore.com` with BridgeCoordinator endpoints, though all are listed as *"No documentation available"* ([source: Bridge Service Help page](https://bridge-rating.vertafore.com/Help))
+
+**INFERRED (reasonable but unconfirmed):**
+- The path to becoming an Integration Partner likely involves contacting Vertafore directly and signing a developer agreement
+- The Developer Portal Getting Started flow likely applies to Integration Partners (VSSO account → create app → sandbox → approval → live)
+- The Bridge Service API at `bridge-rating.vertafore.com` is likely the production endpoint Integration Partners use (matching RiskAdvisor's "Bridge Link" terminology)
+
+**UNKNOWN:**
+- Exact contact or application process for the Integration Partner designation
+- Cost/fees for API access
+- Timeline for approval
+- Whether there's a formal application or just a business development conversation
+
+**Recommended action:** Contact Vertafore directly, reference the 32 existing Integration Partners, and ask how to join. This is the single most important next step for PLRating integration.
 
 **Why NOT Orange Partner Program (unless we also want AMS360 integration):**
 - Orange Partner Program is for broad Vertafore ecosystem integration (AMS360, Sagitta, etc.)
-- PL Rating Integration Partner is specifically for rater data submission
-- ~30 companies have Integration Partner access vs ~45 Orange Partners -- different programs, different requirements
-- Integration Partner appears to be a lighter-weight enrollment: sign a developer agreement (Order), get VSSO credentials, develop in Sandbox, submit for Live approval
-
-**Enrollment process (based on Vertafore Developer Portal docs):**
-1. Contact Vertafore business development
-2. Sign a developer agreement/Order (the API terms at vertafore.com/terms make NO distinction between Orange Partners and other API users)
-3. Get VSSO credentials and Developer Portal access
-4. Create an application, get API Key + Secret Key for Rating API
-5. Develop against Sandbox using Swagger/OpenAPI specs + C#/Java SDKs
-6. Submit for Vertafore approval to promote to Live
-7. Get listed on the PL Rating Integration Partners page
-8. **Production endpoint:** `bridge-rating.vertafore.com` (Bridge Service API)
+- The Integration Partners list is a separate page from the Orange Partners list -- ~32 Integration Partners vs ~45 Orange Partners
+- Only Canopy Connect appears on BOTH lists -- Salt, XILO, RiskAdvisor, EverQuote, etc. are Integration Partners but NOT Orange Partners
+- The Rating API terms make no mention of Orange Partner status as a requirement
 
 **Step count analysis for the agent:**
 | Step | Action | Time |
@@ -439,7 +447,7 @@ CRQ portal at `https://secure.consumerratequotes.com/ConsumerV2?id=#####&lob=aut
 | **XILO** | Rating API + AL3 fallback | Link generated --> opens pre-filled PL Rating | **1 click** | **Yes** (listed, import-only) | No |
 | **Canopy Connect** | Rating API (server-to-server) | 1-click "Submit to PL Rating" --> opens pre-filled | **1 click** | **Yes** (listed) | **Yes** |
 | **RiskAdvisor** | Rating API | Generates data + link in ~3 steps | **~3 clicks** | **Yes** (listed) | No |
-| **Feathery** | Rating API (Premium tier) | Form fields mapped to PL Rating properties | **0 (automated)** | **Yes** (listed) | No |
+| **Feathery** | Rating API (Premium tier) | Form fields mapped to PL Rating properties | **0 (automated)** | **Not listed** (claims integration on website) | No |
 | **EverQuote** | Rating API | Lead data pushed to PL Rating | **0 (automated)** | **Yes** (listed) | No |
 | **QuoteWizard** | Rating API | Lead data pushed to PL Rating | **0 (automated)** | **Yes** (listed) | No |
 | **Momentum AMS** | Rating API | AMS data pushed to PL Rating | **1 click** | **Yes** (listed) | No |
@@ -449,7 +457,7 @@ CRQ portal at `https://secure.consumerratequotes.com/ConsumerV2?id=#####&lob=aut
 - **"Import only"** (like Salt, XILO, RiskAdvisor, EverQuote) = push data INTO PL Rating. This is what we need.
 - **"Import/Export"** (like AgencyZoom, InsuredMine) = bidirectional data flow with PL Rating
 
-**Key insight:** You do NOT need to be an Orange Partner to use the Rating API. The path is the **PL Rating Integration Partner program** -- a separate, lighter-weight program that ~30 companies have already joined. All of the competitors listed above (except Canopy Connect, which has both) are Integration Partners WITHOUT being Orange Partners. The Integration Partner listing page at `help.vertafore.com/plrating/content/howto/integration_partners.htm` is the authoritative source.
+**Key insight:** You do NOT need to be an Orange Partner to use the Rating API. The path is the **PL Rating Integration Partner program** -- a separate, lighter-weight program that 32 companies have already joined. All of the competitors listed above (except Canopy Connect, which has both) are Integration Partners WITHOUT being Orange Partners. The Integration Partner listing page at `help.vertafore.com/plrating/content/howto/integration_partners.htm` is the authoritative source.
 
 ### ACORD AL3 Format Deep Dive
 
@@ -484,7 +492,7 @@ For anyone building the AL3 generator, here is the structure:
 
 ### Cost
 
-- **Rating API (via PL Rating Integration Partner program):** Unknown -- must contact Vertafore. This is the primary path. ~30 companies have this, so it's clearly accessible.
+- **Rating API (via PL Rating Integration Partner program):** Unknown -- must contact Vertafore. This is the primary path. 32 companies have this, so it's clearly accessible.
 - WinsurTech AL3 Creator API: ~$90/month (backup/interim only)
 - ACORD membership (for raw spec): $1,000+/term (not needed if using WinsurTech or Rating API)
 - PLRating agency licensing: ~$100-300+/month (not our cost -- agency pays)
@@ -575,7 +583,7 @@ XILO built an AI-powered Chrome Extension that can "scan and fill any web form."
 
 1. **Email `ezl-support@appliedsystems.com`** to request API enablement for EZLynx (do this today)
 2. **Call TurboRater sales at 800-383-3482 (Option 4)** to request API Account ID and documentation
-3. **Contact Vertafore** about the **PL Rating Integration Partner program** (NOT the Orange Partner Program) -- reference the ~28 existing partners (Salt, XILO, Feathery, EverQuote, etc.) listed at `help.vertafore.com/plrating/content/howto/integration_partners.htm`. Request: API key, Swagger/OpenAPI docs, and C#/Java SDK access
+3. **Contact Vertafore** about becoming a PL Rating Integration Partner (NOT the Orange Partner Program) -- reference the 32 existing partners listed at `help.vertafore.com/plrating/content/howto/integration_partners.htm` and ask about the process, timeline, and cost for Rating API access
 4. **Study the TurboTags GitHub wiki** ([getitc/turbotags](https://github.com/getitc/turbotags)) to understand TurboRater's complete field model
 5. WinsurTech AL3 API ($90/month) as backup ONLY if Orange Partner enrollment is delayed
 
@@ -709,7 +717,7 @@ XILO built an AI-powered Chrome Extension that can "scan and fill any web form."
 
 | Method | Automated? | Available to Us? | Notes |
 |--------|-----------|-----------------|-------|
-| **Rating API (Integration Partner)** | **Automated** | **Yes (with enrollment)** | Apply to PL Rating Integration Partner program; ~30 partners use this. Swagger/OpenAPI specs, C#/Java SDKs. Uses "temporary state + claim" pattern. |
+| **Rating API (Integration Partner)** | **Automated** | **Yes (with enrollment)** | Apply to PL Rating Integration Partner program; 32 partners use this. Swagger/OpenAPI specs, C#/Java SDKs. Uses "temporary state + claim" pattern. |
 | AL3 File Import | Manual browse/upload | **Yes** | User downloads file, imports in PLRating. Backup only. |
 | EMS Service | Automated | **No** (Vertafore-internal, AMS360 only) | N/A |
 | Consumer Rate Quotes (CRQ) | Consumer self-service | **Partial** | Cannot pre-fill data via URL |
@@ -753,21 +761,23 @@ XILO built an AI-powered Chrome Extension that can "scan and fill any web form."
 
 ### Vertafore Developer Portal & Rating API
 
+**Verified from Vertafore's own documentation:**
 - **Developer Portal URL:** developer.vertafore.com
-- **Rating API Reference:** rating-reference.vertafore.com
-- **API Specifications:** Swagger/OpenAPI specs available from Vertafore API Catalog (metadata file: `ratingApiMetaData.json`)
-- **SDKs:** C# and Java SDK generation available ([C# Client Guide](https://help.vertafore.com/devportal/content/howto/usingcsharpclient.htm))
-- **Known endpoint:** `GET /api/PreRating/States`
-- **Auth for API calls:** API Key + Secret Key (NOT OAuth -- simpler scheme, separate from AMS360 auth)
-- **Auth for portal access:** VSSO (Vertafore Single Sign-On)
-- **Deep link URL format:** `rating.vertafore.com/UserInterface/main/iFrameTest.aspx?Partner={NumericID}&Redir=../Connect/Connect.aspx?Import=1`
-- **Partner IDs:** Numeric, assigned upon enrollment
-- **Referenced in:** PL Rating 2022 R2 Release Notes as a distinct import type
-- **Key distinction from AMS360 API:** The Developer Portal docs explicitly state: *"API Keys credential option exists specifically to support the Vertafore Rating API release"* and *"Vertafore AMS360 application developers must use the Oauth credential key method"* -- confirming these are separate API products with different auth schemes
+- **Rating API Reference:** rating-reference.vertafore.com (JS-rendered, requires VSSO auth to view)
+- **C# client:** Generated from Swagger CodeGen; uses PreRatingApi class, requires Json.NET + RestSharp ([source: C# Client Guide](https://help.vertafore.com/devportal/content/howto/usingcsharpclient.htm))
+- **Known endpoint:** `GET /api/PreRating/States` (referenced in C# guide sample code)
+- **Auth for API calls:** API Key + Secret Key -- *"This credential option has been included to support the Vertafore Rating API release"* ([source: API Keys page](https://help.vertafore.com/devportal/content/infographics/apikeys.htm))
+- **Auth for portal access:** VSSO -- *"You need a VSSO account and be registered as a licensed Vertafore Developer Portal customer"* ([source: Getting Started](https://help.vertafore.com/devportal/content/getstarted/gettingstarted.htm))
+- **Sandbox → Live flow:** *"Develop your application in the Sandbox and then, with Vertafore approval, you can promote your application to the Live environment"* ([source: Getting Started](https://help.vertafore.com/devportal/content/getstarted/gettingstarted.htm))
+- **Key distinction from AMS360 API:** *"Vertafore AMS360 application developers must use the Oauth credential key method"* -- confirming Rating API and AMS360 API use different auth ([source: API Keys page](https://help.vertafore.com/devportal/content/infographics/apikeys.htm))
 
-### Bridge Service API (Production Endpoint)
+**Observed but undocumented:**
+- **Deep link URL format:** `rating.vertafore.com/UserInterface/main/iFrameTest.aspx?Partner={NumericID}&Redir=../Connect/Connect.aspx?Import=1` (observed in partner integrations, not from Vertafore docs)
+- **Partner IDs:** Numeric, assigned upon enrollment (inferred from URL patterns)
 
-The production REST API used by Integration Partners is the **Bridge Service** at `bridge-rating.vertafore.com`. This is an ASP.NET Web API with the following documented endpoints (from `/Help`):
+### Bridge Service API (Likely Production Endpoint)
+
+A live ASP.NET Web API exists at `bridge-rating.vertafore.com` ([source: /Help page](https://bridge-rating.vertafore.com/Help)). **All endpoints are listed but have "No documentation available"** -- this is an auto-generated help page with placeholder content. The endpoints are:
 
 **BridgeCoordinator endpoints:**
 | Method | Endpoint | Description |
@@ -783,21 +793,24 @@ The production REST API used by Integration Partners is the **Bridge Service** a
 | `GET` | `/Downloader/IsAlive` | Health check |
 | `GET` | `/Downloader/GetFile?Id={Id}` | Download a file by ID |
 
-**How this maps to the Salt workflow:**
-1. **"Request Client Link"** = Salt's backend `POST`s to `BridgeCoordinator/GetRateModel` with applicant data; PL Rating validates and stores the record, returns a URL
-2. **"Confirm and Sync"** = Opens the returned URL in PL Rating; agent's login session claims the record
+**Why we believe this is the production API (inferred, not confirmed):**
+- RiskAdvisor's documentation uses "Bridge Link" terminology, directly matching the `BridgeCoordinator` naming
+- Salt's workflow ("Request Client Link" → validates payload → returns URL) maps conceptually to `BridgeCoordinator/GetRateModel`
+- RiskAdvisor notes: *"PL Rating has released a new API since they no longer support the current API. We are planning to upgrade."* -- confirming the API exists and is actively versioned ([source](https://help.riskadvisor.insure/articles/7771169-pl-rating-integration))
 
-**Note:** RiskAdvisor's documentation uses "Bridge Link" terminology, directly matching the `BridgeCoordinator` naming. RiskAdvisor also notes: *"PL Rating has released a new API since they no longer support the current API. We are planning to upgrade."* -- confirming the API is actively versioned.
+**Caveat:** We have NOT confirmed that `bridge-rating.vertafore.com` is the endpoint Integration Partners actually use. The endpoint naming is suggestive but the connection is inferred.
 
-### PL Rating Integration Partner Program (PRIMARY PATH)
+### PL Rating Integration Partners (PRIMARY PATH)
 
-- **Separate from Orange Partner Program** -- specifically for feeding data into PL Rating
-- **~30 partners** listed at `help.vertafore.com/plrating/content/howto/integration_partners.htm`
-- **Known partners include:** SALT, XILO, Canopy Connect, RiskAdvisor, EverQuote, QuoteWizard, AgencyZoom, InsuredMine, Momentum AMS, NowCerts (and ~20 others)
-- **"Import only" designation:** Partners marked without "Add-on Product Tab" checkbox = they use the Rating API with no agency-side PL Rating admin configuration needed
-- **Enrollment process:** Contact Vertafore; reference existing Integration Partners as precedent
-- **What you get:** API key, Swagger/OpenAPI documentation, SDK access
-- **Timeline:** Unknown (must inquire)
+**NOTE:** Vertafore does not publicly describe this as a "program" -- it is a list of partners on their help site. We are calling it "Integration Partners" for clarity.
+
+- **Separate list from Orange Partner Program** -- the Integration Partners page lists companies that feed data into PL Rating; the Orange Partners page lists companies with broader Vertafore ecosystem integrations
+- **32 partners** listed at `help.vertafore.com/plrating/content/howto/integration_partners.htm` ([source](https://help.vertafore.com/plrating/content/howto/integration_partners.htm))
+- **Known partners include:** SALT, XILO, Canopy Connect, RiskAdvisor, EverQuote, QuoteWizard, AgencyZoom, InsuredMine, NowCerts, HawkSoft, AMS360, Applied EPIC, and ~20 others
+- **"Import only" vs "Import/Export":** Page distinguishes between partners that only push data in vs. those with bidirectional flow
+- **"Add-on Product Tab" column:** Some partners have a checkbox here, others don't -- the meaning is not documented
+- **How to join: UNKNOWN** -- the page provides **no enrollment instructions, contact info, or application process**. Contacting Vertafore directly is the only option.
+- **Timeline:** Unknown
 
 ### Orange Partner Program (NOT required for rater integration)
 
