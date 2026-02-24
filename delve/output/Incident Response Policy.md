@@ -1,14 +1,16 @@
 <!--
-  CHANGES FROM ORIGINAL:
-  - Modified: Escalation contacts — simplified reporting method from "email + call" to "primary communication channel (e.g., Slack) and create a ticket"
-  - Modified: 48-hour investigation — changed from "CTO and Chief Architect" to "CTO or designated incident lead" (single person)
-  - Modified: Severity classification — removed GDPR-specific classification criteria (PolicyLift does not handle EU personal data)
-  - Modified: Incident response procedures — simplified from CTO+CSO+COO joint response to incident lead handling containment, CEO involved only for customer-affecting incidents or data breaches
-  - Modified: Post-mortem and lessons learned — scoped audience: broad communication for Critical/High incidents affecting customers; engineering-team-level write-up for Medium/Low incidents. Removed blanket "notify all users" requirement.
-  - Modified: External contact list — narrowed from 8 categories (including power, telecom, utilities) to FBI Cyber Division and cyber insurance carrier only
-  - Removed: Template artifacts ("Mark as Complete", "Template Provided", "An example has been provided")
-  - Kept as-is: Purpose, Scope, Overview, incident tracking/documentation requirements, structured incident report fields, vulnerability remediation SLA table, annual review and testing requirements, user training requirement, low-risk incident handling, forensic preservation language, disciplinary action language
+  REDLINE DOCUMENT — Incident Response Policy
+
+  Convention:
+    ~~strikethrough~~ = text to DELETE
+    **[INSERT: text]** = text to ADD
+
+  Apply these changes manually in your SOC2 vendor platform.
 -->
+
+> **REDLINE LEGEND:** ~~Strikethrough~~ = delete · **[INSERT: text]** = add
+
+---
 
 ## Purpose
 
@@ -36,15 +38,30 @@ Information Security Incident: a suspected, attempted, successful, or imminent t
 
 Incident Escalation Contacts
 
-All users must report any system vulnerability, incident, or event pointing to a possible incident to the CTO at the moment that the security problem was discovered. If the CTO is unavailable, the person that discovered the problem should reach out to the following managers in the company until they get answered, in the following order:
+~~Mark as Complete~~
+
+~~Template Provided~~
+
+~~An example has been provided. Please fill out this section with your own content.~~
+
+All users must report any system vulnerability, incident, or event pointing to a possible incident to the CTO at the moment that the security problem was discovered. If the CTO is unavailable, the person that discovered the problem should reach out to the following managers in the company until ~~he~~ **[INSERT: they]** ~~gets~~ **[INSERT: get]** answered, in the following order:
 
 - Chief Architect
+- ~~CSO~~
 - COO
 - CEO
 
-Incidents must be reported via the company's primary communication channel (e.g., Slack #security-incidents) and a ticket must be created in the incident tracking system.
+~~Incidents must be reported by sending an email message with details of the incident, following the notification regarding the problem by a call.~~
+
+**[INSERT: Incidents must be reported via the company's primary communication channel (e.g., Slack #security-incidents) and a ticket must be created in the incident tracking system.]**
 
 Disciplinary Action
+
+~~Mark as Complete~~
+
+~~Template Provided~~
+
+~~An example has been provided. Please fill out this section with your own content.~~
 
 Users must be trained on the procedures for reporting information security incidents or discovered vulnerabilities, and their responsibilities to report such incidents. Failure to report information security incidents shall be a security violation and will be reported to the CEO for disciplinary action.
 
@@ -54,7 +71,7 @@ All information security incidents must be responded to through the incident man
 
 To appropriately plan and prepare for incidents, the organization must review incident response procedures at least once per year for currency and update as required.
 
-The incident response procedure must be tested at least once per year.
+The incident response procedure must be tested ~~on~~ at least once per year.
 
 All critical security (including data breaches) incidents are logged and tracked in the ticketing system and communicated to affected parties. Communication is also conducted with senior management for each security incident, to evaluate the root causes, remediation steps, and lessons learned to be able to prevent similar incidents in the future.
 
@@ -71,7 +88,7 @@ Vulnerabilities assessed by PolicyLift shall be remediated in the following time
 
 ## Procedure
 
-When an information security incident is identified or detected, users must report to company management according to the escalation contacts above. The following information must be included as part of the notification:
+When an information security incident is identified or detected, users must report ~~the~~ **[INSERT: to]** company management according to ~~paragraph 4.1~~ **[INSERT: the escalation contacts above]**. The following information must be included as part of the notification:
 
 - Description of the incident
 - Date, time, and location of the incident
@@ -80,24 +97,36 @@ When an information security incident is identified or detected, users must repo
 - Known evidence of the incident
 - The affected system(s)
 
-Within 48 hours of the incident being reported, the CTO or designated incident lead shall conduct a preliminary investigation and risk assessment to review and confirm the details of the incident. If the incident is confirmed, the incident lead must assess the impact on the organization and assign a severity level, which will determine the level of remediation effort required:
+Within 48 hours of the incident being reported, the CTO ~~and Chief Architect~~ **[INSERT: or designated incident lead]** shall conduct a preliminary investigation and risk assessment to review and confirm the details of the incident. If the incident is confirmed, the ~~CTO~~ **[INSERT: incident lead]** must assess the impact on the organization and assign a severity level, which will determine the level of remediation effort required:
 
 - Critical: the incident is potentially catastrophic to the organization and/or disrupts the organization's day-to-day operations; a violation of legal, regulatory, or contractual requirements is likely.
-- High: the incident will cause harm to one or more business units within the organization and/or will cause delays to a business unit's activities or the incident is a clear violation of organizational security policy, but will not substantively impact the business.
+~~- For GDPR purposes, an incident will also be classified as Critical if it:~~
+    ~~- Involves special categories of personal data~~
+    ~~- Could result in significant harm to data subjects~~
+    ~~- Affects a large number of data subjects~~
+- High: the incident will cause harm to one or more business units within the organization and/ or will cause delays to a business unit's activities or the incident is a clear violation of organizational security policy, but will not substantively impact the business.
 - Medium: Moderate risk with limited impact or additional exploit conditions required.
 - Low: Minimal risk or best-practice issue with little security impact.
 
 Incident Response Procedures
 
-The CTO or designated incident lead shall determine appropriate incident response activities to contain and resolve incidents.
+~~Mark as Complete~~
 
-The incident lead must take all necessary steps to preserve forensic evidence (e.g. log information, files, images) for further investigation to determine if any malicious activity has taken place. All such information must be preserved and provided to law enforcement if the incident is determined to be malicious.
+~~Template Provided~~
 
-For Critical or High incidents that affect customers or involve a data breach, the incident lead must work with the CEO to create and execute a communications plan that communicates the incident to affected parties and, where appropriate, the public.
+~~An example has been provided. Please fill out this section with your own content.~~
+
+The ~~CTO, in consultation with management sponsors,~~ **[INSERT: CTO or designated incident lead]** shall determine appropriate incident response activities to contain and resolve incidents.
+
+The ~~CTO~~ **[INSERT: incident lead]** must take all necessary steps to preserve forensic evidence (e.g. log information, files, images) for further investigation to determine if any malicious activity has taken place. All such information must be preserved and provided to law enforcement if the incident is determined to be malicious.
+
+~~If the incident is deemed as High or Medium, the CTO must work with the CSO and the COO to create and execute a communications plan that communicates the incident to users, the public, and others affected.~~
+
+**[INSERT: For Critical or High incidents that affect customers or involve a data breach, the incident lead must work with the CEO to create and execute a communications plan that communicates the incident to affected parties and, where appropriate, the public.]**
 
 All critical security (including data breaches) incidents are logged and tracked in the ticketing system and communicated to affected parties. Communication is also conducted with senior management for each security incident, to evaluate the root causes, remediation steps, and lessons learned to be able to prevent similar incidents in the future.
 
-The incident lead must take all necessary steps to resolve the incident in a timely manner and recover information systems, data, and connectivity. All technical steps taken during an incident must be documented in the organization's incident log, and must contain the following:
+The ~~CTO~~ **[INSERT: incident lead]** must take all necessary steps to resolve the incident in a timely manner and recover information systems, data, and connectivity. All technical steps taken during an incident must be documented in the organization's incident log, and must contain the following:
 
 - Description of the incident
 - Incident severity level
@@ -107,17 +136,34 @@ The incident lead must take all necessary steps to resolve the incident in a tim
 - Status (open, closed, archived)
 - Disclosures (parties to which the details of this incident were disclosed to, such as customers, vendors, law enforcement, etc.)
 
-After an incident has been resolved, the incident lead must conduct a post mortem that includes root cause analysis and documentation of any lessons learned.
+After an incident has been resolved, the ~~CTO~~ **[INSERT: incident lead]** must conduct a post mortem that includes root cause analysis and documentation of any lessons learned.
 
-For Critical or High incidents affecting customers, the incident lead must communicate findings broadly within the organization and present lessons learned to prevent future occurrences. For Medium and Low incidents, a written post-mortem in the incident ticket and discussion within the engineering team is sufficient. Additional training should be conducted if warranted by the nature of the incident.
+Depending on the severity of the incident, the Chief Executive Officer (CEO) may elect to contact external authorities, including but not limited to law enforcement~~, private investigation firms,~~ and government organizations as part of the response to the incident.
 
-Depending on the severity of the incident, the Chief Executive Officer (CEO) may elect to contact external authorities, including but not limited to law enforcement and government organizations as part of the response to the incident. Where necessary, the CEO must take disciplinary action if a user's activity is deemed as malicious.
+~~The CTO must notify all users of the incident, conduct additional training if necessary, and present any lessons learned to prevent future occurrences.~~
+
+**[INSERT: For Critical or High incidents affecting customers, the incident lead must communicate findings broadly within the organization and present lessons learned to prevent future occurrences. For Medium and Low incidents, a written post-mortem in the incident ticket and discussion within the engineering team is sufficient. Additional training should be conducted if warranted by the nature of the incident.]**
+
+Where necessary, the CEO must take disciplinary action if a user's activity is deemed as malicious.
 
 Low-risk severity incidents are handled through streamlined processes focused on documentation and routine review. These incidents generally do not require immediate escalation or extensive investigation, as they pose minimal impact to operations, security, or compliance. Upon identification, the responsible team member records the incident in the designated tracking system and creates a ticket when appropriate. In some cases, a brief review and notation are sufficient without the need for a formal ticket. All low-risk incidents are periodically reviewed to identify trends, ensure accuracy of documentation, and determine whether any follow-up actions or preventative improvements are needed.
 
 External Contact Details
 
-The following external contacts are maintained for incident escalation when needed:
+~~Mark as Complete~~
 
-- FBI Cyber Division (IC3 — Internet Crime Complaint Center)
-- Cyber insurance carrier breach response hotline
+~~Template Provided~~
+
+~~An example has been provided. Please fill out this section with your own content.~~
+
+The contact details of the following have been provided for follow-up:
+
+- ~~Data protection regulator~~
+- ~~Industry Regulatory Bodies~~
+- ~~Government Agencies~~
+- Law Enforcement Agencies **[INSERT: (FBI Cyber Division / IC3)]**
+- ~~Power Companies~~
+- ~~Telecoms Companies~~
+- ~~Utility Companies~~
+- ~~Emergency Services~~
+- **[INSERT: Cyber insurance carrier breach response hotline]**

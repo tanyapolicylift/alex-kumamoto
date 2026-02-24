@@ -150,23 +150,36 @@ When you are done reviewing, tell the agent: **"Finalize <Policy Name>"**
 
 2. **Read the original source policy** from `source/# <Policy Name>.md`.
 
-3. **Produce the finalized policy** in `output/<Policy Name>.md`. The finalized policy should:
-   - **Preserve the original structure, section ordering, and tone** as closely as possible
-   - **Surgically remove** only the language related to commitments the team unchecked
-   - **Modify** language where user comments indicate a change (e.g., changing "monthly" to "quarterly")
-   - **Keep all other content intact** — do not rewrite sections that weren't flagged
-   - **Not add new content** that wasn't in the original
-   - **Clean up** any orphaned references (e.g., if a section is removed, remove references to it elsewhere)
+3. **Produce a redline document** in `output/<Policy Name>.md`. The output must be the **original source text with inline redline markup** so the team can see exactly what changed and apply edits manually in the SOC 2 vendor platform. This is critical because we cannot directly import rewritten documents — we need to see the exact deletions and insertions against the original.
 
-4. At the top of the output file, add a brief summary of changes:
+   **Redline conventions:**
+   - `~~strikethrough~~` = text to **delete**
+   - `**[INSERT: new text]**` = text to **add**
+   - Unchanged text is left as-is (no markup)
+
+   **Rules for the redline:**
+   - **Start from the original source text verbatim.** Do not reorganize, reorder, or rewrite sections.
+   - **Show deletions inline** using `~~strikethrough~~` on the exact words/sentences/paragraphs being removed.
+   - **Show additions inline** using `**[INSERT: ...]**` placed exactly where the new text should appear.
+   - When replacing text, show the old text struck through immediately followed by the insertion: `~~old text~~ **[INSERT: new text]**`
+   - **Unchanged sections remain untouched** — no markup needed.
+   - **Remove template artifacts** (e.g., "Mark as Complete", "Template Provided", "An example has been provided...") by striking them through.
+   - **Clean up** orphaned references by striking them through.
+
+4. At the top of the output file, add a legend and change summary:
 
 ```markdown
 <!--
-  CHANGES FROM ORIGINAL:
-  - Removed: <brief description>
-  - Modified: <brief description>
-  - Kept as-is: <list of unchanged sections>
+  REDLINE DOCUMENT — <Policy Name>
+
+  Convention:
+    ~~strikethrough~~ = text to DELETE
+    **[INSERT: text]** = text to ADD
+
+  Apply these changes manually in your SOC2 vendor platform.
 -->
+
+> **REDLINE LEGEND:** ~~Strikethrough~~ = delete · **[INSERT: text]** = add
 ```
 
 5. **Confirm with the user** what was changed and what was kept.
