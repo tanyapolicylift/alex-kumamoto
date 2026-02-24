@@ -1,21 +1,12 @@
 # Today
 *What are the Top-of-Funnel interaction patterns present for the agency today?*
 
-
 # Core Data Collection Requirements
 *What exactly did the partner request be collected for a customer*
-* Name
-* Age
-* DoB
-* Address
-* License
-* Vehicles
-* Coverage Preferences
+
 # Solution Potential
 *How exactly will we implement Quote Packets to meet the customer where they are and reduce cycle time?*
 
-Anthony onboard
-- Needs Spanish-speaking
 # Specific Agentic Use Cases
 *How will Quote Packet "Agent Mode" work for this customer? Map the three core agent actions to concrete workflows grounded in this partner's described process.*
 
