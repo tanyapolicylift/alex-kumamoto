@@ -62,7 +62,7 @@ This is analogous to **Class vs. Object** in programming, or **Schema vs. Row** 
 │         TEMPLATE SIDE           │      │         INSTANCE SIDE           │
 │         (the blueprint)         │      │         (the actual data)       │
 │                                 │      │                                 │
-│  packet_template                │      │  quote_packet                   │
+│  packet_template (→ agency)     │      │  quote_packet (→ agency)        │
 │    └─ entity_template[]         │──┐   │    └─ packet_entity[]           │
 │        └─ field_group_template[]│  │   │        └─ field_value[]         │
 │            └─ field_template[]  │  │   │                                 │
@@ -80,6 +80,7 @@ This is analogous to **Class vs. Object** in programming, or **Schema vs. Row** 
 erDiagram
     packet_template {
         uuid id PK
+        uuid agency_id FK
         string name
         string slug
         enum line_type "personal | commercial"
@@ -92,10 +93,15 @@ erDiagram
         timestamps timestamps
     }
 
+    agency {
+        uuid id PK
+        string name
+    }
+
     entity_template {
         uuid id PK
         uuid packet_template_id FK
-        enum entity_type "applicant | business | person | asset | loss_run | coverage | operations"
+        enum entity_type "applicant | business | person | asset | loss_run | coverage | operations | miscellaneous"
         string label
         text description
         enum cardinality "one | many"
@@ -142,7 +148,7 @@ erDiagram
     quote_packet {
         uuid id PK
         uuid packet_template_id FK
-        uuid organization_id FK
+        uuid agency_id FK
         uuid call_id FK
         string name
         enum status "draft | in_progress | review | submitted | archived"
@@ -169,6 +175,8 @@ erDiagram
         timestamps timestamps
     }
 
+    agency ||--o{ packet_template : "owns"
+    agency ||--o{ quote_packet : "owns"
     packet_template ||--o{ entity_template : "defines"
     entity_template ||--o{ field_group_template : "groups"
     field_group_template ||--o{ field_template : "contains"
@@ -193,8 +201,9 @@ The top-level blueprint. One per use case (e.g., "CA Workers Comp", "PLRater Aut
 | Column | Type | Required | Description |
 |--------|------|----------|-------------|
 | `id` | uuid | yes | Primary key |
+| `agency_id` | uuid FK | yes | Owning agency. Templates are scoped to agencies. |
 | `name` | string | yes | Human label, e.g. "California Workers' Compensation" |
-| `slug` | string | yes | Machine key, e.g. `ca_workers_comp`. Unique. |
+| `slug` | string | yes | Machine key, e.g. `ca_workers_comp`. Unique per agency. |
 | `line_type` | enum | yes | `personal` or `commercial` |
 | `output_type` | enum | yes | `acord` or `rater` |
 | `state` | string | no | State code if state-specific, e.g. "CA" |
@@ -290,7 +299,7 @@ An actual submission being worked on by an agent.
 |--------|------|----------|-------------|
 | `id` | uuid | yes | Primary key |
 | `packet_template_id` | uuid FK | yes | Which template this packet follows |
-| `organization_id` | uuid FK | yes | The agency |
+| `agency_id` | uuid FK | yes | Owning agency. Follows the existing `agencyId` FK pattern used by customers, locations, etc. |
 | `call_id` | uuid FK | no | Associated voice call (source of initial data) |
 | `name` | string | yes | Display name, e.g. "Rodriguez LLC - WC Renewal" |
 | `status` | enum | yes | `draft`, `in_progress`, `review`, `submitted`, `archived` |
@@ -350,6 +359,7 @@ The `entity_type` enum defines the semantic role of each data section. Templates
 | `loss_run` | many | Prior insurance & claims history: one instance per policy year. Carrier, premium, claims summary. | Yes | Yes |
 | `coverage` | one | Coverage selections and policy parameters: limits, deductibles, effective dates, experience mod. | Yes | Yes |
 | `operations` | one | Underwriting questions, safety programs, exposure details. Primarily commercial. | Yes | -- |
+| `miscellaneous` | one | Catch-all for data that doesn't fit other entity types. Used for carrier-specific "Company Questions," supplemental forms, or other ad-hoc fields per template. | Yes | Yes |
 
 ### Entity composition per template type:
 
@@ -417,20 +427,29 @@ Loss runs are modeled as `entity_type: loss_run` with `cardinality: many`. Each 
 
 This gives us queryable, structured loss history data that maps to ACORD 125/130's "Prior Carrier Information" and "Loss History" sections.
 
-### Document Side (V1 Suggestion)
+### Document Side (V1)
 
-Loss runs are often PDF documents from prior carriers. We suggest a lightweight `packet_attachment` table:
+Loss runs are often PDF documents from prior carriers. We use a `packet_attachment` table following the existing Supabase storage pattern used by logos (`brands-logos` bucket), avatars (`avatars` bucket), and EZLynx reports (`ezlynx-reports` bucket).
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | uuid | Primary key |
-| `quote_packet_id` | uuid FK | Parent packet |
-| `packet_entity_id` | uuid FK | Optional link to specific loss_run entity |
-| `file_url` | string | Storage URL |
-| `file_name` | string | Original filename |
-| `file_type` | string | MIME type |
-| `attachment_type` | enum | `loss_run`, `supplement`, `mod_worksheet`, `other` |
-| `parsed_data` | jsonb | AI-extracted structured data (future) |
+**Storage pattern (matching existing codebase conventions):**
+- A new Supabase storage bucket: `packet-attachments`
+- Only the **filename** is stored in the database (not full URLs)
+- Full URLs are generated on-demand via `getPresignedUrl()` (server-side, 1-hour expiry)
+- Filename format: `{quotePacketId}-{timestamp}.{extension}` (matches existing `{entityId}-{timestamp}.{ext}` convention)
+- Upload via existing `uploadFileToStorage()` utility; delete via `removeFileFromStorage()`
+
+| Column | Type | Required | Description |
+|--------|------|----------|-------------|
+| `id` | uuid | yes | Primary key |
+| `quote_packet_id` | uuid FK | yes | Parent packet |
+| `packet_entity_id` | uuid FK | no | Optional link to specific loss_run entity instance |
+| `file_name` | string | yes | Stored filename in `packet-attachments` bucket (not a full URL) |
+| `original_file_name` | string | yes | User-facing original filename, e.g. "Travelers_LossRun_2024.pdf" |
+| `file_type` | string | yes | MIME type, e.g. `application/pdf` |
+| `file_size` | int | no | File size in bytes |
+| `attachment_type` | enum | yes | `loss_run`, `supplement`, `mod_worksheet`, `dec_page`, `other` |
+| `parsed_data` | jsonb | no | AI-extracted structured data (future) |
+| `created_at` | timestamp | yes | |
 
 This keeps document handling separate from the core field model while allowing us to associate PDFs with their corresponding structured loss_run entities. In a future iteration, AI can parse uploaded loss run PDFs and auto-populate the structured `loss_run` entity fields.
 
@@ -1065,46 +1084,46 @@ One property per packet (V1). `cardinality: many`, `min_count: 1`, `max_count: 1
 
 `min_count: 0`.
 
-| Field Group | Key | Label | Type | Req | Priority | Rater Mapping |
-|-------------|-----|-------|------|:---:|----------|---------------|
-| **Claim** | | | | | | |
-| | `date_of_loss` | Date of Loss | date | yes | high | PLRater.Claim.Date |
-| | `claim_type` | Claim Type | select | yes | high | PLRater.Claim.Type |
-| | | *Options:* `wind_hail`, `fire`, `water`, `theft`, `liability`, `other` | | | | |
-| | `description` | Description | textarea | no | medium | PLRater.Claim.Description |
-| | `amount_paid` | Amount Paid | currency | no | medium | PLRater.Claim.Amount |
-| | `claim_status` | Status | select | no | medium | PLRater.Claim.Status |
-| | | *Options:* `open`, `closed` | | | | |
+| Field Group | Key            | Label                                                                  | Type     | Req | Priority | Rater Mapping             |
+| ----------- | -------------- | ---------------------------------------------------------------------- | -------- | :-: | -------- | ------------------------- |
+| **Claim**   |                |                                                                        |          |     |          |                           |
+|             | `date_of_loss` | Date of Loss                                                           | date     | yes | high     | PLRater.Claim.Date        |
+|             | `claim_type`   | Claim Type                                                             | select   | yes | high     | PLRater.Claim.Type        |
+|             |                | *Options:* `wind_hail`, `fire`, `water`, `theft`, `liability`, `other` |          |     |          |                           |
+|             | `description`  | Description                                                            | textarea | no  | medium   | PLRater.Claim.Description |
+|             | `amount_paid`  | Amount Paid                                                            | currency | no  | medium   | PLRater.Claim.Amount      |
+|             | `claim_status` | Status                                                                 | select   | no  | medium   | PLRater.Claim.Status      |
+|             |                | *Options:* `open`, `closed`                                            |          |     |          |                           |
 
 ---
 
 #### 11.4 `coverage` (one) - "Coverage Selections"
 
-| Field Group | Key | Label | Type | Req | Priority | Rater Mapping |
-|-------------|-----|-------|------|:---:|----------|---------------|
-| **Dwelling** | | | | | | |
-| | `dwelling_coverage` | Dwelling Coverage (Cov A) | currency | yes | critical | PLRater.Coverage.Dwelling |
-| | `other_structures_pct` | Other Structures % of Dwelling | select | no | medium | PLRater.Coverage.OtherStructPct |
-| | | *Options:* `2`, `5`, `10`, `20` | | | | |
-| | `personal_property_pct` | Personal Property % of Dwelling | select | no | medium | PLRater.Coverage.PPPct |
-| | | *Options:* `25`, `50`, `70`, `75` | | | | |
-| | `loss_of_use_pct` | Loss of Use % of Dwelling | select | no | medium | PLRater.Coverage.LOUPct |
-| | | *Options:* `10`, `20`, `30` | | | | |
-| **Liability** | | | | | | |
-| | `personal_liability` | Personal Liability | select | yes | high | PLRater.Coverage.Liability |
-| | | *Options:* `100000`, `300000`, `500000`, `1000000` | | | | |
-| | `medical_payments` | Medical Payments to Others | select | no | medium | PLRater.Coverage.MedPay |
-| | | *Options:* `1000`, `2500`, `5000` | | | | |
-| **Deductibles** | | | | | | |
-| | `deductible` | All-Peril Deductible | select | yes | high | PLRater.Coverage.Deductible |
-| | | *Options:* `500`, `1000`, `2500`, `5000`, `10000` | | | | |
-| | `wind_hail_deductible` | Wind/Hail Deductible | select | no | medium | PLRater.Coverage.WindDed |
-| | | *Options:* `1_pct`, `2_pct`, `5_pct`, `same_as_aop` | | | | |
-| **Optional Endorsements** | | | | | | |
-| | `water_backup` | Water Backup Coverage | boolean | no | low | PLRater.Coverage.WaterBackup |
-| | `identity_theft` | Identity Theft Coverage | boolean | no | low | PLRater.Coverage.IdentityTheft |
-| | `equipment_breakdown` | Equipment Breakdown | boolean | no | low | PLRater.Coverage.EquipBreakdown |
-| | `scheduled_pp` | Scheduled Personal Property | boolean | no | low | PLRater.Coverage.ScheduledPP |
+| Field Group               | Key                     | Label                                               | Type     | Req | Priority | Rater Mapping                   |
+| ------------------------- | ----------------------- | --------------------------------------------------- | -------- | :-: | -------- | ------------------------------- |
+| **Dwelling**              |                         |                                                     |          |     |          |                                 |
+|                           | `dwelling_coverage`     | Dwelling Coverage (Cov A)                           | currency | yes | critical | PLRater.Coverage.Dwelling       |
+|                           | `other_structures_pct`  | Other Structures % of Dwelling                      | select   | no  | medium   | PLRater.Coverage.OtherStructPct |
+|                           |                         | *Options:* `2`, `5`, `10`, `20`                     |          |     |          |                                 |
+|                           | `personal_property_pct` | Personal Property % of Dwelling                     | select   | no  | medium   | PLRater.Coverage.PPPct          |
+|                           |                         | *Options:* `25`, `50`, `70`, `75`                   |          |     |          |                                 |
+|                           | `loss_of_use_pct`       | Loss of Use % of Dwelling                           | select   | no  | medium   | PLRater.Coverage.LOUPct         |
+|                           |                         | *Options:* `10`, `20`, `30`                         |          |     |          |                                 |
+| **Liability**             |                         |                                                     |          |     |          |                                 |
+|                           | `personal_liability`    | Personal Liability                                  | select   | yes | high     | PLRater.Coverage.Liability      |
+|                           |                         | *Options:* `100000`, `300000`, `500000`, `1000000`  |          |     |          |                                 |
+|                           | `medical_payments`      | Medical Payments to Others                          | select   | no  | medium   | PLRater.Coverage.MedPay         |
+|                           |                         | *Options:* `1000`, `2500`, `5000`                   |          |     |          |                                 |
+| **Deductibles**           |                         |                                                     |          |     |          |                                 |
+|                           | `deductible`            | All-Peril Deductible                                | select   | yes | high     | PLRater.Coverage.Deductible     |
+|                           |                         | *Options:* `500`, `1000`, `2500`, `5000`, `10000`   |          |     |          |                                 |
+|                           | `wind_hail_deductible`  | Wind/Hail Deductible                                | select   | no  | medium   | PLRater.Coverage.WindDed        |
+|                           |                         | *Options:* `1_pct`, `2_pct`, `5_pct`, `same_as_aop` |          |     |          |                                 |
+| **Optional Endorsements** |                         |                                                     |          |     |          |                                 |
+|                           | `water_backup`          | Water Backup Coverage                               | boolean  | no  | low      | PLRater.Coverage.WaterBackup    |
+|                           | `identity_theft`        | Identity Theft Coverage                             | boolean  | no  | low      | PLRater.Coverage.IdentityTheft  |
+|                           | `equipment_breakdown`   | Equipment Breakdown                                 | boolean  | no  | low      | PLRater.Coverage.EquipBreakdown |
+|                           | `scheduled_pp`          | Scheduled Personal Property                         | boolean  | no  | low      | PLRater.Coverage.ScheduledPP    |
 
 ---
 
@@ -1182,15 +1201,15 @@ Required fields are determined by:
 | ~~**T4**~~ | **Multi-template packets.** | **Resolved.** V1 is one packet = one template. Acceptable. Post-V1 can introduce `packet_bundle` if needed. |
 | ~~**T6**~~ | **ACORD mapping fidelity.** | **Resolved.** V1 uses semantic mapping keys (e.g., `125.FEIN`). Actual PDF coordinate mapping will be a separate export layer built later. |
 | ~~**T7**~~ | **Rater mapping fidelity.** | **Resolved.** V1 uses structural placeholder mappings. Actual PLRater field selectors for Super Copy Paste / chrome extension integration will be built in a separate export workstream. Screenshots provide visual reference for field identification. |
+| ~~**Q4**~~ | **Document attachment model.** | **Resolved.** `packet_attachment` table spec'd in Section 8 following existing Supabase storage conventions: new `packet-attachments` bucket, filename-only in DB, presigned URLs on-demand via `getPresignedUrl()`, upload/delete via existing `uploadFileToStorage()`/`removeFileFromStorage()` utilities. AI parsing of documents deferred to fast-follow. |
+| ~~**Q5**~~ | **Carrier-specific "Company Questions."** | **Resolved.** Added `miscellaneous` entity type as a catch-all. Templates can include a `miscellaneous` entity for carrier-specific fields, supplemental questions, or other ad-hoc data that doesn't fit the core entity types. |
+| ~~**Q7**~~ | **State-specific field variations.** | **Resolved.** Use separate templates per state (e.g., `plrater_auto_ca`, `plrater_auto_tx`) to account for major discrepancies between states. No separate feature needed for state-aware field dependencies in V1. |
 
 ### Must Resolve Before Build
 
 | #      | Question                                                                                                                                                                                                                                                                                                                       | Impact                                                          | Suggested Resolution                                                                                                                                                                                                                   |
 | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Q4** | **Document attachment model.** Loss runs, mod worksheets, and supplementals are often PDFs. The `packet_attachment` table in Section 8 is suggested but not fully spec'd.                                                                                                                                                      | Medium - needed for complete WC submissions.                    | Build `packet_attachment` as a simple file storage table in V1. AI parsing of documents can be a fast-follow.                                                                                                                          |
-| **Q5** | **Carrier-specific "Company Questions."** PLRater screenshots show a **Co. Questions** tab with per-carrier fields (e.g., Progressive asks about home policy, credit score, vehicle tech; The General asks about double deductible). These are not part of the core packet data model - they are carrier-specific and dynamic. | Medium - affects completeness of rater export.                  | V1: do not model carrier-specific questions in the template. These are handled at export time by the rater integration layer. Flag as a V2 enhancement if we need to pre-fill carrier questions from packet data.                      |
 | **Q6** | **PLRater Home screenshots.** We have Auto flow screenshots but no Home-specific screenshots yet. The Home template fields are derived from the detailed context doc, which is thorough but not screenshot-validated.                                                                                                          | Low - context doc is very detailed. Fields are likely accurate. | Capture PLRater Home flow screenshots to validate fields before finalizing Home template seed data.                                                                                                                                    |
-| **Q7** | **State-specific field variations.** PLRater context doc details significant CA vs TX differences (PIP vs MedPay, Good Driver discount, credit scoring, wind/hail deductibles, roof ACV rules). Should we have separate templates per state, or handle via field dependencies?                                                 | Medium - affects template proliferation vs complexity.          | V1: use a single template per line (e.g., `plrater_auto`) with state-aware field dependencies (e.g., `state=TX` shows PIP, `state=CA` shows MedPay). Only create state-specific templates if the field set is fundamentally different. |
 
 ### Design Trade-offs to Monitor
 
@@ -1209,15 +1228,20 @@ Required fields are determined by:
 
 ### Database Migrations (ordered)
 
-1. `create_packet_templates` - template table
+1. `create_packet_templates` - template table with FK to agencies
 2. `create_entity_templates` - with FK to packet_templates
 3. `create_field_group_templates` - with FK to entity_templates
 4. `create_field_templates` - with FK to field_group_templates
 5. `create_field_dependencies` - with FKs to field_templates
-6. `create_quote_packets` - instance table
+6. `create_quote_packets` - instance table with FK to agencies
 7. `create_packet_entities` - with FKs to quote_packets + entity_templates
 8. `create_field_values` - with FKs to packet_entities + field_templates
-9. `create_packet_attachments` - file storage
+9. `create_packet_attachments` - file metadata table (files stored in Supabase `packet-attachments` bucket)
+
+### Storage Setup
+
+- Add `"packet-attachments"` to `StorageBucket` type in `src/lib/constants/storage-buckets.ts`
+- Create the `packet-attachments` Supabase storage bucket
 
 ### Seed Data
 

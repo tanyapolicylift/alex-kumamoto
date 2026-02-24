@@ -2,17 +2,17 @@
 
 ## Summary
 
-| Test | Scenario | Winner | Key Finding |
-|------|----------|--------|-------------|
-| 01 | Asks for Jason | Control | Test over-explains; Control attempts transfer |
-| 02 | Jason + payment (health ins) | Test | Control got confused about health insurance scope |
-| 03 | Payment request | Control | Control captured policy number; Test missed it |
-| 04 | Customer service request | Tie | Both reasonable, different approaches |
-| 05 | Spanish language request | Tie | Both handled language switch well |
-| 06 | Called yesterday, estimate | Tie | Both lost caller (connectivity issue) |
-| 07 | Email insurance card | Control | Control resolved faster; Test too verbose |
-| 08 | Billing inquiry | Test | Test offered clearer options upfront |
-| 09 | New car insurance (existing customer) | Control | Control shorter; Test lost email at end |
+| Test | Scenario                              | Winner  | Key Finding                                       |
+| ---- | ------------------------------------- | ------- | ------------------------------------------------- |
+| 01   | Asks for Jason                        | Tie     | Effectively same                                  |
+| 02   | Jason + payment (health ins)          | Test    | Control got confused about health insurance scope |
+| 03   | Payment request                       | Control | Control captured policy number; Test missed it    |
+| 04   | Customer service request              | Tie     | Both reasonable, different approaches             |
+| 05   | Spanish language request              | Tie     | Both handled language switch well                 |
+| 06   | Called yesterday, estimate            | Tie     | Both lost caller (connectivity issue)             |
+| 07   | Email insurance card                  | Control | Control resolved faster; Test more verbose        |
+| 08   | Billing inquiry                       | Test    | Test offered clearer options upfront              |
+| 09   | New car insurance (existing customer) | Tie     | Effectively same                                  |
 
 **Overall: Control 4 | Test 2 | Tie 3**
 

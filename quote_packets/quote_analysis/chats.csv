@@ -1,0 +1,569 @@
+created_at_et,agency_name,id,chat_url,status,line,type,score,short_summary,chat_duration,message_count,data,transcript
+"Jan 12, 2026 10:38 AM",Winkler Insurance,57d5f85e-b955-420f-adea-879997ecd807,https://app.policylift.ai/chats/57d5f85e-b955-420f-adea-879997ecd807,filtered,personal,personal_auto,4,User inquires about home and auto insurance.,00:06:38.512,9,"{""vin"":null,""email"":null,""driver"":null,""lastName"":null,""firstName"":null,""ownership"":null,""primaryUse"":null,""phoneNumber"":null,""vehicleMake"":null,""vehicleYear"":null,""vehicleModel"":null,""claimsHistory"":[],""licenseNumber"":null,""driverBirthDate"":null}","assistant: Hi there. This is Kelly from Winkler Insurance. How can I help you today?
+user: hey i just bought a house and a new car, what am I supposed to do for insurance
+assistant: Got it, congrats on both. Are you looking for **quotes for homeowners and auto insurance**?
+user: why do I need auto insurance the thing only cost me $1000, seems like a waste
+assistant: I get that, even with a low-cost car, Texas requires auto insurance to legally drive, and it also protects you if you cause damage or injuries that could cost way more than the car itself. Do you want me to help you look at an auto insurance quote that keeps things minimal and affordable?
+user: ok cool what do I need for a quote
+assistant: Sure, I just need to grab a few details so an agent can follow up. What kind of insurance do you want to start with, auto, homeowners, or both?
+user: lts start with auto, can I save money if I bundle
+assistant: Yes, bundling auto with homeowners usually saves money, and the agent can walk through that with you. What’s your first and last name?"
+"Jan 12, 2026 11:16 AM",Winkler Insurance,3b2c2e2a-f4e5-4141-8086-524d8a82bc41,https://app.policylift.ai/chats/3b2c2e2a-f4e5-4141-8086-524d8a82bc41,filtered,unknown,unknown,3,User requests auto and home insurance quotes,00:06:08.376,7,"{""email"":null,""lastName"":null,""firstName"":null,""phoneNumber"":null}","assistant: Hi there. This is Kelly from Winkler Insurance. How can I help you today?
+user: hey I just bough a home and a car, someone said I need insurance
+assistant: Got it, I can help with that. Are you looking to get insurance quotes for both your home and your car?
+user: the car costs $1000 whty would I get insurance it seems like a waste
+assistant: I get why it feels that way, actually, even cheaper cars usually need insurance because Texas requires liability coverage, and it also protects you if you cause damage or get sued. Do you want help getting an auto quote that keeps the cost as low as possible?
+user: ok cool what do I need to get a qupte
+assistant: Sure, I just need to grab a few details so an agent can help with the quote. What kind of insurance do you want to start with, auto or home?"
+"Jan 13, 2026 10:47 AM",Winkler Insurance,771d3781-6905-4ecf-8852-a2fa2cefd9ca,https://app.policylift.ai/chats/771d3781-6905-4ecf-8852-a2fa2cefd9ca,filtered,unknown,unknown,3,User requests home and auto insurance in New York,00:09:14.15,19,"{""email"":null,""lastName"":null,""firstName"":null,""phoneNumber"":null}","assistant: Hi there. This is Kelly from Winkler Insurance. How can I help you today?
+user: hablas espanol
+user: I said hablas espanol por favor
+assistant: ¡Perfecto! Continuemos en español. ¿En qué puedo ayudarte hoy, cotización, reclamo, o algo más?
+user: nesecito seguro para mi coche
+assistant: Claro. ¿Me puedes decir tu nombre y apellido?
+user: no, tengo una casa 
+assistant: Entendido. ¿Buscas una cotización de seguro para tu casa o algo diferente?
+user: quiero combinar los dos
+assistant: Perfecto, podemos combinar casa y auto en un solo paquete. ¿Cuál es tu nombre y apellido?
+user: no tengo un nombre
+user: no tengo un nombre
+assistant: Está bien. ¿Quieres una cotización de seguro combinado de casa y auto para una vivienda en Texas?
+user: no vivo en Texas
+assistant: Entiendo. Nosotros solo atendemos en Texas, ¿en qué estado vives actualmente?
+user: New York
+assistant: Gracias por avisar. En ese caso, no podemos ayudarte porque solo damos servicio en Texas. ¿Te gustaría que te recomiende buscar una agencia local en New York?
+user: si
+assistant: Perfecto. Te recomiendo buscar una agencia de seguros independiente en tu ciudad o en línea y pedir una cotización combinada de casa y auto, ellos trabajan con varias compañías y pueden ayudarte rápido. ¿Quieres que te diga cómo encontrarlas fácilmente?"
+"Jan 14, 2026 02:43 PM",Seguros Ideal,828f25e1-f986-4956-963e-9c72a21a0fd0,https://app.policylift.ai/chats/828f25e1-f986-4956-963e-9c72a21a0fd0,completed,commercial,commercial_business_owners_policy,3,Solicita seguro para compañía de pizza,00:05:58.971,9,"{""email"":null,""lastName"":null,""firstName"":null,""businessAge"":null,""lossHistory"":[],""phoneNumber"":null,""businessName"":null,""squareFootage"":null,""businessImpact"":null,""equipmentValue"":null,""inventoryValue"":null,""ownershipStatus"":null}","assistant: Hi there. This is Kelly from Seguros Ideal. How can I help you today?
+user: hey can I order pizza
+assistant: Sure, I can’t order pizza, but what can I help you with today, a quote, a claim, or a policy question?
+user: do you have insurance for my pizza company instead
+assistant: Got it, yes we can help with insurance for a pizza business. What kind of coverage are you looking for, general liability, a business owners policy, or something else?
+user: puedes hablar en espanol
+assistant: ¡Perfecto! Continuemos en español. ¿En qué puedo ayudarte hoy con el seguro de tu pizzería?
+user: si nesecito seguro para mi compania de pizza
+assistant: Claro, puedo ayudarte con eso. ¿Cuál es el nombre de tu compañía de pizza?"
+"Jan 16, 2026 05:26 PM",JAMCO Insurance,9d75c3d2-63c6-4905-ba26-4f223cdbd1af,https://app.policylift.ai/chats/9d75c3d2-63c6-4905-ba26-4f223cdbd1af,completed,personal,personal_homeowners,3,Home insurance quote request for Jose Medrano,00:07:48.982,45,"{""email"":""jose@josemedrano.com"",""address"":""3122 Carter St.  Pasadena, TX 77503"",""roofAge"":5,""stories"":1,""lastName"":""Medrano"",""roofType"":""Regular"",""firstName"":""Jose"",""yearBuilt"":1950,""hasMortgage"":null,""phoneNumber"":""713.922.0778"",""claimsHistory"":[""no""],""occupancyType"":null,""squareFootage"":1200,""currentInsurer"":""no""}","assistant: Hi there. This is Kelly from JAMCO Insurance. How can I help you today?
+user: I need to get a quote for home insurance
+assistant: Got it. What’s your first and last name?
+user: Jose Medrano
+assistant: Got it, Jose. What’s your phone number?
+user: 713.922.0778
+assistant: Okay. What’s your email address?
+user: jose@josemedrano.com
+assistant: Got it. What’s the best time to reach you?
+user: Any time
+assistant: Okay. What’s your date of birth?
+user: 07/09/1975
+assistant: Got it. What’s your ZIP code?
+user: 77503
+assistant: Okay. What’s the address of the home you want to insure?
+user: 3122 Carter St.  Pasadena, TX 77503
+assistant: Got it. Do you currently own the home or are you buying it?
+user: Own
+assistant: Okay. What year was the home built?
+user: 1950
+assistant: Got it. About how many square feet is the home?
+user: 1200
+assistant: Okay. How many stories is the home?
+user: 1
+assistant: Got it. What type of roof do you have?
+user: Regular
+assistant: Okay. When was the roof last replaced?
+user: 5 yrs ago
+assistant: Got it. Do you have a security system?
+user: no
+assistant: Okay. Do you currently have homeowners insurance?
+user: no
+assistant: Okay. Have you had any home insurance claims in the last 5 years?
+user: no
+assistant: Got it. Is there anything specific you want covered or are concerned about?
+user: no
+assistant: Perfect. One of our agents will follow up with your homeowners quote.
+
+Anything else before we wrap up?
+user: no
+assistant: Thanks for reaching out to JAMCO Insurance, Jose. Talk soon!
+user: Thanks.
+assistant: You’re welcome! Have a great day, Jose.
+user: What time will someone call me?
+assistant: Sure. An agent will usually call during business hours, would you like to pick a specific time today or tomorrow?
+user: today at 5 pm
+assistant: It looks like I’m not able to lock in 5:00 PM today right now. Would tomorrow morning or later this afternoon work instead?"
+"Jan 20, 2026 02:42 PM",Gennock Insurance,d13e5e9d-8a48-4537-9ac6-335806448345,https://app.policylift.ai/chats/d13e5e9d-8a48-4537-9ac6-335806448345,completed,commercial,commercial_workers_compensation,4,New pizza restaurant needs workers' comp insurance quote,00:05:58.619,11,"{""email"":null,""taxId"":null,""lastName"":null,""firstName"":null,""phoneNumber"":null,""businessName"":null,""claimsHistory"":[],""safetyProgram"":null,""workLocations"":[],""payrollBreakdown"":null,""employeeBreakdown"":""10 employees"",""subcontractorInfo"":null,""hasReturnToWorkProgram"":null}","assistant: Hi there. This is Kelly from Gennock Insurance. How can I help you today?
+user: Hey Kelly, just opened a pizza restaurant. Can you help me? 
+assistant: Sure, I can help with that. Are you looking for insurance coverage for the restaurant, or something else?
+user: No, I was actually looking for a recipe for pizza. 
+assistant: Got it, I actually help with insurance questions for businesses like your restaurant. Would you like help with insurance coverage for your pizza shop?
+user: Sure, someone told me I need insurance for my business. What types of insurance should I consider? 
+assistant: Sure. Most restaurants look at general liability, property coverage for the building and equipment, workers comp if you have employees, and sometimes a business owners policy that bundles a few of those together. Would you like help getting insurance quotes for your pizza restaurant?
+user: Hey, I just hired 10 employees. Does that mean I need workers' comp? 
+assistant: Got it. In most states, once you have employees, workers comp is required, and it helps cover job related injuries and illnesses. Would you like me to gather a few details so an agent can help you with workers comp coverage?
+user: Cool, can you help me get a quote for a workers' comp? Sounds like it's pretty important. 
+assistant: Sure, I can help get that started. What’s the name of your business?"
+"Jan 20, 2026 02:57 PM",Gennock Insurance,480d1e20-c81a-487f-99c0-657f5983e64a,https://app.policylift.ai/chats/480d1e20-c81a-487f-99c0-657f5983e64a,completed,unknown,unknown,3,Personal auto and umbrella insurance quote requested,00:07:32.349,27,"{""email"":""MikeLevine11@gmail.com"",""lastName"":""Levene"",""firstName"":""Michael"",""phoneNumber"":""203-957-2460""}","assistant: Hi there. This is Kelly from Gennock Insurance. How can I help you today?
+user: Hey Kelly, looking for auto insurance. What do you need from me? 
+assistant: Got it, I’ll grab a few details so an agent can follow up. What kind of auto insurance are you looking for, personal or commercial?
+user: Hey, I want personal auto insurance. 
+assistant: Okay. What’s your first and last name?
+user: My name is Michael Levene. 
+assistant: Got it, Michael. What’s your phone number?
+user: 203-957-2460 
+assistant: Got it. What’s your email address?
+user: MikeLevine11@gmail.com 
+assistant: Okay. What’s the best time to reach you?
+user: January 29th at 2pm. 
+assistant: Got it. What’s your date of birth?
+user: September 5th, 1996 
+assistant: Okay. What’s your ZIP code?
+user: 06883 
+assistant: Got it. How many vehicles do you need to insure?
+user: Just one vehicle. It's a Ford Explorer 2020. 
+assistant: Got it, a 2020 Ford Explorer. How many drivers will be on the policy?
+user: It's myself, and my driver's license number is 724-3652. 
+assistant: Got it. Do you currently have auto insurance?
+user: Yeah, I have a policy with Allstate, but I don't know what it covers. 
+assistant: Okay. Any accidents or tickets in the last 3 years?
+user: I got a speeding ticket last year, and I got pulled over for not wearing my seatbelt two years ago. 
+assistant: Got it. What coverage level are you looking for, minimum or comprehensive?
+user: And then he goes, ""Hey Kelly, I'm looking for a personal umbrella policy."" 
+assistant: Okay. Is this for a personal umbrella policy to add on top of your auto insurance?"
+"Jan 20, 2026 03:36 PM",Winkler Insurance,346b2ef9-fd31-4dc6-93ea-1c9e943c8daa,https://app.policylift.ai/chats/346b2ef9-fd31-4dc6-93ea-1c9e943c8daa,filtered,commercial,commercial_workers_compensation,3,Request for workers' comp quote for pizza business,00:06:38.806,11,"{""email"":null,""taxId"":null,""lastName"":null,""firstName"":null,""phoneNumber"":null,""businessName"":null,""claimsHistory"":[],""safetyProgram"":null,""workLocations"":[],""payrollBreakdown"":null,""employeeBreakdown"":null,""subcontractorInfo"":null,""hasReturnToWorkProgram"":null}","assistant: Hi there. This is Kelly from Winkler Insurance. How can I help you today?
+user: Hey, just started a pizza business. Someone said insurance is important. 
+assistant: Got it, congrats on the new pizza business. Are you looking to get an insurance quote for the business?
+user: I don't know, maybe you have a good recipe for pizza and stuff? 
+assistant: Haha, I wish, but I’m better with insurance than pizza recipes. Do you want help figuring out what insurance a pizza business usually needs?
+user: Oh, if you don't have a good pizza recipe, how do I know I want to buy insurance from you? Sounds like you don't really know what you're talking about! 
+assistant: Totally fair, I’ll stick to what I actually do best. Want me to quickly explain how insurance protects your pizza business if something goes wrong?
+user: Okay, fine. Humor me. How does insurance protect my pizza business even if I have awful pizza because you can't give me a good recipe? 
+assistant: Fair enough. Insurance helps cover things like customer injuries, kitchen fires, equipment breakdowns, or lawsuits, even if the pizza isn’t winning awards. Want me to walk through the most common coverage a pizza business usually carries?
+user: Like, okay, fine. I want a quote for workers' comp for my pizza business. 
+assistant: Got it. What’s the name of your pizza business?"
+"Jan 22, 2026 01:23 PM",Seguros Ideal,accf1b69-3071-4b87-b157-12422990af83,https://app.policylift.ai/chats/accf1b69-3071-4b87-b157-12422990af83,completed,unknown,unknown,2,User requested insurance quote from Seguros Ideal,00:05:53.495,3,"{""email"":null,""lastName"":null,""firstName"":null,""phoneNumber"":null}","assistant: Hi there. This is Kelly from Seguros Ideal. How can I help you today?
+user: Get a Quote
+assistant: Got it. What kind of insurance are you looking for?"
+"Jan 30, 2026 12:35 PM",Moore & Associates Insurance,76b67adb-3e88-4a6d-a8f1-210e14af12bf,https://app.policylift.ai/chats/76b67adb-3e88-4a6d-a8f1-210e14af12bf,completed,personal,personal_homeowners,2,Wes Standish requests homeowners insurance quote,00:06:10.292,5,"{""email"":null,""address"":null,""roofAge"":null,""stories"":null,""lastName"":""Standish"",""roofType"":null,""firstName"":""Wes"",""yearBuilt"":null,""hasMortgage"":null,""phoneNumber"":null,""claimsHistory"":[],""occupancyType"":null,""squareFootage"":null,""currentInsurer"":null}","assistant: Hi there. This is Kelly from Moore & Associates Insurance. How can I help you today?
+user: I need a homeowners quote
+assistant: Got it. What’s your first and last name?
+user: Wes Standish
+assistant: Okay Wes. What’s your phone number?"
+"Feb 03, 2026 06:20 PM",MartinoWest Business & Insurance Solutions,6a246131-a144-4ab4-bd58-a21681358cda,https://app.policylift.ai/chats/6a246131-a144-4ab4-bd58-a21681358cda,completed,unknown,unknown,5,Commercial insurance bundle quote for tree service business,00:11:49.202,51,"{""email"":""test@californiasure.com"",""lastName"":""Suree"",""firstName"":""Cali"",""phoneNumber"":""5553201569""}","assistant: Hi there. This is Harper from MartinoWest Business & Insurance Solutions. How can I help you today?
+user: Get a Quote
+assistant: Sure. What kind of insurance are you looking for?
+user: Commercial insurance for my small business 
+assistant: Got it. What’s the name of your business?
+user: California Sure 
+assistant: Okay. What type of work does your business do?
+user: tree trimming 
+assistant: Got it. What’s your business address?
+user: 1234 California Sure, Weimar CA
+assistant: Okay. About how much is your yearly gross revenue?
+user: 500000
+assistant: Got it. How long have you been in business?
+user: 10 years 
+assistant: Okay. Are there any other owners besides you?
+user: no 
+assistant: Got it. How is the business structured, like LLC, S-Corp, or sole proprietor?
+user: Sole proprietorship
+assistant: Okay. Do you have an EIN number?
+user: I can't remember it 
+assistant: No worries. What type of coverage are you looking for, general liability, workers comp, or something else?
+user: I would like to bundle my insurance 
+assistant: Got it. Which coverages do you want included in the bundle, like general liability, workers comp, commercial auto, or something else?
+user: can you do everything and include payroll HR and safety
+assistant: Okay, we can help with a full package including insurance plus payroll, HR, and safety support. How many employees do you currently have?
+user: 10
+assistant: Got it. Do you own or lease your business location?
+user: own
+assistant: Okay. Do you use any vehicles for the business?
+user: yes 
+assistant: Got it. How many vehicles are used for the business?
+user: 3
+assistant: Okay. Do you currently have any commercial insurance in place?Okay. Do you currently have any commercial insurance in place?
+user: Yes - through State Fund 
+assistant: Got it. Have you had any claims in the last 5 years?
+user: yes - too many - our xmod is 190
+assistant: Okay. Is there anything specific you want covered or any concerns you want the agent to focus on?
+user: I would like to lower my xmod
+assistant: Got it, lowering your x‑mod is something we can definitely focus on. What’s your first and last name?
+user: Cali Suree
+assistant: Okay. What’s the best phone number to reach you?
+user: 5553201569
+assistant: Got it. What’s your email address?
+user: test@californiasure.com
+assistant: Okay. What’s the best time to reach you?
+user: 9-5 weekdays 
+assistant: Quick confirm:
+
+Name: Cali Suree  
+Business: California Sure  
+Phone: (555) 320-1569  
+Email: test@californiasure.com  
+Type: Commercial insurance bundle with payroll, HR, and safety  
+
+All good?
+user: looks great - when can I expect someone to get back to me> 
+assistant: Got it. An agent will reach out within one business day, usually sooner during weekday hours, to go over options and next steps for lowering your x‑mod and bundling everything.
+user: Thank you! 
+assistant: You’re welcome! Thanks for reaching out to MartinoWest, we’ll be in touch soon."
+"Feb 04, 2026 02:51 PM",JAMCO Insurance,3f0b0f91-e332-4100-88eb-bdc71a4711f3,https://app.policylift.ai/chats/3f0b0f91-e332-4100-88eb-bdc71a4711f3,completed,personal,personal_auto,4,Requested auto insurance quote for Toyota CHR,00:08:26.354,37,"{""vin"":null,""email"":""priscillashopalerts@gmail.com"",""driver"":""priscilla salisbury"",""lastName"":""salisbury"",""firstName"":""priscilla"",""ownership"":null,""primaryUse"":null,""phoneNumber"":""8324920692"",""vehicleMake"":""toyota"",""vehicleYear"":2020,""vehicleModel"":""CHR"",""claimsHistory"":[""no""],""licenseNumber"":null,""driverBirthDate"":""09/25/1985""}","assistant: Hi there, this is Kelly from JAMCO Insurance. If you're already working with an agent at JAMCO, I can note that down. Otherwise I'm here to help.
+user: Get a Quote
+assistant: Got it, what kind of insurance are you looking to get a quote for?
+user: car insurance
+assistant: Okay, is this for personal auto insurance?
+user: yes
+assistant: Got it, what’s your first and last name?
+user: priscilla salisbury
+assistant: Got it, Priscilla. What’s the best phone number to reach you?
+user: 8324920692
+assistant: Got it. What’s your email address?
+user: priscillashopalerts@gmail.com
+assistant: Okay, what’s the best time to reach you?
+user: afternoon
+assistant: Got it. What’s your date of birth?
+user: 09/25/1985
+assistant: Got it. What’s your ZIP code?
+user: 77008
+assistant: Okay. How many vehicles do you need to insure?
+user: 1
+assistant: Got it. For your primary vehicle, what’s the year, make, and model?
+user: toyota, CHR, 2020
+assistant: Got it. How many drivers will be on the policy?
+user: 1
+assistant: Got it. Do you currently have auto insurance?
+user: yes
+assistant: Okay. Who’s your current provider?
+user: allstate
+assistant: Got it. Any accidents or tickets in the last 3 years?
+user: no
+assistant: Okay. What coverage level are you looking for, minimum or comprehensive?
+user: full
+assistant: Got it. Is there anything specific you’re looking for in your coverage?
+user: no
+assistant: Perfect. One of our agents will follow up with your auto quote. Anything else you’d like to add before we wrap up?
+user: no
+assistant: Got it. Thanks for reaching out to JAMCO Insurance, we’ll be in touch soon."
+"Feb 05, 2026 02:03 PM",Princeton Insurance,752ea07c-65ee-4489-ab4c-cce65be0ef76,https://app.policylift.ai/chats/752ea07c-65ee-4489-ab4c-cce65be0ef76,completed,unknown,unknown,3,Business insurance inquiry; switch from home insurance,00:06:31.3,9,"{""email"":null,""lastName"":null,""firstName"":null,""phoneNumber"":null}","assistant: Hi there. This is Kelly from Princeton Insurance. How can I help you today?
+user: new homee insuran nceed soon
+assistant: Got it, I can help with a homeowners insurance quote. Are you buying a new home or switching from your current policy?
+user: just bought home in CA
+assistant: Okay. What’s your first and last name?
+user: nevermind bussines starting soon
+assistant: Got it. Are you looking for insurance for a new business, or something else related to getting started?
+user: business en espanol
+assistant: ¡Perfecto! Continuemos en español. ¿Qué tipo de negocio estás comenzando?"
+"Feb 05, 2026 02:18 PM",Princeton Insurance,455bfd24-f7bd-4b6c-b286-bb31a241b360,https://app.policylift.ai/chats/455bfd24-f7bd-4b6c-b286-bb31a241b360,completed,unknown,unknown,4,"Inquiry about California insurance, clarified Texas-only coverage",00:05:17.489,3,"{""email"":null,""lastName"":null,""firstName"":null,""phoneNumber"":null}","assistant: Hi there. This is Kelly from Princeton Insurance. How can I help you today?
+user: i need insurance in california
+assistant: Got it. We actually serve Texas only, are you looking for coverage because you’re moving to Texas?"
+"Feb 05, 2026 08:41 PM",JAMCO Insurance,faad8020-0741-42cb-9c6d-b71828dfa88c,https://app.policylift.ai/chats/faad8020-0741-42cb-9c6d-b71828dfa88c,completed,unknown,unknown,2,"User requests quote, working with Jose",00:05:31.163,5,"{""email"":null,""lastName"":null,""firstName"":null,""phoneNumber"":null}","assistant: Hi there, this is Kelly from JAMCO Insurance. If you're already working with an agent at JAMCO, I can note that down. Otherwise I'm here to help.
+user: Get a Quote
+assistant: Got it, what kind of insurance are you looking to get a quote for?
+user: I'm working with Jose
+assistant: Got it, what kind of insurance are you working with Jose on?"
+"Feb 06, 2026 03:47 PM",Norton Insurance,3011a108-7f41-4a35-9fdb-7b1e7df641ec,https://app.policylift.ai/chats/3011a108-7f41-4a35-9fdb-7b1e7df641ec,completed,personal,personal_flood,4,Requested flood insurance quote for Pensacola home,00:10:36.369,45,"{""email"":""mike@policylift.ai"",""address"":""123 main st, pensacola, fl 01234"",""lastName"":""Levene"",""firstName"":""Mike"",""phoneNumber"":""2039572460"",""contentsCoverageNeeded"":null,""basementBelowGradeLevels"":null,""priorFloodLossesFiveYears"":[],""floodZoneElevationCertificate"":null}","assistant: Hi there. This is Kelly from Norton Insurance. How can I help you today?
+user: hey need insurance in panama city
+assistant: Got it. What kind of insurance are you looking for?
+user: my business is in texas
+user: i have business in texas
+assistant: Okay. Just to be sure, are you looking for insurance coverage for a Texas-based business?
+assistant: Okay. Is the business operating or located in Alabama, Colorado, Florida, Georgia, North Carolina, South Carolina, Tennessee, or Utah?
+user: what days are oyu open
+assistant: We’re open Monday through Friday, 8:00 AM to 4:30 PM Eastern.
+user: can I get flood insurance in pensacola
+assistant: Yes, we can help with flood insurance in Pensacola. Is this for a home or a business?
+user: busienss
+assistant: Got it. What’s the full address of the business property in Pensacola?
+user: can you tell me a joke about flood insurance
+assistant: Sure. Flood insurance is like an umbrella you hope never to use, but you’re really glad it’s there when things start getting wet.
+user: can I get a flood insurance quote for my home
+assistant: Got it. What’s your date of birth?
+user: 1/1/1990
+assistant: Okay. What’s your ZIP code?
+user: 11111
+assistant: Sorry, I need a valid 5 digit ZIP code. What’s the correct ZIP code?
+user: 01234
+assistant: Got it. What’s the full address of the home you want flood insurance for?
+user: 123 main st, pensacola, fl
+assistant: Okay. Is this your primary residence or a rental?
+user: primary
+assistant: Got it. Does your mortgage require flood insurance, or are you choosing to add it on your own?
+user: add it to my existing
+assistant: Okay. Do you currently have flood insurance on the home?
+user: no
+assistant: Got it. Have you ever experienced flooding at this property before?
+user: no
+assistant: Okay. What’s your first and last name?
+user: Mike Levene
+assistant: Got it, Mike. What’s the best phone number to reach you?
+user: 2039572460
+assistant: Got it. What’s your email address?
+user: mike@policylift.ai
+assistant: Okay. What’s the best time to reach you?
+user: tomorrow at 9am
+assistant: Quick confirm, Mike. Name Mike Levene, phone 2039572460, email mike@policylift.ai, flood insurance for your primary home in Pensacola, all good?
+user: looks good
+assistant: Perfect. One of our agents will follow up with your flood insurance quote, is there anything else you want to add before we wrap up?
+user: no 
+assistant: Got it. Thanks for reaching out to Norton Insurance, we’ll be in touch soon."
+"Feb 10, 2026 09:44 AM",Moore & Associates Insurance,96c4741f-e9e6-4c96-9921-914656b5d3bc,https://app.policylift.ai/chats/96c4741f-e9e6-4c96-9921-914656b5d3bc,completed,personal,personal_homeowners,4,Homeowners insurance quote request for Martin Slapnik,00:14:07.827,45,"{""email"":""marty.slapnik@vibrantlearning.com"",""address"":""300 Spartina ct, north myrtle beach, SC 29582"",""roofAge"":null,""stories"":3,""lastName"":""Slapnik"",""roofType"":""shingle and metal"",""firstName"":""Martin"",""yearBuilt"":2022,""hasMortgage"":null,""phoneNumber"":""843.424.4102"",""claimsHistory"":[""no""],""occupancyType"":null,""squareFootage"":4200,""currentInsurer"":""State Farm""}","assistant: Hi there. This is Kelly from Moore & Associates Insurance. How can I help you today?
+user: Get a Quote
+assistant: Got it. What kind of insurance are you looking for?
+user: Home Owners insurance
+assistant: Sure. What’s your first and last name?
+user: Martin Slapnik
+assistant: Got it, Martin. What’s the best phone number to reach you?
+user: 843.424.4102
+assistant: Okay. What’s your email address?
+user: marty.slapnik@vibrantlearning.com
+assistant: Got it. What’s the best time to reach you?
+user: during the day
+assistant: Okay. What’s your date of birth?
+user: January 5th 1978
+assistant: Got it. What’s your ZIP code?
+user: 29582
+assistant: Sure. What’s the address of the home?
+user: 300 Spartina ct, north myrtle beach, SC 29582
+assistant: Got it. Do you own the home or are you buying it?
+user: own
+assistant: Okay. What year was it built?
+user: 2022
+assistant: Got it. About how many square feet is it?
+user: 4200
+assistant: Okay. How many stories does the home have?
+user: 3
+assistant: Got it. What type of roof does it have?
+user: shingle and metal
+assistant: Okay. When was the roof last replaced?Got it. Do you have a security system?
+user: yes
+assistant: Got it. Do you currently have homeowners insurance?
+user: yes
+assistant: Okay. Who’s your current homeowners insurance provider?
+user: State Farm
+assistant: Got it. Have you had any homeowners claims in the last 5 years?
+user: no
+assistant: Okay. Is there anything specific you want covered or are concerned about with the policy?
+user: we have a pool
+assistant: Got it. Is the pool fenced and does it have a locking gate?
+user: yes
+assistant: Quick confirm, Martin.
+
+Name: Martin Slapnik  
+Phone: (843) 424-4102  
+Email: marty.slapnik@vibrantlearning.com  
+Insurance: Homeowners
+
+All good?
+user: yes
+assistant: Perfect! One of our agents will follow up with your homeowners quote.  
+
+Anything else you want to add before we wrap up?
+user: nope. all good
+assistant: Thanks for reaching out to Moore & Associates Insurance, Martin. Talk soon!"
+"Feb 10, 2026 11:47 AM",Winkler Insurance,5ea5ece7-46a5-4fb4-90f4-f92a9f36bd4c,https://app.policylift.ai/chats/5ea5ece7-46a5-4fb4-90f4-f92a9f36bd4c,completed,unknown,unknown,3,User requests insurance quote via chat,00:05:39.608,3,"{""email"":null,""lastName"":null,""firstName"":null,""phoneNumber"":null}","assistant: Hi there. This is Kelly from Winkler Insurance. How can I help you today?
+user: Get a Quote
+assistant: Sure. What kind of insurance are you looking for?"
+"Feb 10, 2026 04:33 PM",East Texas Affordable Insurance,e8bfc756-58b4-4556-becc-252c2adb93e1,https://app.policylift.ai/chats/e8bfc756-58b4-4556-becc-252c2adb93e1,completed,personal,personal_auto,3,Alan Martinez requests auto insurance quote,00:09:40.273,37,"{""vin"":null,""email"":""alan@etxainsurance.com"",""driver"":""alan martinez"",""lastName"":""martinez"",""firstName"":""alan"",""ownership"":null,""primaryUse"":null,""phoneNumber"":""9033943856"",""vehicleMake"":""chevy"",""vehicleYear"":1999,""vehicleModel"":""silverado 1500"",""claimsHistory"":[""no""],""licenseNumber"":null,""driverBirthDate"":""10/23/2007""}","assistant: Hi there. This is David from East Texas Affordable Insurance. How can I help you today?
+user: Get a Quote
+assistant: Got it. What kind of insurance are you looking for?
+user: auto 
+assistant: Okay. What’s your first and last name?
+user: alan martinez 
+assistant: Got it, Alan. What’s your phone number?
+user: 9033943856
+assistant: Got it, 903-394-3856. What’s your email address?
+user: alan@etxainsurance.com
+assistant: Okay. What’s the best time to reach you?
+user: any time of the day 
+assistant: Got it. What’s your date of birth?
+user: 10/23/2007
+assistant: Okay. What’s your ZIP code?
+user: 75801
+assistant: Got it. How many vehicles do you need to insure?
+user: 1
+assistant: Okay. For your primary vehicle, what’s the year, make, and model?
+user: 1999 chevy silverado 1500
+assistant: Got it. How many drivers will be on the policy?
+user: 1
+assistant: Okay. Do you currently have auto insurance?
+user: yes
+assistant: Got it. Who’s your current insurance provider?
+user: progressive 
+assistant: Okay. Any accidents or tickets in the last 3 years?
+user: no
+assistant: Got it. What coverage level are you looking for, minimum or comprehensive?
+user: liability
+assistant: Okay. Is there anything specific you’re looking for with the policy?
+user: no 
+assistant: Perfect. One of our agents will follow up with your auto quote.
+
+Anything else before we wrap up?
+user: no 
+assistant: Got it. Thanks for reaching out to East Texas Affordable Insurance, we’ll be in touch soon.
+user: okay thanks 
+assistant: You’re welcome, Alan. Talk soon and have a great day."
+"Feb 11, 2026 10:11 AM",Moore & Associates Insurance,aaeec354-0638-49fe-a1eb-d91adfdfc015,https://app.policylift.ai/chats/aaeec354-0638-49fe-a1eb-d91adfdfc015,completed,unknown,unknown,4,Cheryl Patterson requests home and auto insurance quotes,00:11:39.145,61,"{""email"":""cabjzsp@protonmail.com"",""lastName"":""patterson"",""firstName"":""cheryl"",""phoneNumber"":""5404679409""}","assistant: Hi there. This is Kelly from Moore & Associates Insurance. How can I help you today?
+user: Get a Quote
+assistant: Got it. What kind of insurance are you looking for?
+user: home and auto
+assistant: Okay, we can definitely help with home and auto.  
+
+What’s your first and last name?
+user: cheryl patterson
+assistant: Got it, Cheryl.  
+
+What’s your phone number?
+user: 5404679409
+assistant: Got it, (540) 467-9409.  
+
+What’s your email address?
+user: cabjzsp@protonmail.com
+assistant: Got it.  
+
+What’s the best time to reach you?
+user: now
+assistant: Okay, we’ll note that.  
+
+What’s your date of birth?
+user: 10261957
+assistant: Got it.  
+
+What’s your 5-digit ZIP code?
+user: 29576
+assistant: Got it.  
+
+What’s the address of the home you’d like to insure?
+user: 22 crooked island cir murrells inlet sc 29576
+assistant: Got it.  
+
+Do you currently own the home, or are you in the process of buying it?
+user: process of buying
+assistant: Okay.  
+
+What year was the home built?
+user: 1983
+assistant: Got it.  
+
+About how many square feet is the home?
+user: 1431
+assistant: Got it.  
+
+How many stories does the home have?
+user: 1
+assistant: Got it.  
+
+What type of roof does it have?
+user: metal
+assistant: Got it.  
+
+When was the roof last replaced?
+user: 10 years
+assistant: Got it.  
+
+Do you have a security system installed?
+user: no
+assistant: Got it.  
+
+Do you currently have homeowners insurance?
+user: yes
+assistant: Okay.  
+
+Who’s your current homeowners insurance provider?
+user: farm bureau of virginia
+assistant: Got it.  
+
+Have you had any home insurance claims in the last 5 years?
+user: yes
+assistant: Okay.  
+
+Anything specific you’d like covered on the home policy?
+user: wind
+assistant: Got it.  
+
+For your auto policy, how many vehicles do you need to insure?
+user: 2
+assistant: Got it.  
+
+For your primary vehicle, what’s the year, make, and model?
+user: 2014 chevrolet impala
+assistant: Got it.  
+
+How many drivers will be on the auto policy?
+user: 2
+assistant: Got it.  
+
+Do you currently have auto insurance?
+user: yes
+assistant: Okay.  
+
+Who’s your current auto insurance provider?
+user: farm bureau of virginia
+assistant: Got it.  
+
+Any accidents or tickets in the last 3 years?
+user: no
+assistant: Got it.  
+
+Are you looking for minimum coverage or full coverage on the autos?
+user: liability
+assistant: Got it.  
+
+Anything specific you’re looking for on the auto policy?
+user: normal liability coverage
+assistant: Quick confirm:  
+
+Name: Cheryl Patterson  
+Phone: (540) 467-9409  
+Email: cabjzsp@protonmail.com  
+Type: Home and Auto Quote  
+
+All good?
+user: yes
+assistant: Perfect! One of our agents will follow up with your home and auto quotes.  
+
+Anything else before we wrap up?
+user: no
+assistant: Thanks for reaching out to Moore & Associates Insurance. Talk soon!"
+"Feb 11, 2026 12:01 PM",Moore & Associates Insurance,7f57042c-141d-4665-9cdb-236e9f7f0d03,https://app.policylift.ai/chats/7f57042c-141d-4665-9cdb-236e9f7f0d03,completed,personal,personal_condo,3,Jeanne Lambert condo insurance quote inquiry,00:12:34.05,35,"{""email"":""djcblamb@gmail.com"",""address"":""342 kiskadee loop #b, Myrtle Beach, SC 29526"",""lastName"":""Lambert"",""unitType"":null,""firstName"":""Jeanne"",""phoneNumber"":""4123354877"",""claimsHistory"":[""no claims""],""coverageLimit"":null,""squareFootage"":null,""liabilityLimit"":null,""occupantsNumber"":null}","assistant: Hi there. This is Kelly from Moore & Associates Insurance. How can I help you today?
+user: Get a Quote
+assistant: Got it. What kind of insurance are you looking for?
+user: h-06
+assistant: Okay, condo insurance. What’s your first and last name?
+user: Jeanne Lambert
+assistant: Got it, Jeanne. What’s your phone number?
+user: 4123354877
+assistant: Got it, (412) 335-4877. What’s your email address?
+user: djcblamb@gmail.com
+assistant: Got it. What’s the best time to reach you?
+user: during the day works
+assistant: Okay. What’s your date of birth?
+user: 5-19-1960
+assistant: Got it. What’s your 5-digit ZIP code?
+user: looking to buy a place in myrtle beach
+assistant: Got it, Myrtle Beach. Do you know the 5-digit ZIP code for the condo?
+user: 29526 is one I may be looking at
+assistant: Got it, 29526. What’s the condo address?
+user: 342 kiskadee loop #b
+assistant: Got it. Do you own it now or are you buying it?
+user: possibly buying it. just gathering information right now
+assistant: Okay. Does the HOA have a master policy?
+user: yes
+assistant: Got it. About how much personal property coverage do you think you’ll need for your belongings?
+user: not sure haven't purchased any personal belongings yet
+assistant: No worries, we can help you figure that out. Do you currently have condo insurance with another provider?
+user: no
+assistant: Got it. Is there anything specific you want covered with this condo policy?
+user: not sure. that's what i wanted to discuss with you
+assistant: Quick confirm:
+
+Name: Jeanne Lambert  
+Phone: (412) 335-4877  
+Email: djcblamb@gmail.com  
+Type: Condo Insurance  
+
+All good?
+user: yes
+assistant: Perfect! One of our agents will follow up with your condo quote and go over coverage options with you.
+
+Anything else before we wrap up?
+user: no that's all
+assistant: Thanks for reaching out to Moore & Associates Insurance. Talk soon!"
