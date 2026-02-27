@@ -32,7 +32,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk Assessment and Tre
 
 **Why:** An annual risk assessment is one of the most explicitly checked items in a SOC 2 audit. Auditors will ask to see the risk register, the assessment methodology, and evidence that it was completed within the audit period. For a startup, this does not need to be a massive exercise — a half-day session with a spreadsheet-based risk register is perfectly sufficient — but it must be documented and it must happen.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -53,7 +53,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk Assessment and Tre
 
 **Why:** The risk register is the tangible artifact auditors will pull during a SOC 2 exam. They want to see that risks are identified, scored, assigned to owners, and have treatment plans. A simple spreadsheet (risk description, owner, likelihood, impact, score, treatment, status) is all you need. The key is that it exists, is populated with real risks, and shows evidence of being updated.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -74,7 +74,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk Assessment and Tre
 
 **Why:** SOC 2 requires that someone is accountable for risk management. At a 10-person startup, this does not need to be a dedicated hire — it can be the CTO, a co-founder, or an engineering lead with "CISO" as an additional hat. The important thing is that one person is named and documented as responsible. Simplify the policy to reference a single role (e.g., "CISO or designee") rather than bouncing between "compliance officer" and "CISO."
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -93,7 +93,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk Assessment and Tre
 
 **Why:** Vulnerability scanning is a standard SOC 2 expectation. Auditors will ask for scan reports and evidence of remediation. For a cloud-native startup, the network-layer piece is largely handled by cloud provider tools (AWS Inspector, GuardDuty, etc.), and application scanning can be done with open-source tools. The annual cadence is the minimum — many startups run scans more frequently as part of CI/CD. The key is having at least one documented annual scan with evidence of follow-up on findings.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -114,7 +114,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk Assessment and Tre
 
 **Why:** Auditors want evidence that risk assessment results reach decision-makers. At a startup, this does not need to be a formal 30-page report delivered in a boardroom. A summary document or even a recorded Slack/email thread where the CISO shares the updated risk register with the founders and notes key changes is sufficient. The point is to have a paper trail showing leadership is informed and involved.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -135,7 +135,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk Assessment and Tre
 
 **Why:** Auditors will look at the risk register and ask: "For the high-risk items, what did you do about them?" Having documented treatment plans and evidence of follow-through is essential. However, the word "immediately" is unrealistic for a small team — replacing it with "promptly" or "in a timely manner" gives you appropriate flexibility without weakening the commitment. The treatment plans can be simple (a Jira ticket, a line item in the risk register with a target date and owner).
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -154,7 +154,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk Assessment and Tre
 
 **Why:** This is a lightweight but meaningful practice. Auditors like to see that risk acceptance is a deliberate decision, not an oversight. For a startup, this can be as simple as the CEO or CTO adding a sign-off column in the risk register spreadsheet for accepted risks, or sending a brief email acknowledging the accepted residual risks after the annual assessment. Minimal effort, good audit optics.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -171,9 +171,9 @@ When you are done reviewing, tell the agent: **"Finalize Risk Assessment and Tre
 
 **Why:** While having cyber insurance is a good business practice, it is not a core SOC 2 audit requirement. Auditors will not fail you for lacking an annual insurance review process. This is a risk transfer mechanism that is more relevant to enterprise governance. If PolicyLift already has cyber insurance, a brief annual check-in with the broker is sensible but does not need to be enshrined in policy. Consider removing this from the policy or softening it to "management may periodically review insurance coverage."
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
-
+Soften as prescribed
 ---
 
 ## Commitment 9: Fraud Risk Reporting Obligation to CEO and COO
@@ -188,7 +188,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk Assessment and Tre
 
 **Why:** Fraud risk reporting is more of a SOX / financial audit concern than a SOC 2 requirement. SOC 2 auditors are focused on security, availability, processing integrity, confidentiality, and privacy — not financial fraud. That said, having a general "report concerns to management" clause is harmless and reasonable. Simplify this to fold into a general "report suspected security or compliance concerns to management" statement rather than calling out fraud, waste, and abuse as a separate process.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -211,7 +211,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk Assessment and Tre
 
 **Why:** Asset inventories and data flow diagrams are commonly requested by SOC 2 auditors. You do not need a fancy CMDB or data mapping tool — a spreadsheet listing your key systems (AWS services, databases, SaaS tools), who owns each, and a simple diagram showing how customer data flows through your stack is sufficient. Doing this as part of the annual risk assessment (not as a separate ongoing process) is the right level of effort for a startup. The references to "non-electronic data" and "facilities" are enterprise boilerplate and can be scoped down to what is relevant.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -228,7 +228,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk Assessment and Tre
 
 **Why:** This is a standard part of any risk assessment methodology and auditors expect to see it. In practice, it just means adding two columns to your risk register spreadsheet: "inherent risk score" and "residual risk score." When you apply a control or mitigation, you re-score the risk. It takes minimal extra effort during the assessment and makes the register look complete and professional.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---

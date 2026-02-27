@@ -32,7 +32,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Security Po
 
 **Why:** Auditors will explicitly ask for evidence of annual policy review and employee acknowledgment. This is a baseline SOC 2 requirement. If you already use a compliance platform (Vanta, Drata, etc.), this is largely automated. Even without one, a calendar reminder + a shared doc sign-off is sufficient at your size.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -51,9 +51,9 @@ When you are done reviewing, tell the agent: **"Finalize Information Security Po
 
 **Why:** SOC 2 requires that policy changes are approved by appropriate management -- that part is non-negotiable. However, requiring Board review of every policy change record is heavyweight for a startup. Simplify to: CTO or COO approve changes; maintain a change log; Board reviews the overall security program annually (not individual policy edits). This keeps you compliant without creating unnecessary Board overhead.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
-
+Make it the CTO
 ---
 
 ## Commitment 3: Background Checks for All New Hires and Contractors
@@ -68,7 +68,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Security Po
 
 **Why:** Background checks are a standard SOC 2 expectation and auditors routinely sample employee files to confirm this. Services like Checkr make this cheap and easy. The only nuance is "contractors" -- make sure your scope is realistic. If you use freelancers for short engagements, decide whether this applies to all of them or only those with system access.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -85,7 +85,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Security Po
 
 **Why:** Auditors check for signed confidentiality agreements in employee files. Most startups already do this via their employment agreements or a standalone NDA. Just make sure it is a distinct, trackable artifact in each person's file -- not buried in a 40-page employment contract where you cannot prove it was signed.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -104,7 +104,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Security Po
 
 **Why:** Annual security awareness training is non-negotiable for SOC 2 -- auditors will ask for completion records. A platform like KnowBe4 or even a simple annual training session with a sign-off sheet works. However, the requirement to "regularly assess and document effectiveness" goes beyond what most startups do. Simplify to: annual security training for all employees, with completion tracked. Secure coding can be covered as part of engineering onboarding or periodic team sessions -- no need for a formal "program" with effectiveness metrics at your size.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -129,7 +129,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Security Po
 
 **Why:** Asset management and endpoint hardening are core SOC 2 controls. Auditors will want to see that company devices are encrypted, patched, and tracked. An MDM tool handles most of this automatically. The "daily scan for patch compliance" language is aggressive -- most startups do continuous monitoring via their MDM rather than a separate daily scan. If you are a Mac-only shop, the Windows antivirus requirement is moot. Adjust the policy to reflect your actual fleet. The asset inventory can be your MDM dashboard -- no need for a separate spreadsheet.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -146,7 +146,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Security Po
 
 **Why:** This is a standard SOC 2 requirement for companies relying on cloud infrastructure. AWS and GCP publish their SOC 2 reports; you just need to download them annually and document that someone reviewed them. Takes 30 minutes once a year. Auditors specifically check for this.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -171,7 +171,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Security Po
 
 **Why:** Vulnerability scanning and patch management are absolutely required for SOC 2 -- this is non-negotiable. However, the policy as written creates a bureaucratic process (monthly IT leadership patch approval meetings, formal remediation plans for each finding) that is overkill for a small team. Simplify to: automated vulnerability scanning (tools like Dependabot, Snyk, AWS Inspector), automated patching where possible, and a lightweight monthly review of open high/critical findings. At 10 people, "IT leadership patch approval" is just the CTO or engineering lead glancing at a dashboard -- do not create a formal meeting or sign-off process for this.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -211,7 +211,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Security Po
 
 **Why:** Logging and monitoring are core SOC 2 controls. Auditors will want to see that you capture audit trails and can detect anomalies. If you are on AWS/GCP, CloudTrail/Cloud Audit Logs handle most IAM and infrastructure logging automatically. Application-level logging via a tool like Datadog, CloudWatch, or similar is standard. The 1-year retention is a common SOC 2 expectation. The key is to not over-promise: commit to logging what you actually log, set up a handful of meaningful alerts (e.g., root account usage, failed login spikes, deployment failures), and ensure retention is configured. Do not try to log "everything" on day one -- start with IAM, infrastructure changes, and application errors.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -232,7 +232,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Security Po
 
 **Why:** An incident response plan is one of the most commonly audited SOC 2 controls. Auditors will ask to see the plan and evidence that it was tested. The good news: "testing" for a startup usually means a simple tabletop exercise (a 1-hour meeting where you walk through a hypothetical incident). You do not need to run a full red-team simulation. Write a clear, short plan, run a tabletop once a year, and document the outcome. This is very achievable.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -249,7 +249,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Security Po
 
 **Why:** Annual risk assessments are a pillar of SOC 2. Auditors will ask for the risk register and evidence of the assessment process. At a startup, this does not need to be elaborate -- a spreadsheet listing 15-25 risks, each rated by likelihood and impact, with a brief mitigation plan or acceptance rationale, is sufficient. Compliance platforms like Vanta can help template this. Budget about a half-day annually to do it properly.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -266,7 +266,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Security Po
 
 **Why:** Vendor management is expected for SOC 2, but the scope matters. You do not need to assess every SaaS tool you use -- focus on vendors that handle sensitive data or have access to your production environment. For a startup, a simple vendor inventory spreadsheet with columns for "what data they access," "do they have a SOC 2," and "date reviewed" is sufficient. Do not create a heavyweight procurement process. The key is demonstrating that you thought about vendor risk for your critical vendors, not that you ran a formal assessment on every $10/month tool.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---

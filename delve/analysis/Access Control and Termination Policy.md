@@ -28,7 +28,7 @@ When you are done reviewing, tell the agent: **"Finalize Access Control and Term
 
 **Why:** MFA is one of the first things auditors check. Most modern SaaS tools (Google Workspace, GitHub, AWS) make it trivial to enforce org-wide. If you aren't doing this already, it's the single highest-ROI security control you can implement. Non-negotiable for SOC 2.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -45,7 +45,7 @@ When you are done reviewing, tell the agent: **"Finalize Access Control and Term
 
 **Why:** Least privilege is a core SOC 2 principle and auditors will ask how you provision access. However, "formal independent approval" sounds heavier than it needs to be at a 10-person startup. A simple Slack thread or a short checklist in your project management tool (Linear, Notion, etc.) showing "Manager X approved access Y for Person Z" is sufficient. You do not need a ticketing system or approval-chain software. Keep the principle, lighten the process.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -64,7 +64,7 @@ When you are done reviewing, tell the agent: **"Finalize Access Control and Term
 
 **Why:** Auditors will sample onboarding events and ask to see evidence that access was provisioned according to a process. At a startup, a Notion/Google Sheets template that you fill out per hire is plenty. The device inventory can be a simple spreadsheet. The key is consistency — pick a method and use it every time. This is highlighted (==) in the source, likely because it's a gap today.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -83,7 +83,7 @@ When you are done reviewing, tell the agent: **"Finalize Access Control and Term
 
 **Why:** Timely access revocation for departing employees is a classic SOC 2 audit target. Auditors will pull a list of terminated employees and check whether their accounts were disabled promptly. The one-business-day standard is industry-typical and reasonable. The checklist itself can be simple — the important part is having one and using it consistently. At a small startup the "HR representative notifies security administrators" step is probably just one person Slacking another, which is fine as long as it's documented.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -100,7 +100,7 @@ When you are done reviewing, tell the agent: **"Finalize Access Control and Term
 
 **Why:** Individual accountability is fundamental to SOC 2. Auditors need to see that actions can be traced to specific people. Most cloud tools make individual accounts easy. If you have legacy shared accounts (e.g., a shared social media login, a shared AWS root account), document them and store credentials in your password manager. This is straightforward.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -119,7 +119,7 @@ When you are done reviewing, tell the agent: **"Finalize Access Control and Term
 
 **Why:** Having a designated password manager and a no-hardcoded-credentials rule is expected by auditors and is genuinely good security hygiene. The 8-character minimum is modest by modern standards (many orgs use 12+), but it's fine for SOC 2. The main operational change is picking a password manager if you haven't already and ensuring everyone uses it. Consider running a secrets-scan on your codebase to catch any hardcoded credentials.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -140,7 +140,7 @@ When you are done reviewing, tell the agent: **"Finalize Access Control and Term
 
 **Why:** Auditors want to see that access changes are intentional and approved, not ad-hoc. At a 10-person startup, role changes are infrequent, so this won't be burdensome. A Slack message from a manager saying "Please grant X access to Y" plus a note in your access log is sufficient — you don't need a formal ticketing workflow. For emergency access, just make sure someone writes down what happened after the fact.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -157,7 +157,7 @@ When you are done reviewing, tell the agent: **"Finalize Access Control and Term
 
 **Why:** Periodic access reviews are one of the most commonly tested SOC 2 controls. Auditors will ask to see evidence of these reviews (screenshots, spreadsheets, tickets showing accounts were reviewed and any issues remediated). Quarterly is the standard cadence for SOC 2. At a small startup this might take 1-2 hours per quarter — pull user lists from AWS/GCP, GitHub, Google Workspace, and your production database, verify each person still needs their access level, and document it. Not glamorous, but it's a must-do.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -174,7 +174,7 @@ When you are done reviewing, tell the agent: **"Finalize Access Control and Term
 
 **Why:** Annual policy review is a standard SOC 2 expectation. It's low-effort — once a year, sit down, re-read each policy, note any changes, update version dates, and send an email/Slack message to the team. Auditors will look for evidence that policies were reviewed (a dated review note or version history). This is boilerplate but expected.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---

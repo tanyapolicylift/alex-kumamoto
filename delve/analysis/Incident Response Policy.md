@@ -32,7 +32,7 @@ When you are done reviewing, tell the agent: **"Finalize Incident Response Polic
 
 **Why:** Auditors absolutely expect a defined escalation path and evidence that employees know how to report incidents. The escalation chain itself is straightforward. However, requiring both an email *and* a follow-up phone call is overly prescriptive — a Slack message or a ticket in your incident tracking tool should be equally valid. Simplify the reporting mechanism to "notify via the company's primary communication channel (e.g., Slack #security-incidents) and create a ticket" rather than mandating email + call. The disciplinary language is fine to keep — auditors like seeing that reporting is taken seriously.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -53,7 +53,7 @@ When you are done reviewing, tell the agent: **"Finalize Incident Response Polic
 
 **Why:** This is one of the most audited areas of SOC 2. Auditors will ask to see your incident log, check that incidents are tracked to resolution, and verify that documentation exists. You need a real system for this — a Jira project, Linear workspace, or even a dedicated spreadsheet works, but it must be consistently used. The specific fields listed are reasonable and standard. The forensic preservation language (logs, screenshots) is good practice and auditors appreciate it, though for a startup it mostly means "don't delete your cloud logs." Medium difficulty because the real challenge is the discipline of documenting every incident thoroughly, not the tooling.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -70,7 +70,7 @@ When you are done reviewing, tell the agent: **"Finalize Incident Response Polic
 
 **Why:** Having a structured intake form is good practice and easy to implement — a pinned Slack message, a Google Form, or a Jira issue template takes 15 minutes to set up. Auditors like seeing that you collect consistent information at the point of reporting. It also makes your incident log much more useful. Low effort, real value.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -87,7 +87,7 @@ When you are done reviewing, tell the agent: **"Finalize Incident Response Polic
 
 **Why:** Auditors want to see that incidents are triaged promptly and assigned a severity level. The 48-hour SLA is reasonable and standard. However, requiring *both* the CTO and Chief Architect to jointly investigate every report is heavy for a small team — a single designated "incident lead" (whoever is on-call or the CTO) should be sufficient. The four-tier severity model (Critical/High/Medium/Low) is standard and worth keeping. The GDPR-specific classification criteria are a nice touch if you handle EU personal data, but can be removed if not applicable.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -106,7 +106,7 @@ When you are done reviewing, tell the agent: **"Finalize Incident Response Polic
 
 **Why:** Vulnerability management with defined SLAs is a core SOC 2 expectation. Auditors will sample vulnerabilities and check whether you met your own remediation timelines — so whatever numbers you put in this policy, you will be held to them. The timelines listed are industry-standard but aggressive for a small team. Consider whether 24-72 hours for Critical is realistic given your staffing (it may be, depending on the type of vulnerability). The bigger concern is Medium at 30-60 days — if you have a backlog of medium-severity findings from a scanner, you could easily blow past this. Set timelines you can actually meet consistently, or auditors will flag the gap between policy and practice.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -127,7 +127,7 @@ When you are done reviewing, tell the agent: **"Finalize Incident Response Polic
 
 **Why:** Having a documented incident response procedure (detect, contain, eradicate, recover, communicate) is absolutely required for SOC 2. Auditors will want to see this written down. However, requiring the CTO, CSO, *and* COO to jointly produce a communications plan for every High or Medium incident is overkill for a 10-person startup — half your leadership team would be pulled into every incident. Simplify to: the CTO (or designated incident lead) handles containment and resolution, and loops in the CEO for external communications only when the incident affects customers or involves a data breach. For a startup, a one-page runbook covering these phases is sufficient.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -148,7 +148,7 @@ When you are done reviewing, tell the agent: **"Finalize Incident Response Polic
 
 **Why:** Post-incident reviews are a SOC 2 staple — auditors will ask to see post-mortem documentation and evidence that lessons learned fed back into improvements. This is non-negotiable. However, notifying *all users* and presenting lessons learned to the entire company after every incident is excessive. For Critical/High incidents affecting customers, yes — broad communication and a formal write-up make sense. For Medium/Low incidents, a brief write-up in the incident ticket and a discussion within the engineering team is sufficient. The "additional training if necessary" clause is good — keep it as a judgment call, not a mandate for every incident.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -167,7 +167,7 @@ When you are done reviewing, tell the agent: **"Finalize Incident Response Polic
 
 **Why:** Annual policy review and incident response testing are explicitly called out in SOC 2 Trust Services Criteria. Auditors will ask for evidence of both. The policy review is low effort — read through the document once a year and note any updates. The IR test is the heavier lift, but it doesn't have to be elaborate: a 1-hour tabletop exercise where the team walks through a hypothetical incident scenario is sufficient. Document both activities with dates and attendees. This is non-negotiable for SOC 2.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -184,7 +184,7 @@ When you are done reviewing, tell the agent: **"Finalize Incident Response Polic
 
 **Why:** Security awareness training that covers incident reporting is a SOC 2 baseline. Auditors will check that employees have been trained. This doesn't need to be a separate training program — it can be a section in your general security awareness training (which you'll need for SOC 2 anyway). A 5-minute module or a section in your onboarding deck covering "here's how to report a security issue" is sufficient. Low effort, high audit value.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -203,9 +203,9 @@ When you are done reviewing, tell the agent: **"Finalize Incident Response Polic
 
 **Why:** Having a list of "who to call" externally is reasonable but the scope here is absurd for a cloud-based SaaS startup. You do not need contact details for power companies, telecoms companies, or utility companies — you run on AWS/GCP, not in a physical data center. Simplify this to: (1) law enforcement contact info (local FBI cyber division or equivalent), (2) data protection regulator if you handle EU data (relevant supervisory authority), and (3) your cyber insurance carrier's breach hotline if you have one. Drop everything else. Auditors will not ding you for not having your power company's phone number.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
-
+You are exactly right we want to simplify to only commit to FBI Cyber Division and our Insurance Carrier, we do not handle EU data.
 ---
 
 ## Commitment 11: Low-Risk Incident Handling and Periodic Trend Review
@@ -220,5 +220,5 @@ When you are done reviewing, tell the agent: **"Finalize Incident Response Polic
 
 **Why:** This is actually well-written and startup-friendly — it acknowledges that not every incident needs a full-blown investigation. Having a tiered response where low-risk items get documented but don't trigger the entire escalation chain is both practical and shows maturity to auditors. The "periodic trend review" can be a quick look at your incident log during quarterly security reviews. Keep this as-is; it's one of the more sensible parts of the policy.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**

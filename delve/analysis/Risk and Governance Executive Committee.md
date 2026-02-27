@@ -30,9 +30,9 @@ When you are done reviewing, tell the agent: **"Finalize Risk and Governance Exe
 
 **Why:** SOC 2 auditors want to see that *someone* at the leadership level is responsible for risk oversight. But you do not need a formally chartered "Executive Committee" with a Board-appointed chairman. For a 10-person startup, this can simply be "the founders meet periodically to review risk" — documented in a lightweight way. Simplify this to name 2-3 people (e.g., CEO + CTO) as the risk oversight group without the enterprise governance theater of Board appointments and chairmanship.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
-
+Commit to the suggestion, leadership will meet periodically to review risk
 ---
 
 ## Commitment 2: Hold RGEC Meetings at Least Twice Per Year
@@ -47,7 +47,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk and Governance Exe
 
 **Why:** SOC 2 auditors will look for evidence that risk governance happens on a regular cadence. Two meetings per year is actually a very light ask — most frameworks expect quarterly. This is the minimum viable frequency and easy to maintain. Just pick two dates (e.g., mid-year and end-of-year), hold the meeting, and keep notes.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -66,7 +66,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk and Governance Exe
 
 **Why:** Auditors absolutely want to see documented evidence that governance meetings happened and decisions were made. Minutes are the proof. The "signed by one member" language is overly formal — a Notion page or Google Doc with a noted approver is fine. The action-item tracking is genuinely useful and easy to do. Keep this, but don't worry about wet signatures or formal sign-off ceremonies.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -87,7 +87,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk and Governance Exe
 
 **Why:** A formal risk assessment is one of the core pillars of SOC 2. Auditors will look for a documented risk register and evidence that leadership reviewed and addressed risks. This is not optional. The good news: for a small startup, your risk register can be a simple spreadsheet with 15-25 risks, their likelihood, impact, and what you're doing about them. Review it at your biannual meetings and you've covered this commitment.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -108,7 +108,7 @@ When you are done reviewing, tell the agent: **"Finalize Risk and Governance Exe
 
 **Why:** Auditors do want to see that someone is checking whether your controls actually match your commitments. But the language about "evaluation of manual versus automated controls" and "appropriate balance of preventive and detective controls" is enterprise-grade formality. For a startup: during your biannual risk meeting, include a quick review of "are we actually doing what our policies say we do?" That covers this. Remove the control-design-philosophy language — no auditor at a Series A startup expects a formal manual-vs-automated control analysis.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -195,5 +195,5 @@ When you are done reviewing, tell the agent: **"Finalize Risk and Governance Exe
 
 **Why:** SOC 2 auditors do want to see that policies are reviewed periodically — annual review is a standard expectation across all your policies. But this doesn't need to be a formal "Board approval" process. Simplify to: "This charter is reviewed annually as part of the company's policy review cycle." That way it gets swept up with all your other policy reviews rather than being a standalone Board agenda item.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**

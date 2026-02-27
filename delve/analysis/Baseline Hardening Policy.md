@@ -30,7 +30,7 @@ When you are done reviewing, tell the agent: **"Finalize Baseline Hardening Poli
 
 **Why:** If you're running on AWS/GCP, you already have security groups and VPC firewalls — this is mostly about making sure they're configured correctly and not left wide open. Auditors will check that you have network-level access controls. This is table stakes for SOC 2 and cloud security in general; very little incremental effort if you're already using cloud infrastructure properly.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -51,7 +51,7 @@ When you are done reviewing, tell the agent: **"Finalize Baseline Hardening Poli
 
 **Why:** Auditors will want to see evidence of vulnerability management — both that you scan and that you act on findings. Enabling auto-updates on laptops is trivial. Running a vulnerability scanner is straightforward (GitHub Dependabot is free). The "management review" piece is the real commitment: you need a lightweight but documented process for triaging vulnerabilities. This doesn't need to be heavy — a monthly Slack thread or ticket review is fine — but it needs to exist and have evidence.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -70,7 +70,7 @@ When you are done reviewing, tell the agent: **"Finalize Baseline Hardening Poli
 
 **Why:** Access reviews are one of the most commonly tested SOC 2 controls. At a 10-person company this is genuinely easy — you can review all access in under an hour. The annual cadence is the minimum auditors expect. Least-privilege for production access is also non-negotiable; auditors will ask who has access and why. This is low-effort, high-value.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -91,7 +91,7 @@ When you are done reviewing, tell the agent: **"Finalize Baseline Hardening Poli
 
 **Why:** Auditors will ask to see that you have logging enabled and that you actually look at the logs. Cloud providers give you CloudTrail/Cloud Audit Logs out of the box — the main effort is making sure they're turned on and retained. A monitoring/alerting tool like CloudWatch or Datadog is standard for any production system. The "log management tool" language sounds enterprise-heavy but can be satisfied by CloudWatch Logs, Datadog, or even a simple ELK setup. The key is: logs exist, they're centralized enough to search, and someone gets alerted when things go wrong.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -108,9 +108,9 @@ When you are done reviewing, tell the agent: **"Finalize Baseline Hardening Poli
 
 **Why:** This commitment is written with traditional on-premise servers in mind. If your production workloads run on managed cloud services (Lambda, Fargate, managed Kubernetes, etc.), there are no "servers" to install AV on — and auditors understand this. If you do run EC2 instances or VMs, a lightweight agent (e.g., CrowdStrike, SentinelOne, or even ClamAV) satisfies this. For a startup on modern cloud-native infrastructure, consider simplifying this to "endpoint protection is deployed where applicable based on architecture" rather than a blanket AV requirement. Auditors care more about endpoint protection on employee laptops than on ephemeral containers.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
-
+Please perform the recommended update to language
 ---
 
 ## Commitment 6: Annual Risk Assessment
@@ -125,7 +125,7 @@ When you are done reviewing, tell the agent: **"Finalize Baseline Hardening Poli
 
 **Why:** An annual risk assessment is a foundational SOC 2 requirement across all Trust Services Criteria. Auditors will ask for this document — it's essentially non-negotiable. The good news: at a 10-person startup, this doesn't need to be a 50-page enterprise exercise. A structured spreadsheet listing 15-25 risks with likelihood, impact, and mitigation notes is perfectly adequate. Budget half a day once a year. Note: this commitment also appears in the Risk Assessment and Treatment Policy, so the work is shared — but the Baseline Hardening Policy explicitly references it too.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -146,7 +146,7 @@ When you are done reviewing, tell the agent: **"Finalize Baseline Hardening Poli
 
 **Why:** HTTPS everywhere is already standard practice — if you're not doing this, something is very wrong. Encryption at rest is also straightforward on cloud platforms (S3, RDS, GCS all support encryption at rest with a checkbox). Auditors will specifically verify both in-transit and at-rest encryption. This is the easiest "Critical" item on the list: it's likely already done, and if not, it's a one-time configuration.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -163,7 +163,7 @@ When you are done reviewing, tell the agent: **"Finalize Baseline Hardening Poli
 
 **Why:** MFA is one of the first things auditors check. Every major cloud provider and SaaS tool supports it. If you use an SSO provider (Okta, Google Workspace with enforced MFA), you can satisfy this across the board with a single configuration. This is absolute baseline — no startup should skip this.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -182,9 +182,9 @@ When you are done reviewing, tell the agent: **"Finalize Baseline Hardening Poli
 
 **Why:** Multi-AZ deployment is standard cloud architecture and most startups already do it (or should). The real commitment here is backup restoration testing — you need to actually prove your backups work, not just assume they do. Auditors will ask for evidence. This doesn't need to be a full DR drill; restoring a database snapshot to a test environment once or twice a year and documenting it is sufficient. Simplify the language to set a clear cadence (e.g., "annually" or "semi-annually") rather than leaving it open-ended.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
-
+Please set to annual as recommended
 ---
 
 ## Commitment 10: Password Policies and Baseline Configuration Management
@@ -203,5 +203,5 @@ When you are done reviewing, tell the agent: **"Finalize Baseline Hardening Poli
 
 **Why:** Password policies are easy to enforce if you use SSO or an identity provider — just set the policy there once. The 8-character minimum with complexity is actually below modern best practices (NIST now recommends longer passphrases over complex short passwords), but it satisfies the SOC 2 checkbox. System hardening is good practice but vague — for a cloud-native startup, this mostly means following cloud provider best practices (CIS benchmarks) and not leaving default settings in place. The annual baseline configuration review is the operational commitment to watch: you need a documented record that someone reviewed and confirmed your production configs are still appropriate. At a small startup, this can be combined with your annual risk assessment or access review cycle to avoid creating yet another standalone review process.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**

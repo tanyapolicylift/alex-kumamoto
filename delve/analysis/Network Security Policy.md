@@ -35,7 +35,7 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** Firewalls and default-deny configurations are fundamental to SOC 2. Auditors will ask to see your firewall rules and evidence that they've been reviewed. If you're running on AWS/GCP, security groups and network ACLs serve this role — just make sure you document an annual review. The testing piece can be lightweight (a checklist confirming rules match intended state) rather than a formal penetration test of every rule.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -59,7 +59,7 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** SOC 2 requires encrypted remote access, but mandating VPN for everything is an enterprise-era approach. Most modern startups use cloud-hosted SaaS tools (accessible over HTTPS) and zero-trust architectures instead of traditional VPNs. If your production systems are in AWS/GCP and you access them via SSH with key-based auth or through a cloud console with MFA, that already satisfies the auditor. Rewrite this to say "all remote access must be encrypted and authenticated" and list your actual access methods (e.g., SSO + MFA for SaaS, SSH keys for infrastructure, VPN only if you actually use one). Don't commit to blanket VPN if you don't need it.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -84,7 +84,7 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** Centralized logging is non-negotiable for SOC 2. Auditors will ask where your logs go, how long they're retained, and whether anyone reviews them. If you're on AWS/GCP, you likely already have CloudTrail/Cloud Audit Logs and VPC flow logs available — just make sure they're turned on, shipped somewhere central, and that you have basic alerting for anomalies. You don't need a $100k/year SIEM; a lightweight setup (CloudWatch + alerts, or Datadog) is fine at this stage. The "observe all firewall traffic" language is aspirational — simplify to "alert on suspicious patterns."
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -102,7 +102,7 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** A dedicated IDS (like Snort or Suricata) is heavy for a 10-person startup. However, SOC 2 auditors do expect some form of intrusion/anomaly detection. In a cloud environment, you can satisfy this with managed services like AWS GuardDuty or GCP Security Command Center, which are trivial to enable and cost very little. Rewrite the policy to say "intrusion detection capabilities" rather than committing to a specific on-prem IDS. If you turn on GuardDuty, you can check this box with minimal effort.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -128,7 +128,7 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** Network segmentation between production and non-production is a core SOC 2 expectation. Auditors will check that dev cannot freely access prod. In cloud environments, this is typically done via separate VPCs, accounts, or projects — which you may already have. Customer data segmentation is also essential for trust services criteria. The IoT/IP phone language is irrelevant for a modern cloud-native startup — remove it to avoid creating an obligation nobody will track. Keep the substance (env separation + tenant segmentation), drop the legacy hardware references.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -147,7 +147,7 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** SOC 2 auditors will almost certainly ask for a network or architecture diagram. This is one of the most common audit requests and is very easy to satisfy. Draw your cloud architecture (VPCs, subnets, security groups, load balancers, databases) in something like Lucidchart, draw.io, or even a whiteboard photo. Review it once a year to make sure it still matches reality. This is low effort with high audit payoff.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -168,7 +168,7 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** If you ever have a vendor or partner with direct network-level access (e.g., a VPN tunnel to a partner, a peered VPC), SOC 2 expects you to have assessed the risk and documented an agreement. For most small startups, third-party access happens via APIs over the internet, not via direct network connections — so this may rarely apply. Keep the commitment but simplify: "Before granting any third party direct network-level access, we conduct a risk assessment and require a signed agreement." If all third-party integration is via SaaS APIs, note that this applies to direct network connections only.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -193,9 +193,9 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** Full MDM (like Jamf, Intune, or Kandji) is genuinely useful for device security and auditors appreciate it, but it is a meaningful operational commitment — you need to configure profiles, manage enrollment, handle exceptions, and maintain it over time. For a 10-person startup, a lighter approach may suffice: require company-managed laptops with disk encryption and screen lock enabled, and use an MDM-lite tool or manual verification. SOC 2 does not strictly require MDM — it requires that endpoints are managed and secured. You can satisfy this with documented device requirements + periodic checks rather than a full MDM rollout. If you do have MDM already, keep this. If not, simplify the language to "endpoints must meet security baselines (encryption, auto-lock, patching)" and mention MDM as an optional enforcement mechanism.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
-
+Please keep this as light as possible - we do not want to commit to MDM explicitly, we'll just meet security baselines.
 ---
 
 ## Commitment 9: Vulnerability Scanning and Penetration Testing
@@ -213,7 +213,7 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** Vulnerability scanning and penetration testing are strongly expected by SOC 2 auditors. Most auditors want to see at least annual penetration testing and more frequent vulnerability scans (quarterly or continuous). The good news: you can use third-party services for pen tests (a few thousand dollars for a startup-scale engagement) and automated scanners (many free or low-cost options). The policy language ("as appropriate") already gives you flexibility on cadence. Keep this commitment and define a realistic cadence: annual pen test, quarterly or continuous vulnerability scans.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -232,7 +232,7 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** Accurate timestamps are essential for log correlation and incident investigation — auditors expect this. The good news is that if you're running in AWS/GCP, time sync is handled automatically by the cloud provider. This is essentially a free commitment. Just confirm your instances use the cloud provider's NTP service and that your logging timestamps are in UTC. No real operational burden here.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -251,9 +251,9 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** In a cloud-native environment, infrastructure-as-code (Terraform, CloudFormation, Pulumi) replaces traditional "backup the router config" thinking. If your infrastructure is defined in code and stored in version control (Git), you already satisfy the spirit of this commitment. For physical network devices (if any), this matters more. Simplify the policy language to: "Infrastructure configurations are defined in code and stored in version control, or backed up to a secure central location." This avoids creating an obligation to manually back up cloud security group rules that are already in your Terraform repo.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
-
+We use IaC, please simplify accordingly
 ---
 
 ## Commitment 12: Patching Schedule for Network Devices
@@ -275,7 +275,7 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** Patch management is a core SOC 2 control. Auditors will ask about your patching cadence and may sample devices to check. You need to define concrete timelines (e.g., "critical patches within 14 days, all others within 30 days") and have a way to verify compliance. For cloud infrastructure, much of this is handled by managed services (RDS, Lambda, etc.), but you still need to patch OS-level components on EC2 instances, container base images, and employee laptops. Keep this, and define the specific SLAs for patch timelines.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -336,5 +336,6 @@ When you are done reviewing, tell the agent: **"Finalize Network Security Policy
 
 **Why:** SOC 2 expects general security awareness training (covered in other policies), but a dedicated "network security training program" for your infrastructure team is overkill at startup scale. Your engineers likely stay current through their own professional development. Simplify this to a general statement that engineering staff maintain relevant technical skills, or fold it into your broader security awareness training commitment in another policy. Don't create a standalone training obligation here.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
+Simplify as suggested

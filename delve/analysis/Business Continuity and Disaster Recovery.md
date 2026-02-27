@@ -32,7 +32,7 @@ When you are done reviewing, tell the agent: **"Finalize Business Continuity and
 
 **Why:** Auditors will ask to see a BIA during a SOC 2 Type II audit — it is the backbone of your BC/DR story. However, for a 10-person startup, this does not need to be an elaborate multi-department exercise. A single document listing your 5-10 critical systems (database, app servers, auth provider, payment processing, etc.) with RTO/RPO targets and a rough impact assessment is sufficient. The nine-factor checklist in the policy (monetary loss, regulatory requirements, etc.) is enterprise overkill — cover RTO, RPO, and business impact and you are in good shape. The "Risk Assessment first" requirement is already handled if you have a Risk Assessment policy in place.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -51,7 +51,7 @@ When you are done reviewing, tell the agent: **"Finalize Business Continuity and
 
 **Why:** SOC 2 auditors will look for a documented continuity plan. But "every internal department" writing its own BCP is enterprise thinking — at a 10-person startup, you are one department. Write a single, concise BCP document that covers: (1) who makes decisions during an outage, (2) how the team communicates (Slack channel, phone tree), (3) what the critical systems are and how they fail over, and (4) how you notify customers. Skip "personnel relocation information" and "organizational buy-in" — those are filler for large orgs. One document, 2-4 pages, is all you need.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -68,7 +68,7 @@ When you are done reviewing, tell the agent: **"Finalize Business Continuity and
 
 **Why:** Auditors want to see that you have documented recovery procedures. But for a startup, having a separate BCP and DRP is unnecessary overhead — they cover overlapping ground. Merge the DRP into your BCP as a "Recovery Procedures" section that documents: which infrastructure to restore first, how to restore from backups, the runbook for spinning up services in a new region, and who is responsible. Drop the enterprise-specific items like "liaison with insurance companies" and "recovery cost estimation" — those are irrelevant at your scale.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -87,7 +87,7 @@ When you are done reviewing, tell the agent: **"Finalize Business Continuity and
 
 **Why:** This is table stakes. If you are on AWS RDS or similar managed databases, you likely already have automated daily backups with cross-AZ replication enabled by default. Verify the setting is on, make sure CloudWatch (or equivalent) alerts on failures, and you are done. The "weekly" minimum is very lenient — most managed databases back up daily or continuously. This is one of the first things an auditor will verify. Non-negotiable.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -104,7 +104,7 @@ When you are done reviewing, tell the agent: **"Finalize Business Continuity and
 
 **Why:** An untested backup is not a backup. Auditors will ask for evidence that you have verified your backups actually restore successfully. This is a one-day exercise once a year: spin up a test instance, restore from backup, verify data integrity, document it, tear it down. Easy to do, easy to forget — put it on the calendar. Non-negotiable for SOC 2.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -123,7 +123,7 @@ When you are done reviewing, tell the agent: **"Finalize Business Continuity and
 
 **Why:** Auditors want to see that your BC/DR plan is not just shelfware — that you have actually exercised it. For a startup, an annual tabletop exercise is sufficient: gather the team for 1-2 hours, walk through a scenario ("our primary region goes down — what do we do?"), and write up a one-page summary of what went well and what needs fixing. You do not need "disaster simulations" or multiple tests per year. The assessment report can be lightweight — a dated document with attendees, scenario, findings, and action items. The key is having dated evidence that you tested.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -142,7 +142,7 @@ When you are done reviewing, tell the agent: **"Finalize Business Continuity and
 
 **Why:** Auditors want to see that someone owns this — it cannot be "everyone's job" (which means no one's job). At a 10-person startup, this does not require a formal role assignment matrix or department-level heads. Simply designate one person (likely your CTO or head of engineering) as the BC/DR owner in your plan document. That person is responsible for keeping the plan current, scheduling the annual test, and leading response during an actual incident. One line in the BCP naming the owner, not a committee structure.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -161,7 +161,7 @@ When you are done reviewing, tell the agent: **"Finalize Business Continuity and
 
 **Why:** Auditors will check that employees know the BC/DR plan exists and understand their role. For a 10-person startup, "regular training sessions" is overkill — you do not need a formal training program. Cover BC/DR awareness as part of your annual security training (which you will already need for SOC 2). Make the BCP/DRP accessible to everyone (e.g., in a shared wiki or Notion). When you do your annual tabletop exercise (Commitment 6), that itself serves as training. No separate recurring sessions needed.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -178,7 +178,7 @@ When you are done reviewing, tell the agent: **"Finalize Business Continuity and
 
 **Why:** Simple and useful beyond compliance. Maintain a list of team members' phone numbers and personal emails in a secure, accessible location (e.g., a pinned doc, your BCP document, or a password manager shared vault). Review it when someone joins or leaves. At 10 people this is trivial to maintain and auditors like to see it as part of your continuity plan. Just make sure it is actually kept current — stale contact lists are worse than useless in a real incident.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
