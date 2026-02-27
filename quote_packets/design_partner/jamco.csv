@@ -1,0 +1,35 @@
+field_name,field_group,entity_name,entity_cardinality,required,label,description,field_type,intake_priority
+first_name,Personal Info,applicant,one,yes,First Name,"Core identifier. First thing Romeo asks on every call. Required for Hawksoft client profile creation.",text,critical
+last_name,Personal Info,applicant,one,yes,Last Name,"Core identifier. Required for Hawksoft client profile creation.",text,critical
+date_of_birth,Personal Info,applicant,one,yes,Date of Birth,"Primary rating factor. Maps to Hawksoft-to-TurboRater bridge.",date,critical
+mailing_address,Address,applicant,one,yes,Mailing Address,"Determines garaging and rating territory. Portal should use address autocomplete.",address,critical
+phone,Contact,applicant,one,yes,Phone,"Core contact field. May already be captured from voice agent call — shown in portal only if missing.",phone,critical
+email,Contact,applicant,one,yes,Email,"Needed for quote presentation — JAMCO presents quotes via email. Also needed for follow-up and portal link delivery.",email,critical
+first_name,Driver Info,person,many,yes,First Name,"Romeo collects all household drivers on the initial call. Add another driver button adds a new driver card.",text,critical
+last_name,Driver Info,person,many,yes,Last Name,"Required for driver identification in household.",text,critical
+date_of_birth,Driver Info,person,many,yes,Date of Birth,"Required for every driver in household. Each added driver requires Name + DOB + DL# at minimum.",date,critical
+gender,Driver Info,person,many,yes,Gender,"Rating factor. Required for TurboRater driver record.",select,high
+relationship,Driver Info,person,many,yes,Relationship to Applicant,"Required for TurboRater driver record (spouse, child, other).",select,high
+household_members,Driver Info,person,many,no,Household Members / Additional Insureds,"May include non-driving household members for excluded driver assessment.",text,medium
+driver_license,License,person,many,yes,Driver's License #,"Not reliably captured by voice agent (AI fatigue concern). One of the portal's highest-value fields.",text,critical
+year,Vehicle Identification,asset,many,yes,Year,"Core vehicle identification. Romeo collects verbally for each car.",number,critical
+make,Vehicle Identification,asset,many,yes,Make,"Core vehicle identification. Romeo collects verbally for each car.",text,critical
+model,Vehicle Identification,asset,many,yes,Model,"Core vehicle identification. Romeo collects verbally for each car.",text,critical
+vin,Vehicle Identification,asset,many,no,VIN,"Hawksoft does VIN lookup to supplement vehicle data. Validate via NHTSA check digit. If customer doesn't have VIN Year/Make/Model is acceptable.",vin,critical
+primary_use,Usage,asset,many,yes,Vehicle Usage,"Commute / Pleasure / Business. Romeo confirmed as collected field.",select,high
+garaging_address,Garaging,asset,many,no,Garaging Address,"Only if different from mailing address. Inferred from Hawksoft screen walkthrough.",address,medium
+comprehensive_deductible,Per-Vehicle Coverage,asset,many,yes,Comprehensive Deductible,"Romeo asks coverages on the initial call. Improves quote accuracy but TurboRater can default if missing.",select,high
+collision_deductible,Per-Vehicle Coverage,asset,many,yes,Collision Deductible,"Per-vehicle deductible. TurboRater can default if missing.",select,high
+roadside_assistance,Per-Vehicle Coverage,asset,many,no,Roadside Assistance,"Part of per-vehicle coverage options requested on initial call.",boolean,medium
+towing,Per-Vehicle Coverage,asset,many,no,Towing,"Part of per-vehicle coverage options requested on initial call.",boolean,medium
+rental_reimbursement,Per-Vehicle Coverage,asset,many,no,Rental Reimbursement,"Part of per-vehicle coverage options.",boolean,medium
+date_of_incident,Incident,loss_run,many,yes,Date of Incident,"Romeo collects tickets/accidents/claims as screening mechanism. Affects carrier eligibility and surcharges.",date,high
+incident_type,Incident,loss_run,many,yes,Incident Type,"Type of ticket accident or claim. Used for risk screening.",select,high
+description,Incident,loss_run,many,no,Description,"Free-text or structured date/description of the incident.",textarea,medium
+current_carrier,Prior Carrier,coverage,one,yes,Current Carrier,"Romeo asks on every first call. Critical for competitive positioning and prior insurance verification.",text,critical
+current_coverage_limits,Prior Carrier,coverage,one,yes,Current Coverage Limits,"The deal-breaker field. Without this the agency quotes at minimums and loses the deal. BI limits at minimum; full coverage table ideal.",text,critical
+current_premium,Prior Carrier,coverage,one,yes,Current Premium,"Customers are price-sensitive — knowing their current premium lets JAMCO position competitively.",currency,critical
+policy_expiration,Prior Carrier,coverage,one,no,Policy Expiration / Renewal Date,"Determines urgency and shopping window.",date,medium
+monthly_payment,Prior Carrier,coverage,one,no,Monthly Payment Amount,"Helps with competitive positioning on monthly cost.",currency,medium
+payment_method,Prior Carrier,coverage,one,no,Payment Method,"EFT or payment financing. Affects payment plan options presented.",select,low
+desired_liability_limits,Liability,coverage,one,no,Desired Liability Limits,"TurboRater defaults to current if known. Low priority — Romeo and team set these during consultative finalization step.",text,low

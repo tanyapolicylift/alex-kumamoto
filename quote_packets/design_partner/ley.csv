@@ -1,0 +1,33 @@
+field_name,field_group,entity_name,entity_cardinality,required,label,description,field_type,intake_priority
+first_name,Personal Info,applicant,one,yes,First Name,"Core identifier. Kyle collects first on every call. Required for PLRater Client Info tab.",text,critical
+last_name,Personal Info,applicant,one,yes,Last Name,"Core identifier. Required for PLRater Client Info tab.",text,critical
+date_of_birth,Personal Info,applicant,one,yes,Date of Birth,"Primary rating factor. Kyle explicitly listed in required fields.",date,critical
+marital_status,Personal Info,applicant,one,yes,Marital Status,"Kyle: 'We have to know if they're married or single.' Directly impacts rate and triggers spouse driver addition.",select,critical
+ssn,Personal Info,applicant,one,no,Social Security Number,"Used by carriers for credit-based insurance scores. Also Kyle's informal lead qualification signal — reluctance indicates challenging prospect.",ssn,medium
+mailing_address,Address,applicant,one,yes,Mailing Address,"Determines rating territory and garaging location. Kyle explicitly listed in required fields. Portal should use address autocomplete.",address,critical
+residence_type,Address,applicant,one,yes,Own or Rent Home,"Triggers multi-policy opportunity + homeowner discount on auto. Key cross-sell signal for home bundling.",select,high
+phone,Contact,applicant,one,yes,Phone,"Core contact field. May already be captured from call.",phone,critical
+email,Contact,applicant,one,yes,Email,"Needed for InsureGrid link delivery follow-up communications and video proposal delivery.",email,critical
+first_name,Driver Info,person,many,yes,First Name,"Kyle: 'If there's any other driving adults living in that house.' Add another driver button adds a new driver card.",text,critical
+last_name,Driver Info,person,many,yes,Last Name,"Required for driver identification.",text,critical
+date_of_birth,Driver Info,person,many,yes,Date of Birth,"Required for every additional driver. Each added driver requires Name + DOB + DL# at minimum.",date,critical
+gender,Driver Info,person,many,yes,Gender,"Rating factor in most states. Required for PLRater Drivers tab.",select,high
+relationship,Driver Info,person,many,yes,Relationship to Applicant,"Required for PLRater Drivers tab (spouse child other).",select,high
+driver_license,License,person,many,yes,Driver's License #,"Kyle explicitly listed in required fields. Not voice-capturable — portal's highest-value field. Required for MVR pull.",text,critical
+occupation,Demographics,person,many,no,Occupation,"Kyle: 'A lot of insurance companies rate on your occupation... the factory worker is not getting the same rate as a teacher.' Discount eligibility.",text,high
+college_student,Demographics,person,many,no,College Student?,"Discount for child away at college 100+ miles. Kyle: 'Is your son at college?' Only applicable to drivers age 16-25.",boolean,medium
+vehicle_at_college,Demographics,person,many,no,Vehicle at College?,"Related to college student discount. Vehicle garaged at college location affects garaging territory.",boolean,medium
+vin,Vehicle Identification,asset,many,no,VIN,"Kyle: 'And the VIN and the vehicles the VINs.' Not voice-capturable. Validate via NHTSA check digit. Fall back to Year/Make/Model if unavailable.",vin,critical
+year,Vehicle Identification,asset,many,yes,Year,"Core vehicle identification. Voice-capturable as fallback when VIN not available.",number,critical
+make,Vehicle Identification,asset,many,yes,Make,"Core vehicle identification.",text,critical
+model,Vehicle Identification,asset,many,yes,Model,"Core vehicle identification. NHTSA decode supplements from VIN.",text,critical
+primary_use,Usage,asset,many,yes,Vehicle Usage,"Commute / Pleasure / Business. Affects rate.",select,high
+annual_mileage,Usage,asset,many,yes,Annual Mileage,"Rating factor for many carriers.",number,high
+garaging_address,Garaging,asset,many,no,Garaging Address,"Only if different from mailing address. Relevant for 'Is the vehicle at college?' scenario.",address,medium
+date_of_incident,Incident,loss_run,many,yes,Date of Incident,"Screening criterion. Kyle flags 2+ DUIs as low priority.",date,high
+incident_type,Incident,loss_run,many,yes,Incident Type,"Type of accident or violation. Kyle uses this for risk screening — 2+ DUIs deprioritized.",select,high
+description,Incident,loss_run,many,no,Description,"Free-text or structured date/description of the incident.",textarea,medium
+current_carrier,Prior Carrier,coverage,one,no,Current Carrier,"For apples-to-apples comparison. May already be captured via InsureGrid or voice call.",text,medium
+policy_expiration,Prior Carrier,coverage,one,no,Policy Expiration Date,"Timing — determines urgency and prior coverage verification.",date,medium
+years_continuously_insured,Prior Carrier,coverage,one,no,Prior Coverage Duration,"How long with current carrier — loyalty/stability indicator.",number,medium
+desired_liability_limits,Liability,coverage,one,no,Desired Liability Limits,"PLRater defaults; Kyle customizes per customer. Low priority for portal — Kyle prefers to set these himself during consultative step.",text,low
