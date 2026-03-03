@@ -20,6 +20,7 @@ Garage Type,garage_type,select,FALSE,medium,,"[{""label"":""None"",""value"":""n
 Fireplaces,fireplaces,number,FALSE,medium,,,,Structure Details,,TRUE,Property,asset,one,,0,
 Occupancy Type,occupancy_type,select,TRUE,high,,"[{""label"":""Primary Residence"",""value"":""primary_residence""},{""label"":""Secondary/Seasonal"",""value"":""secondary_seasonal""},{""label"":""Tenant Occupied"",""value"":""tenant_occupied""}]",,Occupancy,,TRUE,Property,asset,one,,0,
 Number Of Families,number_of_families,select,FALSE,medium,,"[{""label"":""1"",""value"":""1""},{""label"":""2"",""value"":""2""},{""label"":""3"",""value"":""3""},{""label"":""4"",""value"":""4""}]",,Occupancy,,TRUE,Property,asset,one,,0,
+Has Mortgage,has_mortgage,boolean,FALSE,low,Mortgagee details will be collected at binding,,,Occupancy,,TRUE,Property,asset,one,,0,
 Heating Type,heating_type,select,TRUE,high,,"[{""label"":""Central Forced Air"",""value"":""central_forced_air""},{""label"":""Heat Pump"",""value"":""heat_pump""},{""label"":""Baseboard"",""value"":""baseboard""},{""label"":""Radiant"",""value"":""radiant""},{""label"":""Wood Stove"",""value"":""wood_stove""},{""label"":""Other"",""value"":""other""}]",,Home Systems,,TRUE,Property,asset,one,,0,
 Electrical Update Year,electrical_update_year,number,FALSE,medium,Year electrical wiring was last updated,,,Home Systems,,TRUE,Property,asset,one,,0,
 Plumbing Update Year,plumbing_update_year,number,FALSE,medium,Year plumbing was last updated,,,Home Systems,,TRUE,Property,asset,one,,0,
