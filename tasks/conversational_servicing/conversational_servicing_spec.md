@@ -624,6 +624,8 @@ AgencyServicingConfig:
 ## 7. Appendix A: COI Research by State
 
 > The following research covers COI-related requirements, standard practices, and regulatory references for four target states. Personal lines (home & auto) and commercial lines are addressed for each state.
+>
+> For extended research including additional insured endorsement guidance (CG 20 10, CG 20 37) and a full statute quick-reference appendix, see [[research_coi_requirements_by_state]].
 
 ### 7.1 California
 
@@ -633,6 +635,7 @@ AgencyServicingConfig:
 - Standard proof of coverage is provided via ACORD 28 or carrier-specific Evidence of Property Insurance forms
 - Mortgage companies (Wells Fargo, Chase, etc.) require a mortgagee clause listing the lender as loss payee — wording must match the lender's exact requirements
 - California Insurance Code §790.03 et seq. (Unfair Practices Act) governs fair claims and information handling but does not impose COI-specific requirements for personal lines
+- **FAIR Plan note**: In wildfire-exposed areas, homeowners may be covered through the California FAIR Plan (insurer of last resort). Lenders typically require a supplemental Difference in Conditions (DIC) policy alongside FAIR Plan coverage — the COI intake agent should ask if the caller's coverage involves the FAIR Plan, as this may require separate evidence documents
 - Landlords commonly require renter's insurance proof — no state-mandated form; carrier declarations pages or ACORD certificates are accepted
 
 **Auto Insurance:**
@@ -677,17 +680,19 @@ AgencyServicingConfig:
 
 #### Commercial Lines
 
-- **Ohio enacted COI legislation in 2015** (ORC §3905.471) — one of the earlier states to do so
-- **Key provisions of ORC §3905.471:**
+- **Ohio enacted comprehensive COI legislation** via ORC Chapter 3938 — the "Certificates of Insurance Act" — effective March 23, 2016 (also referenced as ORC §3905.471 in earlier codifications)
+- **Key provisions of the Certificates of Insurance Act:**
   - Prohibits any person from requiring an insurance agent to issue a certificate that contains terms not contained in the underlying insurance policy
   - Prohibits altering or modifying a standard ACORD certificate form
   - Certificates cannot create or confer new or additional rights beyond what the policy provides
   - A certificate holder cannot require an agent to warrant that the insurance policy terms comply with a contract between the certificate holder and the named insured
+  - Prohibits unfair, misleading, or deceptive language on COIs
+  - **Penalties**: Up to $1,000 per violation; license suspension or revocation. Both agents issuing non-compliant COIs and businesses demanding them can be held liable
 - ACORD 25, 27, and 28 remain the standard forms
-- Ohio Department of Insurance enforces compliance — violations can result in agent disciplinary action
+- Ohio Department of Insurance enforces compliance
 
 #### Key Regulatory References
-- ORC §3905.471 — Certificate of Insurance (commercial lines COI legislation)
+- ORC Chapter 3938 / §3905.471 — Certificates of Insurance Act (commercial lines COI legislation, effective March 2016)
 - ORC §4509.101 — Financial Responsibility (auto)
 - ORC §4509.104 — Electronic proof of financial responsibility
 - ORC §3937 series — Property insurance regulations
@@ -700,7 +705,7 @@ AgencyServicingConfig:
 
 **Home Insurance:**
 - Standard proof via ACORD 28 or carrier evidence-of-property-insurance forms
-- Florida's property insurance market is unique due to hurricane exposure — carriers like Citizens Property Insurance (state-backed) are common
+- Florida's property insurance market is unique due to hurricane exposure — carriers like Citizens Property Insurance (state-backed) are common. Citizens requires 4-point inspections for older homes (roof, electrical, plumbing, HVAC) and wind mitigation inspections (OIR form OIR-B1-1802) — these may come up on COI-related calls if the insured's lender is asking about coverage eligibility
 - Mortgage companies require standard mortgagee clause — no Florida-specific form beyond standard ACORD
 - Florida Statutes §627 (Insurance Rates and Contracts) governs policy requirements but does not impose personal lines COI-specific rules
 - **Wind/flood note**: Some mortgage companies require separate evidence of windstorm coverage (especially in coastal areas where wind is excluded from the base policy and covered by Citizens or a wind pool). The COI intake agent should ask if the caller's lender has mentioned wind or flood coverage requirements.
@@ -755,12 +760,12 @@ AgencyServicingConfig:
 
 - **Texas enacted comprehensive COI legislation in 2011** (Texas Insurance Code §1811)
 - **Key provisions of TIC §1811:**
-  - A certificate of insurance must comply with an applicable filing with TDI (§1811.051)
+  - **All COI forms must be filed with and approved by TDI before use** (§1811.051) — stricter than other states
   - Prohibits requiring an insurance agent or insurer to issue a certificate that warrants or represents that specific terms exist in a policy unless the terms exist (§1811.053)
   - Prohibits requiring the issuance of a certificate that amends, extends, or alters the coverage provided by the actual policy (§1811.054)
   - No person may prepare or issue a certificate that misrepresents the existence or nature of insurance coverage (§1811.055)
   - Certificates are for informational purposes only and do not confer rights or alter policy terms (§1811.056)
-  - Violation is subject to administrative penalties by TDI
+  - Violation is subject to civil penalties up to $1,000 per willful violation by TDI
 - **TDI enforcement**: TDI has issued bulletins reinforcing that standard ACORD forms should not be modified and that agents should not sign off on certificate language that misrepresents coverage
 - Texas has one of the most detailed COI statutes in the country and is frequently cited as a model by other states considering similar legislation
 
@@ -777,7 +782,7 @@ AgencyServicingConfig:
 | Aspect | California | Ohio | Florida | Texas |
 |---|---|---|---|---|
 | **Personal Lines COI Regulation** | No specific COI statute | No specific COI statute | No specific COI statute | No specific COI statute |
-| **Commercial Lines COI Legislation** | No (guidance only) | Yes — ORC §3905.471 (2015) | Yes — FL Stat. §627.4137 (2013) | Yes — TIC §1811 (2011) |
+| **Commercial Lines COI Legislation** | No (guidance only) | Yes — ORC Ch. 3938 (2016) | Yes — FL Stat. §627.4137 (2013) | Yes — TIC §1811 (2011) |
 | **COI Form Alteration Prohibited** | CDI guidance (not statute) | Yes (by statute) | Yes (by statute, misdemeanor penalty) | Yes (by statute, admin penalties) |
 | **Electronic Proof of Auto Insurance** | Yes | Yes (2018) | Yes | Yes |
 | **Auto Minimum Liability** | 30/60/15 (increased 2025) | 25/50/25 | PIP + 10K PD (no BI required; see HB 1181) | 30/60/25 |
