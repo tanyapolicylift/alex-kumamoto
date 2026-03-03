@@ -652,8 +652,9 @@ AgencyServicingConfig:
 
 #### Key Regulatory References
 - Cal. Insurance Code §790.03 — Unfair Practices Act
-- Cal. Vehicle Code §16020 — Financial Responsibility
+- Cal. Vehicle Code §16020 — Financial Responsibility (electronic proof accepted per §16020(b))
 - Cal. Insurance Code §1861.05 — Rating and disclosure standards
+- **2025 Update**: AB 1755 (effective Jan 1, 2025) increased auto minimum liability limits to 30/60/15 — up from the prior 15/30/5 limits that had been in place since 1967. New limits apply upon policy renewal. A further increase to 50/100/25 is scheduled for January 1, 2035.
 
 ---
 
@@ -728,6 +729,7 @@ AgencyServicingConfig:
 - FL Stat. §627.733, §627.7275 — Motor Vehicle Insurance (PIP, liability)
 - FL Stat. §316.646 — Proof of insurance / electronic proof
 - FL Stat. §627 — Insurance Rates and Contracts (general)
+- **2025–2026 Watch**: HB 1181 (filed 2025) proposes repealing Florida's PIP/no-fault system and requiring bodily injury liability with minimums of $25K/$50K. If enacted, new BI requirements would take effect July 1, 2026 — which would significantly change auto COI/proof-of-coverage requirements in Florida. Monitor legislative status.
 
 ---
 
@@ -778,6 +780,6 @@ AgencyServicingConfig:
 | **Commercial Lines COI Legislation** | No (guidance only) | Yes — ORC §3905.471 (2015) | Yes — FL Stat. §627.4137 (2013) | Yes — TIC §1811 (2011) |
 | **COI Form Alteration Prohibited** | CDI guidance (not statute) | Yes (by statute) | Yes (by statute, misdemeanor penalty) | Yes (by statute, admin penalties) |
 | **Electronic Proof of Auto Insurance** | Yes | Yes (2018) | Yes | Yes |
-| **Auto Minimum Liability** | 15/30/5 | 25/50/25 | PIP + 10K PD (no BI required) | 30/60/25 |
+| **Auto Minimum Liability** | 30/60/15 (increased 2025) | 25/50/25 | PIP + 10K PD (no BI required; see HB 1181) | 30/60/25 |
 | **Coastal/Wind Considerations** | Earthquake (not wind-specific) | N/A | TWIA / Citizens windstorm | TWIA windstorm |
 | **Key COI Enforcement Body** | CDI | Ohio DOI | OIR | TDI |
