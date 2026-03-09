@@ -34,7 +34,7 @@ This policy is relatively lightweight compared to other SOC 2 policies. It prima
 
 **Why:** SOC 2 auditors will look for a designated individual responsible for information security. This is table-stakes and already satisfied by this policy document. No additional work needed — just keep the designation current.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -53,7 +53,7 @@ This policy is relatively lightweight compared to other SOC 2 policies. It prima
 
 **Why:** Auditors expect to see that security strategy is reviewed periodically, but a 10-person startup does not need a standalone "comprehensive information security strategy" document. The Information Security Policy itself, combined with an annual review note, is sufficient. Recommendation: define "regularly" as **annually**, and treat the annual review of your security policies as fulfilling this. Do not create a separate strategy document.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -72,7 +72,7 @@ This policy is relatively lightweight compared to other SOC 2 policies. It prima
 
 **Why:** Risk assessment is a core SOC 2 requirement and auditors will absolutely check for it. However, this CISO policy just says the CISO is *responsible* for it — the actual process should live in the Risk Assessment and Treatment Policy. Keep this as a responsibility assignment, but do not duplicate process definitions here. The real work happens elsewhere.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -91,7 +91,7 @@ This policy is relatively lightweight compared to other SOC 2 policies. It prima
 
 **Why:** Policy ownership is fundamental to SOC 2. Auditors need to see that policies are reviewed, updated, and owned by a named individual. At a startup, this means Alex reviews all security policies at least annually and signs off on them. The compliance monitoring side is naturally handled by the SOC 2 audit process itself (your auditor and any GRC tool like Vanta/Drata will track this for you).
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -110,7 +110,7 @@ This policy is relatively lightweight compared to other SOC 2 policies. It prima
 
 **Why:** Annual security awareness training for all employees is a SOC 2 staple — auditors will check for completion records. Use an off-the-shelf platform (KnowBe4, Curricula, or even a simple annual slide deck + quiz). However, "ongoing training for the information security team" is enterprise language — at a 10-person startup where the "security team" is effectively one person (the CISO), this is meaningless overhead. Remove or simplify the specialized training clause to something like "the CISO will maintain current knowledge of security threats and best practices."
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -129,7 +129,7 @@ This policy is relatively lightweight compared to other SOC 2 policies. It prima
 
 **Why:** Vendor management is a recognized SOC 2 area and auditors expect someone to own it. Like the risk assessment commitment, this CISO policy is just assigning ownership — the process details belong in the Vendor Management Policy. Keep this as a responsibility line item, no separate process needed here.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -148,7 +148,7 @@ This policy is relatively lightweight compared to other SOC 2 policies. It prima
 
 **Why:** Auditors like to see evidence that security is communicated to leadership. For a startup where the CISO *is* one of the founders/executives, formal reporting is somewhat theatrical — you are already in every meeting. Recommendation: satisfy this with a brief **annual** written security summary to the board (can be a few paragraphs or a slide deck), plus ad-hoc communication for incidents. Do not commit to monthly or quarterly formal reports — that is overkill at this stage.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -167,7 +167,7 @@ This policy is relatively lightweight compared to other SOC 2 policies. It prima
 
 **Why:** SOC 2 does not require a standalone security budget. At a 10-person startup, security spending is naturally part of general operating expenses and engineering costs. Creating and maintaining a formal security budget line is unnecessary overhead. If you want to keep this, simplify to: "The CISO will ensure adequate resources are allocated to information security as part of the company's overall budgeting process." Do not create a separate budget tracking process.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -184,7 +184,7 @@ This policy is relatively lightweight compared to other SOC 2 policies. It prima
 
 **Why:** This is a reasonable governance practice but not something SOC 2 auditors specifically test for. At a startup, this can be satisfied with a one-line note during your annual policy review cycle ("CISO assignment reviewed — no changes"). Do not create a formal review process. Just tack it onto the annual policy review.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---

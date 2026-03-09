@@ -32,8 +32,8 @@ When you are done reviewing, tell the agent: **"Finalize Change Management Polic
 
 **Why:** This is the backbone of SOC 2 change management. Auditors will look for evidence that changes are authorized before they hit production and that there is an audit trail. The good news: if you are already using GitHub PRs (or similar) with required approvals, you are most of the way there. The "automatic tools" language does not mean you need a dedicated change management platform — GitHub/GitLab with branch protection rules qualifies. Just make sure you can pull a report showing "every production change was approved before merge."
 
-- [ ] **Implementing**
-- **Comment:**
+- [x] **Implementing**
+- **Comment:** Finalized version softened tooling language to "Automatic tools may be employed where appropriate" (from "shall be employed wherever possible").
 
 ---
 
@@ -51,7 +51,7 @@ When you are done reviewing, tell the agent: **"Finalize Change Management Polic
 
 **Why:** This is non-negotiable for SOC 2. Auditors will check that branch protection is enabled and that MFA is enforced on your SCM. For a startup already using GitHub, this is a settings change — enable "Require pull request reviews before merging" and "Require approvals" on your main/production branch, and enforce 2FA at the org level. The logging and attribution part comes free with any modern SCM.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -72,7 +72,7 @@ When you are done reviewing, tell the agent: **"Finalize Change Management Polic
 
 **Why:** Auditors want to see that you know what your production environment looks like and that changes to it are tracked. But "baseline configuration documentation" sounds more formal than it needs to be for a startup. If you use Infrastructure as Code (Terraform, CloudFormation, Pulumi, etc.), your IaC repo IS your baseline configuration document — it is versioned, auditable, and updated with every change. If you do not use IaC, a simple inventory spreadsheet listing your key systems, their versions, and configs would suffice. You do not need a formal "configuration monitoring" tool at this stage — your IaC diffs or a quarterly manual review will satisfy auditors.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -89,7 +89,7 @@ When you are done reviewing, tell the agent: **"Finalize Change Management Polic
 
 **Why:** Auditors will ask about your environments and expect to see separation between where code is developed/tested and where it runs in production. Most startups already have this (even a simple staging environment counts). If you do not have a separate environment yet, this is worth the investment — it also just makes good engineering sense. The cost of a staging environment in the cloud is typically minimal.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -110,7 +110,7 @@ When you are done reviewing, tell the agent: **"Finalize Change Management Polic
 
 **Why:** Auditors expect to see that you have thought about how you communicate changes to affected parties. But this does not need to be an elaborate multi-page procedure. A short document (half a page) saying "for planned maintenance, we post to our status page 24 hours in advance and email affected customers; for unplanned outages, we update the status page immediately and email after resolution" is sufficient. If you already use a status page (e.g., Statuspage by Atlassian, Instatus), point to that. The key is having something written down, not having a complex multi-channel communication matrix.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -129,8 +129,8 @@ When you are done reviewing, tell the agent: **"Finalize Change Management Polic
 
 **Why:** Formal post-implementation review meetings with defined attendees and agendas are overkill for a 10-person startup where the people who built the change are the same people operating the system. Auditors want to see that you have a way to catch and roll back failed changes, not that you hold formal committee meetings about them. A simpler alternative: (1) Use deployment monitoring (error rates, latency) to detect problems after deploys, and (2) document any rollback decisions in your ticketing system or Slack channel. If you already do retrospectives or post-mortems for incidents, that covers the spirit of this commitment. You do not need a separate recurring "change review meeting."
 
-- [ ] **Implementing**
-- **Comment:**
+- [x] **Implementing**
+- **Comment:** Simplified in finalized version — post-implementation reviews "when warranted based on risk, impact, or observed issues" rather than periodic scheduled meetings.
 
 ---
 
@@ -148,7 +148,7 @@ When you are done reviewing, tell the agent: **"Finalize Change Management Polic
 
 **Why:** Auditors know that emergencies happen and that you cannot always follow the full approval workflow. What they will flag is if you have NO process for emergencies — that suggests either emergencies never happen (unlikely) or people bypass controls without any documentation (bad). The fix is simple: write a short emergency change procedure (e.g., "In an emergency, get verbal approval from CTO via Slack, push the fix, then create a retrospective PR/ticket within 24 hours documenting what happened and get formal approval after the fact"). The "periodic meetings for lessons learned" part folds into your existing incident retrospective process — you do not need a separate meeting series for this.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -167,7 +167,7 @@ When you are done reviewing, tell the agent: **"Finalize Change Management Polic
 
 **Why:** Patch management is a core SOC 2 control. Auditors will ask to see your patching policy and will sample evidence that you are actually following it. The good news: you do not need to overcomplicate this. Define simple SLAs (e.g., critical patches within 7 days, high within 30 days, medium within 90 days), enable auto-updates where feasible (OS-level patches, dependency updates via Dependabot/Renovate), and keep a record of when patches were applied. If you are fully cloud-native and use managed services (RDS, Lambda, etc.), much of the OS-level patching is handled by your cloud provider — document that fact. The CVSS recommendation is just guidance, not a rigid requirement.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -184,7 +184,7 @@ When you are done reviewing, tell the agent: **"Finalize Change Management Polic
 
 **Why:** Having a formal "change advisory board" with enumerated denial criteria is enterprise-level process. For a startup, the PR review process already serves this function — a reviewer can reject a PR for any of these reasons. The one useful nugget here is rollback plans: for significant infrastructure or database changes, it is genuinely good practice to think about "how do we undo this if it breaks?" You do not need a formal checklist or CAB — just add a lightweight prompt in your PR template (e.g., "Rollback plan: ___") for changes that touch infrastructure or data. The rest of the denial criteria language can be removed without SOC 2 risk.
 
-- [ ] **Implementing**
-- **Comment:**
+- [x] **Implementing**
+- **Comment:** Simplified in finalized version — denial criteria condensed to a brief list (inadequate planning/testing, security risks, operational impact, timing). Rollback addressed in post-implementation section instead.
 
 ---

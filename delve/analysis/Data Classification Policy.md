@@ -30,7 +30,7 @@ When you are done reviewing, tell the agent: **"Finalize Data Classification Pol
 
 **Why:** SOC 2 auditors expect you to have a documented data classification scheme. The four-tier model here is standard and well-understood. The actual effort is low — you just need to finalize the example lists so they reflect PolicyLift's real data types (not the generic template examples like "Java and .NET Source Code"). The default-to-Confidential rule is a smart safety net.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -49,7 +49,7 @@ When you are done reviewing, tell the agent: **"Finalize Data Classification Pol
 
 **Why:** An asset inventory is a core SOC 2 expectation. Auditors will ask to see it. For a 10-person startup, this does not need to be an enterprise CMDB — a well-maintained spreadsheet or Notion table listing your key data stores (production DB, S3 buckets, Google Drive, Slack, etc.) with owner and classification is sufficient. The annual review cadence is reasonable. The real work is the initial build; maintenance is lightweight once it exists.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -70,7 +70,7 @@ When you are done reviewing, tell the agent: **"Finalize Data Classification Pol
 
 **Why:** Ownership assignment is expected by auditors and is practically useful — it answers "who do I ask about access to X?" At a startup, this is trivial: most assets are owned by one of a handful of people. Just add an "Owner" column to your asset inventory. No new process needed beyond keeping it current.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -87,7 +87,7 @@ When you are done reviewing, tell the agent: **"Finalize Data Classification Pol
 
 **Why:** Formal protective marking (watermarks, email classification tags, screen warnings) is an enterprise practice. SOC 2 auditors for startups do not typically expect watermarked PDFs or classified email headers. What they do expect is that you know which data is sensitive and handle it appropriately. If you want a lightweight version, a simple convention like marking Google Docs or Notion pages with a classification label in the title or header is more than enough. Skip watermarks, print markings, and email classification systems entirely.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -108,7 +108,7 @@ When you are done reviewing, tell the agent: **"Finalize Data Classification Pol
 
 **Why:** This is the operational heart of data classification — without it, the classification scheme is just labels. Auditors will check that sensitive data actually has access restrictions matching its classification. For a startup, this means: production databases should have limited access, PII should be encrypted, admin credentials should be tightly held, and public repos should not contain secrets. You do not need a 20-page handling matrix. A one-page table mapping each classification level to a few concrete rules (who can access, encryption requirements, sharing rules) is sufficient.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -127,7 +127,7 @@ When you are done reviewing, tell the agent: **"Finalize Data Classification Pol
 
 **Why:** Auditors will check that you have a vendor management process that includes data protection requirements. Having standard NDA and data protection clauses in vendor contracts is good practice and expected. However, requiring every third party to "adhere to this policy" verbatim is overkill — most vendors have their own SOC 2 or equivalent. Simplify this to: (a) include data protection clauses in vendor contracts, and (b) get NDAs when sharing Confidential/Restricted data with non-vendor third parties like consultants. This aligns with your Vendor Management Policy and avoids redundant obligations.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -144,7 +144,7 @@ When you are done reviewing, tell the agent: **"Finalize Data Classification Pol
 
 **Why:** SOC 2 does not audit your PR process. This is a general corporate governance practice, not a security control. For a 10-person startup, you do not need a formal "corporate communications" function. A simpler commitment — "external disclosures of non-Public information require founder/CEO approval" — captures the same intent without creating process overhead. Keep the spirit, drop the formality.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -161,5 +161,5 @@ When you are done reviewing, tell the agent: **"Finalize Data Classification Pol
 
 **Why:** SOC 2 auditors expect evidence that employees have been trained on security policies, including data handling. This does not require a standalone training program — fold it into your general security awareness onboarding. Have new hires read the data classification policy and acknowledge it. A short Loom video or one-page summary covering "here's how we classify data and what that means for you" is more than enough for a startup.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**

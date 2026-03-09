@@ -17,21 +17,20 @@ The IT Leadership Committee shall consist of IT and Engineering Executive Manage
 The Committee’s specific responsibilities shall include:
 
 - Review and approve the corporation’s technology planning and strategy
-    
+
 - Review significant technology investments and expenditures
-    
+
 - Review and evaluate activities and processes that are essential in meeting the organization’s security commitments
-    
+
 - Discuss if there are any IT security-related issues and take actions as necessary
-    
+
 - Receive reports from management concerning the Corporation’s technology operations including, among other things, software development, project performance, technical operations performance, technology architecture, and significant technology investments.
-    
+
 - Approve policies related to software development, project performance, technical operations performance, and technology investments or recommend policies to the Board for approval, as appropriate
-    
+
 - Perform any other activities consistent with this charter, the Corporation’s bylaws, and governing law
-    
+
 - Discuss the lesson learned from ongoing incident response activities and take necessary corrective action as appropriate
-    
 
 ### **Reporting**
 

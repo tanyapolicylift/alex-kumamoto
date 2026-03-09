@@ -30,7 +30,7 @@ When you are done reviewing, tell the agent: **"Finalize Acceptable Use Policy"*
 
 **Why:** MFA and a company password manager are table stakes for SOC 2. Auditors will check that MFA is enforced and that there is a documented approach to credential management. Most startups already use a password manager — just make sure it is formally designated and MFA is turned on everywhere.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -47,7 +47,7 @@ When you are done reviewing, tell the agent: **"Finalize Acceptable Use Policy"*
 
 **Why:** SOC 2 auditors explicitly look for evidence that security awareness training is conducted at least annually and at onboarding. This is non-negotiable. The effort is mostly upfront (choosing a tool, setting up the curriculum); recurring effort is low once established.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -68,8 +68,8 @@ When you are done reviewing, tell the agent: **"Finalize Acceptable Use Policy"*
 
 **Why:** Auditors will want to see that you know what devices access your systems and that those devices meet minimum security standards. For a 10-person startup, a full device registry plus a formal BYOD policy is heavy. Simplify by (a) requiring company-managed devices via an MDM tool like Kandji or Jamf, which gives you the registry and enforcement in one shot, or (b) if personal devices are used, documenting minimum standards (encryption on, screen lock, current OS) without a full standalone BYOD policy document. The highlighted text flags the BYOD clause — decide whether you actually allow personal devices or if you can avoid this complexity by issuing company laptops.
 
-- [ ] **Implementing**
-- **Comment:**
+- [x] **Implementing**
+- **Comment:** Simplified in finalized version — no device registry or formal BYOD policy. Just requires devices to "meet PolicyLift baseline security requirements."
 
 ---
 
@@ -85,7 +85,7 @@ When you are done reviewing, tell the agent: **"Finalize Acceptable Use Policy"*
 
 **Why:** Auditors care about patch management and knowing what software is in your environment. However, the policy refers to "IT" — which is a highlighted flag because a 10-person startup likely does not have a dedicated IT department. Simplify by (a) assigning this responsibility to a named person (e.g., CTO or a senior engineer), (b) maintaining a lightweight approved-tools list (a simple spreadsheet or Notion page), and (c) using MDM or automatic updates to handle patching rather than a manual process. You do not need a formal software approval workflow — just a list and a responsible person.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -104,8 +104,8 @@ When you are done reviewing, tell the agent: **"Finalize Acceptable Use Policy"*
 
 **Why:** Audit logging is a core SOC 2 requirement — auditors will ask to see logs and will test that they exist and are retained. The highlighted text flags this because "comprehensive" is doing a lot of heavy lifting. For a startup, scope this to what matters: cloud provider audit logs (AWS CloudTrail / GCP Audit Logs), application access logs, and identity provider logs. You do not need a full SIEM on day one. Use your cloud provider's native logging, ensure it is turned on and retained for at least 12 months, and be ready to pull logs if asked. The mention of "time synchronization" is standard (NTP) and typically handled automatically by cloud infrastructure.
 
-- [ ] **Implementing**
-- **Comment:**
+- [x] **Implementing**
+- **Comment:** Simplified in finalized version to "audit logging for key systems and administrative activities where supported" — scoped down from "comprehensive."
 
 ---
 
@@ -125,7 +125,7 @@ When you are done reviewing, tell the agent: **"Finalize Acceptable Use Policy"*
 
 **Why:** Encryption in transit (TLS) and at rest (cloud provider default encryption) are SOC 2 essentials and likely already in place if you use AWS/GCP. Data classification is also expected — auditors want to see that you categorize data and handle it accordingly. The cryptographic key management language is where this gets heavy; for a startup using cloud-managed encryption (AWS KMS, GCP KMS), key management is largely handled for you. Simplify the commitment: keep classification, keep encryption, but define key management as "we use cloud-provider-managed keys" rather than writing a standalone key management procedure.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -146,7 +146,7 @@ When you are done reviewing, tell the agent: **"Finalize Acceptable Use Policy"*
 
 **Why:** Incident reporting is a foundational SOC 2 control. Auditors will ask: "How do employees report security incidents?" and "Can you show me evidence of reported incidents?" This is easy to implement — set up a dedicated Slack channel or email alias, document the process in onboarding materials, and reference it in training. The policy language here is appropriate and does not need simplification.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -167,7 +167,7 @@ When you are done reviewing, tell the agent: **"Finalize Acceptable Use Policy"*
 
 **Why:** Having a documented disciplinary process for policy violations is expected in SOC 2 — it shows the policies have teeth. For a startup, this does not need to be elaborate. A simple note in the employee handbook ("violations of security policies may result in disciplinary action up to and including termination") plus basic log protection (which your cloud provider handles if you set permissions correctly) covers this. The "thoroughly investigated" language is fine as aspirational; you do not need a formal investigation framework at this stage.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -186,8 +186,8 @@ When you are done reviewing, tell the agent: **"Finalize Acceptable Use Policy"*
 
 **Why:** Disabling external auto-forwarding is a one-click admin setting in Google Workspace or Microsoft 365 and prevents a common data exfiltration vector. Auditors may check for this. The "personal email" prohibition is common sense for data protection. The "verify recipients" clause is more behavioral than technical — it is fine to include but does not require tooling. Easy win, keep it.
 
-- [ ] **Implementing**
-- **Comment:**
+- [x] **Implementing**
+- **Comment:** Finalized version softened to "take reasonable care to send communications only to intended recipients" and kept personal email prohibition. Explicit auto-forwarding ban removed but intent preserved.
 
 ---
 
@@ -203,5 +203,5 @@ When you are done reviewing, tell the agent: **"Finalize Acceptable Use Policy"*
 
 **Why:** SOC 2 auditors expect a data retention policy, but for a startup, this can be a simple one-page document stating retention periods by data type (e.g., "customer data: retained for duration of contract plus 1 year; logs: 12 months; employee records: per legal requirements"). You do not need automated deletion workflows on day one. Just document the intent and review annually. The active deletion requirement ("delete when no longer needed") is important for reducing risk but can be handled as a periodic manual review rather than an automated process.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**

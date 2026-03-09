@@ -37,7 +37,7 @@ When you are done reviewing, tell the agent: **"Finalize Board of Directors Char
 
 **Why:** SOC 2 auditors do want to see that there is board-level (or executive-level) oversight of security and risk. However, this laundry list of 9+ review items is enterprise-grade. A 10-person startup can satisfy auditors with a single annual meeting where founders/leadership review risk posture, security program status, and business continuity. You do not need separate line items for "succession planning," "fraud incentive review," or "subcommittee assessment" at this stage. Collapse this into a simple annual leadership review with 3-4 key agenda items: risk assessment results, security program status, business continuity, and budget.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -56,7 +56,7 @@ When you are done reviewing, tell the agent: **"Finalize Board of Directors Char
 
 **Why:** Auditors will want evidence that board/leadership oversight actually happened — and meeting minutes are the standard proof artifact. However, the "approved at the next meeting" formality is unnecessary overhead for a startup that meets infrequently. Just keep written notes/minutes from the annual review meeting and store them where you can produce them for auditors. A shared Google Doc or Notion page with attendees and decisions is fine. Drop the formal approval-at-next-meeting process.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -79,7 +79,7 @@ When you are done reviewing, tell the agent: **"Finalize Board of Directors Char
 
 **Why:** SOC 2 auditors expect to see that governance responsibilities have been assigned to named individuals. You need to fill this in — but you almost certainly do not need a "Vice Chairman" at a 10-person startup. Simplify to just list the founders/leadership who serve as the board. If you have actual investors on the board, list them. If not, listing the founding team is fine. The key is that someone is named as responsible for oversight.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -106,7 +106,7 @@ When you are done reviewing, tell the agent: **"Finalize Board of Directors Char
 
 **Why:** Executive ownership of the security program is genuinely critical for SOC 2. Auditors need to see that leadership is involved, not just the engineering team running things unsupervised. However, the language here implies multiple separate review sessions with internal auditors and independent auditors — that is enterprise overhead. At a startup, the CEO (or a designated founder) should be clearly responsible for overseeing the security/compliance program and should review its status at least annually. You do not need "separate executive sessions" with multiple auditor types. Simplify to: the CEO reviews and approves the security program, participates in the annual risk review, and is the point of contact for external auditors during SOC 2 engagement.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -125,8 +125,8 @@ When you are done reviewing, tell the agent: **"Finalize Board of Directors Char
 
 **Why:** A 10-person startup does not need an internal audit function. SOC 2 Type II does not require an internal auditor — you need an external auditor (your SOC 2 auditing firm), and you need internal controls, but a dedicated internal audit role or contractor is enterprise-grade overkill. The policy already hedges with "if any," which is a signal this is optional. Remove this commitment. If you grow to 50+ people and handle very sensitive data, revisit.
 
-- [ ] **Implementing**
-- **Comment:**
+- [x] **Implementing**
+- **Comment:** Kept in finalized version despite Remove recommendation — the "if any" hedge makes it low-risk to retain.
 
 ---
 
@@ -142,7 +142,7 @@ When you are done reviewing, tell the agent: **"Finalize Board of Directors Char
 
 **Why:** Annual risk assessment is genuinely important for SOC 2 — auditors will want to see that you identified risks and have a treatment plan. However, having a separate formal committee produce a report to a separate Board is organizational theater at a 10-person company. Simplify: conduct an annual risk assessment (this is covered by a separate Risk Assessment policy), document the results, and have the CEO/leadership review them as part of the annual board meeting (Commitment 1). No separate committee report needed — just make risk assessment review an agenda item.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -161,7 +161,7 @@ When you are done reviewing, tell the agent: **"Finalize Board of Directors Char
 
 **Why:** BCP/DR review is important for SOC 2 — auditors check that you have a plan and that leadership has reviewed it. This should be a line item in your annual review meeting. Succession planning, on the other hand, is not a SOC 2 requirement. It is a good business practice, but auditors will not ask "who takes over if the CTO leaves?" Keep the BCP review as part of the annual meeting agenda; drop the formal succession planning requirement from this policy.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -178,7 +178,7 @@ When you are done reviewing, tell the agent: **"Finalize Board of Directors Char
 
 **Why:** Annual policy review is a standard SOC 2 expectation. Auditors want to see that policies are not "write once and forget." This is low effort — add a recurring calendar reminder to review and re-approve this charter alongside your other annual policy reviews. Just make sure you document the review date (even if no changes were made). This can be batched with all other policy reviews in a single session.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -195,7 +195,7 @@ When you are done reviewing, tell the agent: **"Finalize Board of Directors Char
 
 **Why:** This is a COSO/internal controls concept borrowed from financial audit frameworks. SOC 2 does not require a formal fraud incentive analysis for a startup. At 10 people, you know your team — there is no need for a formal policy review to determine if someone's pay structure might motivate fraud. This is enterprise boilerplate. Remove it. If you grow significantly or handle financial transactions directly, revisit.
 
-- [ ] **Implementing**
-- **Comment:**
+- [x] **Implementing**
+- **Comment:** Kept in finalized version despite Remove recommendation — retained as a line item in the annual board meeting agenda.
 
 ---

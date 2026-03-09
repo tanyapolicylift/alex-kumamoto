@@ -15,13 +15,12 @@ The scope of this policy covers PolicyLift’s relationship with business partne
 The company has a vendor management policy in place, which includes:
 
 - Maintain critical third-party vendor inventory
-    
+
 - Review baseline vendor security requirements
-    
+
 - Periodically evaluate the performance of critical third-party vendors
-    
+
 - Conduct a vendor assessment to identify associated risks
-    
 
 ### **Overview**
 
@@ -42,17 +41,16 @@ Prior to outsourcing any PolicyLift’s processes or services to a third party/v
 The risk categories that should be considered during the risk assessment process includes (but is not limited to):
 
 - Information security: assessment of third-party controls related to security, privacy, confidentiality and availability of data shared
-    
+
 - Monitoring gaps: periodic assessments, ongoing monitoring, incident notification, offboarding, adherence, and appropriateness of SLAs
-    
+
 - Business continuity: availability considerations as third-party services and solutions become more integrated to the core company offering or service provided
-    
+
 - Data exposure: incorrectly classified data and unidentified data that could be exposed to the third-party
-    
+
 - Regulatory requirements: regulators mandate the supervision of third-party suppliers for security, privacy, and data protection compliance
-    
+
 - Due diligence: distributed IT environments, legacy/ longstanding suppliers, and use of subcontractors by the third party
-    
 
 ### **Contract**
 

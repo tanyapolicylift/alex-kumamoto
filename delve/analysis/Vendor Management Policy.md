@@ -30,7 +30,7 @@ When you are done reviewing, tell the agent: **"Finalize Vendor Management Polic
 
 **Why:** This is table-stakes for SOC 2. Auditors will ask to see your vendor list. For a startup, this is likely a spreadsheet with 15-30 rows covering your cloud providers, SaaS tools, and any contractors with system access. Low effort, high value.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -58,7 +58,7 @@ This is really three related sub-commitments:
 
 **Why:** Auditors will want to see that you evaluate vendors before giving them access to your environment. However, the policy as written is enterprise-grade: separate due diligence processes, network connectivity assessments, and multi-factor risk categorization (six categories listed) are overkill for a 10-person startup. **Simplify to a single lightweight vendor assessment form** — a one-page checklist covering security posture, data handling, and SOC 2/ISO 27001 status — applied to any vendor that accesses customer data. Skip the formal "network connectivity" risk assessment; for a cloud-native startup, network-level vendor access is rare. The separate "due diligence" section for outsourcing can be collapsed into the same form.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -77,7 +77,7 @@ This is really three related sub-commitments:
 
 **Why:** Annual vendor reviews are a core SOC 2 control. Auditors will sample your vendor list and ask for evidence that you reviewed them within the audit period. For a startup, this can be a lightweight annual sweep: check if their SOC 2 report is current, confirm data access hasn't expanded, and note any incidents. The key is having dated documentation that the review happened.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -94,7 +94,7 @@ This is really three related sub-commitments:
 
 **Why:** This is one of the most commonly tested SOC 2 controls. Auditors love asking for evidence that you reviewed your key vendors' SOC 2 reports. Practically, this means downloading the SOC 2 Type II report from AWS, your hosting provider, and any other critical SaaS vendors once a year, reading the opinion letter and exceptions, and noting any CUECs you need to follow. Document the review with a date and reviewer name. This is real work but non-negotiable.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -111,7 +111,7 @@ This is really three related sub-commitments:
 
 **Why:** Quarterly assessments for non-SOC-2 vendors is a significant burden, especially for a startup. Most SOC 2 audits accept an annual review cadence for all vendors. The quarterly requirement here seems designed for large enterprises with hundreds of vendors and dedicated vendor management teams. **Simplify to annual reviews for all vendors**, with an option to flag high-risk non-SOC-2 vendors for more frequent review if warranted. If you have a critical vendor with no SOC 2 report (e.g., a small contractor), consider requiring them to complete a security questionnaire annually instead.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -128,7 +128,7 @@ This is really three related sub-commitments:
 
 **Why:** Having management sign off on vendor risks is a standard SOC 2 expectation and demonstrates a "tone at the top." For a 10-person startup where the founders are already making these decisions, this is essentially already happening informally. Just formalize it: add a sign-off field to whatever vendor assessment form you use. One signature from a founder or CTO is enough.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -157,7 +157,7 @@ This is really three related sub-commitments:
 
 **Why:** Having contracts and confidentiality agreements with vendors is a real SOC 2 requirement. However, this policy implies custom contract negotiation with every vendor, which is unrealistic for SaaS tools where you simply accept their terms. **Simplify the approach**: for major SaaS vendors (AWS, etc.), accepting their ToS and DPA (Data Processing Agreement) is sufficient — just keep a record that you reviewed and accepted them. For contractors and smaller vendors with direct data access, use a standard NDA/confidentiality agreement template. You do not need to negotiate custom security clauses with every vendor, but you should have a simple contract or NDA on file for any vendor touching customer data.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -184,7 +184,7 @@ This is really three related sub-commitments:
 
 **Why:** Auditors will want to see that you have a process for revoking vendor access when relationships end. The full process described here — termination checklists, designated procurement managers, formal exit reviews, data return/destruction certification — is enterprise-heavy. **Simplify to a basic offboarding checklist**: when you stop using a vendor, revoke API keys, remove shared credentials, disable integrations, and note it on the vendor inventory. For vendors that held customer data, send a brief email requesting data deletion confirmation. You do not need a "procurement and contract manager" role or formal exit reviews at your stage.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -201,7 +201,7 @@ This is really three related sub-commitments:
 
 **Why:** This is a brief statement but it matters. Auditors want to see that reviews are not just checkbox exercises — if you find a problem during a vendor review, you actually do something about it. For a startup, this does not need a formal corrective action tracking system. Just document what you found and what you did about it (even if the answer is "accepted the risk because X"). A note in the vendor inventory spreadsheet is sufficient.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---

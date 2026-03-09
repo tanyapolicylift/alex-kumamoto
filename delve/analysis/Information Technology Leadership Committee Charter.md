@@ -30,7 +30,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Technology 
 
 **Why:** SOC 2 auditors do want to see that someone with authority is overseeing IT and security decisions — but the mechanism matters less than the evidence. At a 10-person startup, the founding team already *is* the IT leadership. You don't need a formally chartered committee with a capital-C name. Instead, designate 2-3 people (e.g., CTO + CEO) as the "technology oversight group" and document that in a single sentence. That satisfies auditors without the theater of a separate governance body.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -51,7 +51,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Technology 
 
 **Why:** Auditors will look for evidence that security and technology governance happens on a regular cadence — quarterly is the standard expectation. However, the formality described here (signed minutes, action item tracking between meetings, formal circulation) is enterprise-level overhead. For a startup, a quarterly 30-minute meeting with a simple shared doc summarizing what was discussed and any decisions made is sufficient. You could even fold this into an existing all-hands or leadership sync. The key is having *dated artifacts* that prove the meetings happened and covered security/technology topics. Skip the formal signing requirement — a Google Doc or Notion page with attendees listed is fine.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -72,7 +72,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Technology 
 
 **Why:** This is corporate governance boilerplate, not a SOC 2 requirement. SOC 2 cares about security controls, not whether your board approved your tech strategy. At a 10-person startup, the people making technology decisions *are* the leadership — there is no "management" reporting to a separate "committee" about project performance. This language creates an obligation to produce formal reports nobody needs. Remove it entirely. If you keep Commitment 2 (quarterly meetings), you can briefly touch on tech direction during those meetings without a formal review/approval process.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -93,7 +93,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Technology 
 
 **Why:** This is the one piece of this charter that genuinely matters for SOC 2. Auditors need evidence that leadership periodically reviews whether security commitments are being met and that incidents are discussed and learned from. You don't need a formal committee to do this — but you *do* need a quarterly touchpoint where someone in a leadership role reviews: (a) are our security controls working, (b) were there any incidents and what did we learn, and (c) any new security issues to address. This can happen in the same quarterly meeting from Commitment 2. Just make sure the meeting notes explicitly cover these security topics.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -110,7 +110,7 @@ When you are done reviewing, tell the agent: **"Finalize Information Technology 
 
 **Why:** SOC 2 does expect that your security and IT policies are reviewed and approved by someone with authority — auditors will check for an "approved by" line or evidence of review. But this doesn't require a formal committee approval process. At a startup, having your CTO (or whoever owns security) review and sign off on policies is sufficient. You can note "Approved by [Name], [Date]" on each policy document. Drop the language about recommending policies to the Board — that's enterprise governance structure you don't need.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -127,5 +127,5 @@ When you are done reviewing, tell the agent: **"Finalize Information Technology 
 
 **Why:** Annual policy review is a general SOC 2 expectation, but that applies to your core security policies (Information Security Policy, Access Control Policy, etc.) — not to an internal committee charter. No auditor is going to ask whether the Board reviewed the ITLC charter this year. This is pure enterprise governance overhead. If you keep a version of this charter at all, just note that it will be reviewed as part of your normal annual policy review cycle. No need for a separate Board review.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**

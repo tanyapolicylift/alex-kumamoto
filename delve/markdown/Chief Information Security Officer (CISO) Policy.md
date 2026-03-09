@@ -13,79 +13,68 @@ The CISO will be responsible for the following:
 **Information Security Strategy**
 
 - Develop and implement a comprehensive information security strategy aligned with PolicyLift's business objectives
-    
+
 - Regularly review and update the strategy to address evolving threats and technologies
-    
 
 **Risk Management**
 
 - Identify and assess information security risks across the organization
-    
+
 - Develop and oversee risk mitigation strategies and incident response plans
-    
 
 **Policy and Compliance**
 
 - Establish and maintain information security policies, standards, and procedures
-    
+
 - Ensure compliance with relevant industry standards and regulations
-    
 
 **Security Operations**
 
 - Oversee the day-to-day operation of the information security program
-    
+
 - Manage the information security team and their activities
-    
 
 **Incident Response**
 
 - Lead the company's response to information security incidents
-    
+
 - Conduct post-incident reviews and implement lessons learned
-    
 
 **Security Awareness and Training**
 
 - Develop and implement security awareness programs for all employees
-    
+
 - Ensure ongoing training for the information security team
-    
 
 **Vendor Management**
 
 - Oversee the security aspects of PolicyLift's relationships with vendors and third-party service providers
-    
+
 - Ensure appropriate security controls are in place for all external partnerships
-    
 
 **Technology Assessment**
 
 - Evaluate and recommend security products, services, and protocols to enhance the company's information security posture
-    
+
 - Stay informed about the latest information security technologies and threats
-    
 
 **Reporting**
 
 - Provide regular reports to the CEO and board of directors on the state of information security
-    
+
 - Communicate security strategies, risks, and incidents to stakeholders at all levels of the organization
-    
 
 **Budget Management**
 
 - Develop and manage the information security budget
-    
+
 - Allocate resources effectively to address the most critical security needs
-    
 
 **Cross-functional Collaboration**
 
 - Work closely with other departments to ensure security is integrated into all aspects of the business
-    
+
 - Serve as a bridge between technical and non-technical stakeholders on security matters
-    
 
 The CISO commits to prioritizing information security for PolicyLift. This arrangement ensures that security considerations are integrated at the highest level of decision-making within the company.
 

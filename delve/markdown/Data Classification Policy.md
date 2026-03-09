@@ -47,9 +47,8 @@ In some circumstances, confidential or restricted information might have to be d
 ### Risk Impact Consideration
 
 - No impact
-    
+
 - Minimal inconvenience if not available
-    
 
 Public Examples
 
@@ -60,80 +59,72 @@ You have customized this section.
 ### Examples (Not Exhaustive)
 
 - Press Releases
-    
+
 - Public Website Material
-    
+
 - Public Financial Filings
-    
+
 - Product Brochures
-    
+
 - Published Reports
-    
+
 - Marketing Materials
-    
+
 - Job Postings
-    
+
 - External Presentations
-    
 
 ## Internal
 
 ### Risk Impact Consideration
 
 - Disruption to the business if not available
-    
+
 - Low degree of risk if corrupted or modified
-    
 
 Internal Examples
-
-Template Provided
-
-An example has been provided. Please fill out this section with your own content.
 
 ### Examples (Not Exhaustive)
 
 - Policies, Standards, Processes, Playbooks, Procedures, and Frameworks
-    
+
 - Office Memos and Internal Staff-Wide Communications
-    
+
 - Planning Documents
-    
+
 - Project Status Reports
-    
+
 - Meeting Agendas and Minutes
-    
+
 - Documents Containing Work Contact Information
-    
+
 - Strategic Planning Documents
-    
+
 - Townhall Materials
-    
 
 ## Confidential
 
 ### Risk Impact Consideration
 
 - Loss of reputation or competitive advantage
-    
+
 - Loss of confidence in the Partnership
-    
+
 - Loss of personal or individual privacy
-    
+
 - Loss of intellectual property
-    
+
 - Loss of opportunity
-    
+
 - Financial loss
-    
+
 - High degree of risk if corrupted or modified
-    
+
 - Compromise of Board deliberations
-    
+
 - Privacy breach
-    
+
 - Destruction of partnerships and relationships
-    
 
 Confidential Examples
 
@@ -144,97 +135,90 @@ You have customized this section.
 ### Examples (Not Exhaustive)
 
 - Personnel Files
-    
+
 - PolicyLift Banking Information
-    
+
 - Contracts
-    
+
 - Customer Data
-    
+
 - Financial Reports
-    
+
 - Executive Committee of the Board Deliberations and Supporting Documents
-    
+
 - Other Committees of the Board
-    
+
 - Partner Information Designated as Sensitive
-    
+
 - Third-Party Business Information Submitted in Confidence
-    
+
 - Compensation Information
-    
+
 - Legal Advice
-    
+
 - Electronic Signature Files
-    
+
 - RFP and/or Funding Applications That Are Not Awarded
-    
+
 - Voice Recordings of Meetings
-    
+
 - IP Addresses
-    
+
 - Network and System Information
-    
+
 - Personally Identifiable Information (PII)
-    
+
 - Protected Health Information (PHI)
-    
 
 ## Restricted
 
 ### Risk Impact Consideration
 
 - Extreme or serious injury
-    
+
 - Loss of public safety
-    
+
 - Significant financial loss
-    
+
 - Significant legal implications
-    
+
 - Significant damage
-    
 
 ### Examples (Not Exhaustive)
 
 **Acquisition and Financial Data**
 
 - Unpublished PolicyLift Financial Statements
-    
+
 - General Ledger Data
-    
+
 - Data Related to Potential Acquisitions
-    
 
 **Source Code**
 
 - Java and .NET Source Code for In-House Applications
-    
 
 **Risk Data**
 
 - Vulnerability/Penetration Test Reports
-    
+
 - Detailed Security Audit Reports
-    
+
 - Application Security Bugs and Flaws
-    
 
 **Cryptographic Keys**
 
 - Private Keys
-    
+
 - Disk Encryption Keys
-    
 
 **Legal and HR Records**
 
 - Criminal Records and/or Investigations
-    
+
 - Litigation Records
-    
+
 - Employee Financial Information
-    
 
 ## **Asset Labeling and Handling**
 

@@ -30,7 +30,7 @@ When you are done reviewing, tell the agent: **"Finalize Personnel Security Poli
 
 **Why:** Background checks are a standard SOC 2 expectation and auditors will look for evidence that they happen. Services like Checkr make this trivially easy and inexpensive. The pre-hire checklist can be a simple Google Form or a Notion template — nothing elaborate needed.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -49,7 +49,7 @@ When you are done reviewing, tell the agent: **"Finalize Personnel Security Poli
 
 **Why:** This is table stakes for SOC 2 and for any startup generally. You likely already have something like this from your lawyer. The key audit evidence is a signed copy on file for every person. Make sure contractor agreements include the same confidentiality language — auditors check contractor coverage too.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -68,7 +68,7 @@ When you are done reviewing, tell the agent: **"Finalize Personnel Security Poli
 
 **Why:** Annual policy acknowledgment is one of the most commonly checked SOC 2 controls. Auditors will ask for a list of all personnel and proof that each one acknowledged policies within the audit period. This can be as simple as an annual email with a DocuSign link or a checkbox in your compliance tool (Vanta, Drata, etc.). Very low effort, very high audit value.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -91,8 +91,8 @@ When you are done reviewing, tell the agent: **"Finalize Personnel Security Poli
 
 **Why:** Annual security awareness training is non-negotiable for SOC 2 — auditors will explicitly check for completion records. Use an off-the-shelf platform (KnowBe4, Curricula, or whatever your compliance tool bundles) and you are done. However, the "specialized training scheduled at intervals for different units" language is enterprise overhead. At a 10-person startup, everyone can take the same training. Simplify to: security awareness training at hire + annually for all personnel, with records retained. Drop the specialized-by-unit cadence.
 
-- [ ] **Implementing**
-- **Comment:**
+- [x] **Implementing**
+- **Comment:** Finalized version keeps specialized training language but scopes it to "when there are significant changes to the information systems" rather than scheduled intervals by unit.
 
 ---
 
@@ -108,7 +108,7 @@ When you are done reviewing, tell the agent: **"Finalize Personnel Security Poli
 
 **Why:** Auditors want to see that there are consequences for policy violations — it shows the policies have teeth. You probably already have an employee handbook via your PEO or HR platform (Gusto, Rippling, etc.). Just make sure it includes a section stating that policy violations may result in disciplinary action including termination. This can be a single paragraph; it does not need to be a standalone document.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -129,7 +129,7 @@ When you are done reviewing, tell the agent: **"Finalize Personnel Security Poli
 
 **Why:** Auditors may ask to see job descriptions for key security roles (CISO, engineering leads) to verify that security responsibilities are formally assigned. You do not need formal job descriptions for every single role at a 10-person startup. Simplify to: maintain written role descriptions for security-relevant roles (whoever fills the CISO function, engineering leads, anyone with production access). A short paragraph per role in a Notion doc is sufficient. Do not build an enterprise-grade job description library.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -148,8 +148,8 @@ When you are done reviewing, tell the agent: **"Finalize Personnel Security Poli
 
 **Why:** Annual performance evaluations are good practice but are not a core SOC 2 control. Auditors are primarily interested in whether security responsibilities are assigned and whether people complete required training — not whether you have a formal annual review cycle with job-description-linked criteria. Most early-stage startups do lightweight check-ins, not structured annual reviews. If you already do annual reviews, great — include a brief discussion of security responsibilities and training. If you do not, do not build a formal performance review process just for SOC 2. Simplify to: periodic check-ins that include discussion of security-relevant training needs.
 
-- [ ] **Implementing**
-- **Comment:**
+- [x] **Implementing**
+- **Comment:** Finalized version softened to "regular performance evaluations" (from "annual by end of calendar year") — more flexible cadence.
 
 ---
 
@@ -166,7 +166,7 @@ When you are done reviewing, tell the agent: **"Finalize Personnel Security Poli
 **Why:** Access management is one of the most heavily scrutinized areas in a SOC 2 audit. Auditors will sample access grants and ask to see evidence that each one was requested and approved before being provisioned. This does not need to be a heavyweight ITSM tool — a Slack workflow, a Jira ticket template, or even a Google Form that routes to a manager for approval will satisfy auditors. The key is having a written record that access was authorized. This commitment is correctly scoped and important to keep.
 
 - [ ] **Implementing**
-- **Comment:**
+- **Comment:** Removed from this policy in the finalized version — access request tracking is covered by the Access Control and Termination Policy instead.
 
 ---
 
@@ -184,7 +184,7 @@ When you are done reviewing, tell the agent: **"Finalize Personnel Security Poli
 
 **Why:** Auditors want to see that there is a clear picture of who is responsible for what, especially for security functions. At a 10-person startup, a simple org chart in Notion or your HR tool (which likely auto-generates one) is fine. The "communicate changes to all personnel" part is natural at a small company — you are already doing this in Slack when someone joins, leaves, or changes roles. Keep this but do not over-formalize it. An auto-generated org chart from your HR tool plus normal Slack announcements will satisfy this.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -201,5 +201,5 @@ When you are done reviewing, tell the agent: **"Finalize Personnel Security Poli
 
 **Why:** The policy language here is notably soft — it says "shall consider creating" rather than "shall create." Auditors care far more about the access revocation side of termination (covered in Access Control and Termination Policy) than a formal separation agreement. That said, having a basic offboarding checklist that includes a reminder of ongoing confidentiality obligations is good practice and easy to do. Simplify to: include a confidentiality reminder as part of the offboarding process. You do not need a formal legal separation agreement for every departure unless your lawyer recommends it.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**

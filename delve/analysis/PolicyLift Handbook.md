@@ -44,7 +44,7 @@ Sections **not** analyzed because they are standard HR/legal boilerplate with no
 
 **Why:** SOC 2 auditors explicitly check that employees have acknowledged company policies. This is table stakes — you need a record showing each employee received and acknowledged the handbook (and by extension, the security policies referenced within it). For a small startup, this is as simple as a signed PDF or a checkbox in your onboarding tool.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -63,7 +63,7 @@ Sections **not** analyzed because they are standard HR/legal boilerplate with no
 
 **Why:** Personnel files are where you store evidence of background checks, policy acknowledgements, and training completion — all of which auditors want to see. Most startups already handle this through their payroll/HR platform (Gusto, Rippling, etc.). The commitment itself is minimal; the real question is whether you are storing the right documents in those files. No new process needed if you already use an HR tool.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -82,7 +82,7 @@ Sections **not** analyzed because they are standard HR/legal boilerplate with no
 
 **Why:** SOC 2 auditors want to see that security policies are enforceable — that there are consequences for violations. You do not need a complex HR discipline system; you just need the handbook to state that policy violations can lead to disciplinary action up to termination. The three-tier structure (verbal, written, termination) is clean and standard. Keep it as-is; it costs nothing and demonstrates that policies have teeth.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -103,7 +103,7 @@ Sections **not** analyzed because they are standard HR/legal boilerplate with no
 
 **Why:** The anti-harassment investigation procedure is important for employment law compliance, but it is not a SOC 2 audit focus area. What SOC 2 auditors *do* care about is that employees have a way to report security concerns and policy violations — a whistleblower/reporting channel. The reference to the "Delve platform whistleblower form" serves double duty here. Recommendation: keep the whistleblower/reporting channel reference (it supports SOC 2 integrity controls), but do not over-invest in formalizing the detailed investigation procedure beyond what employment law requires. The detailed harassment investigation steps are a legal obligation, not a SOC 2 one.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -130,7 +130,7 @@ Sections **not** analyzed because they are standard HR/legal boilerplate with no
 
 **Why:** These commitments directly support SOC 2 access control and acceptable use requirements. Password sharing prohibition, software installation controls, and the company's right to monitor systems are all things auditors expect to see in policy. However, note that most of this likely overlaps with the separate **Acceptable Use Policy** (`source/# Acceptable Use Policy.md`). Recommendation: keep these statements in the handbook for completeness (they reinforce what employees sign), but ensure they are consistent with your standalone Acceptable Use Policy. Do not create conflicting rules between the two documents.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -149,7 +149,7 @@ Sections **not** analyzed because they are standard HR/legal boilerplate with no
 
 **Why:** SOC 2 confidentiality criteria require that the organization has policies governing how sensitive data is handled and that employees understand their obligations. This handbook language establishes the baseline expectation. It costs nothing to keep and reinforces the Data Classification Policy. The specific enumeration of PII types (SSN, driver's license, account numbers, etc.) is helpful for auditors — it shows the company has thought about what constitutes sensitive data.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -166,7 +166,7 @@ Sections **not** analyzed because they are standard HR/legal boilerplate with no
 
 **Why:** This is a direct SOC 2 requirement. The AICPA Trust Services Criteria (CC2.1 / CC2.2) require that the entity communicates information about the system's boundaries, components, and responsibilities to both internal users and external parties. Auditors will look for system descriptions, architecture documentation, and user-facing documentation. This commitment is correctly placed here but feels oddly tacked onto the end of an employee handbook. Recommendation: keep this commitment, but consider whether the actual system documentation lives in a more appropriate location (e.g., an internal wiki or the SOC 2 system description itself). The handbook should reference it; the documentation itself should exist elsewhere.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---
@@ -185,7 +185,7 @@ Sections **not** analyzed because they are standard HR/legal boilerplate with no
 
 **Why:** SOC 2 auditors care that employees are aware of current policies, but they do not prescribe a specific change notification process for HR handbooks. The language here is already appropriately vague ("every effort will be made"). For a 10-person startup, policy changes can be communicated via a Slack message or team meeting. No formal process is needed. Keep the language as-is — it is flexible enough to not create a real burden — but do not invest in building a formal policy change management workflow just for the handbook.
 
-- [ ] **Implementing**
+- [x] **Implementing**
 - **Comment:**
 
 ---

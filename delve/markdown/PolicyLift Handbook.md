@@ -83,52 +83,50 @@ In order to conduct the operations of PolicyLift efficiently and professionally,
 Although it is not possible to list all forms of inappropriate behavior and conduct, the following are examples that are considered inappropriate and may result in disciplinary action up to and including termination of employment:
 
 - Falsifying employment or other company records;
-    
+
 - Violating the Anti-Harassment policy;
-    
+
 - Violating certain national, regional, or local laws and regulations;
-    
+
 - Violating security or safety rules or failing to observe safety rules or safety practices; failing to wear required safety equipment; tampering with equipment or safety equipment;
-    
+
 - Soliciting gratuities from customers or clients;
-    
+
 - Displaying excessive or unexcused absenteeism or tardiness;
-    
+
 - Possessing firearms, weapons or explosives on company property without authorization, in violation of policy or while on duty;
-    
+
 - Using the company’s property and supplies, particularly for personal purposes in an excessive, unnecessary or unauthorized way;
-    
+
 - Negligent damage of property;
-    
+
 - Violating the Violence in the Workplace policy;
-    
+
 - Violating the Drug-Free Workplace policy;
-    
+
 - Committing theft or unauthorized possession of company property or the property of fellow employees;
-    
+
 - Possessing or removing any company property, including documents, from the premises without prior permission from management;
-    
+
 - Using company equipment or property for personal reasons without proper authorization; using company equipment for profit;
-    
+
 - Giving confidential or proprietary information to competitors;
-    
+
 - Working for a competing business while an employee of the company;
-    
+
 - Breaking confidentiality of information such as, National identification numbers, including any part of National identification numbers. Personal information also includes driver's license numbers, state-issued identification card numbers, date of birth, credit or debit or other account numbers, passport numbers, alien registration numbers or health insurance identification numbers;
-    
+
 - Engaging in abusive conduct, or bullying, such as using obscene, abusive or threatening language or gestures or other verbal or physical conduct a reasonable person would find threatening, intimidating, or humiliating;
-    
+
 - Soliciting, selling, or collecting funds for any purpose while on working time (not including meals and authorized breaks). Employees who are not on working time shall not interfere with the work of employees who are on working time.
-    
 
 Where appropriate, supervisors will follow a process of progressive employee discipline. Before or during application of any discipline, employees may be given an opportunity to relate their version of the incident or problem and provide an explanation. Examples of progressive employee discipline include:
 
 - Verbal Counseling - A conversation with an employee explaining that the employee’s conduct or poor performance is unacceptable, and repeated or continued unacceptable conduct or performance will result in more severe disciplinary action. A record of the notice of the verbal counseling may be made and retained in the employee's personnel file.
-    
+
 - Written Counseling - A written document or memo that describes the unacceptable conduct or performance of the employee and specifies needed changes or improvements. A copy of the written counseling generally will be retained in the employee's personnel file.
-    
+
 - Termination - If an employee fails to follow acceptable conduct or performance standards, the company may terminate the employee’s employment.
-    
 
 Depending on the specific circumstances, the company may suspend or terminate an employee without prior discipline, or without following a particular order of discipline.
 
