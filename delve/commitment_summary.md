@@ -397,16 +397,16 @@ This document groups every commitment PolicyLift has adopted into logical catego
 
 These commitments were analyzed but explicitly excluded from PolicyLift's finalized policies.
 
-| Commitment | Policy | Reason |
-|------------|--------|--------|
-| Third-party supplier BC/DR requirements | BC/DR #10 | Overkill for current stage; vendor management covers contractual obligations |
-| DLP software for email | Info Security #9 | Enterprise-grade; not required for SOC 2 at startup scale |
-| HIPAA/BAA compliance for PHI handling | Info Security #14 | PolicyLift does not handle PHI |
-| Media disposal via third-party sanitization | Info Security #15 | Cloud-native infrastructure; no physical media to dispose |
-| Separation of duties for network vs. computer operations | Network Security #13 | Impractical at 10 people; same team handles both |
-| Wireless network approval and physical security of network hardware | Network Security #14 | Cloud-native; no company-managed physical network hardware |
-| Access request tracking via ticketing system | Personnel Security #8 | Covered by Access Control and Termination Policy instead |
-| Oversight of fraud risk management | RGEC #6 | Not a SOC 2 requirement at this stage |
-| Succession planning for key roles | RGEC #7 | Good practice but not SOC 2; revisit at scale |
-| Authority to retain independent consultants at company expense | RGEC #8 | Enterprise governance overhead |
-| Prepare and submit reports to the board | RGEC #9 | Folded into annual board meeting agenda; no separate deliverable needed |
+| Commitment                                                          | Policy                | Reason                                                                       |
+| ------------------------------------------------------------------- | --------------------- | ---------------------------------------------------------------------------- |
+| Third-party supplier BC/DR requirements                             | BC/DR #10             | Overkill for current stage; vendor management covers contractual obligations |
+| DLP software for email                                              | Info Security #9      | Enterprise-grade; not required for SOC 2 at startup scale                    |
+| HIPAA/BAA compliance for PHI handling                               | Info Security #14     | PolicyLift does not handle PHI                                               |
+| Media disposal via third-party sanitization                         | Info Security #15     | Cloud-native infrastructure; no physical media to dispose                    |
+| Separation of duties for network vs. computer operations            | Network Security #13  | Impractical at 10 people; same team handles both                             |
+| Wireless network approval and physical security of network hardware | Network Security #14  | Cloud-native; no company-managed physical network hardware                   |
+| Access request tracking via ticketing system                        | Personnel Security #8 | Covered by Access Control and Termination Policy instead                     |
+| Oversight of fraud risk management                                  | RGEC #6               | Not a SOC 2 requirement at this stage                                        |
+| Succession planning for key roles                                   | RGEC #7               | Good practice but not SOC 2; revisit at scale                                |
+| Authority to retain independent consultants at company expense      | RGEC #8               | Enterprise governance overhead                                               |
+| Prepare and submit reports to the board                             | RGEC #9               | Folded into annual board meeting agenda; no separate deliverable needed      |
