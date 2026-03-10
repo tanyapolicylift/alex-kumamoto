@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice AI Call Log Analysis — Phases 1–3</title>
+<style>
+  :root { --blue: #1a5276; --accent: #2e86c1; --light-bg: #f8f9fa; --border: #dee2e6; --green: #27ae60; --red: #e74c3c; --orange: #f39c12; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #333; line-height: 1.65; max-width: 960px; margin: 0 auto; padding: 40px 24px; background: #fff; }
+  h1 { font-size: 1.9em; color: var(--blue); border-bottom: 3px solid var(--accent); padding-bottom: 12px; margin-bottom: 32px; }
+  h2 { font-size: 1.45em; color: var(--blue); margin: 36px 0 16px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 1.15em; color: #444; margin: 24px 0 10px; }
+  p, li { margin-bottom: 10px; }
+  ul, ol { padding-left: 24px; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 0.92em; }
+  th, td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+  th { background: var(--blue); color: white; font-weight: 600; }
+  tr:nth-child(even) { background: var(--light-bg); }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 20px 0; }
+  .stat-card { background: var(--light-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+  .stat-card .number { font-size: 2em; font-weight: 700; color: var(--accent); }
+  .stat-card .label { font-size: 0.85em; color: #666; margin-top: 4px; }
+  .callout { background: #eaf2f8; border-left: 4px solid var(--accent); padding: 16px 20px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .callout-warn { background: #fef9e7; border-left-color: var(--orange); }
+  .callout-success { background: #eafaf1; border-left-color: var(--green); }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.82em; font-weight: 600; margin-right: 6px; }
+  .tag-addressable { background: #d4efdf; color: #1e8449; }
+  .tag-inherent { background: #fadbd8; color: #c0392b; }
+  .recommendation { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 16px 0; }
+  .recommendation h4 { color: var(--accent); margin-bottom: 8px; }
+  .transcript-sample { background: #f4f4f4; padding: 12px 16px; border-radius: 6px; font-family: 'SF Mono', 'Consolas', monospace; font-size: 0.85em; margin: 10px 0; white-space: pre-wrap; line-height: 1.5; }
+  .section-divider { border: none; border-top: 2px solid var(--border); margin: 40px 0; }
+</style>
+</head>
+<body>
+
+<h1>Voice AI Call Log Analysis</h1>
+<p style="color:#666; margin-bottom:32px;">Analysis of ~1,800 call records over three months from an insurance agency voice AI phone assistant.</p>
+
+<h2>Phase 1: Data Cleaning</h2>
+
+<p>The raw dataset contained <strong>1,879 call records</strong>. After cleaning, the eligible call set includes <strong>1,180 calls</strong> — all with a "completed" status.</p>
+
+<div class="stat-grid">
+  <div class="stat-card"><div class="number">1,879</div><div class="label">Total Raw Records</div></div>
+  <div class="stat-card"><div class="number">699</div><div class="label">Removed</div></div>
+  <div class="stat-card"><div class="number">1,180</div><div class="label">Eligible Calls</div></div>
+</div>
+
+<h3>Removal Breakdown</h3>
+<table>
+  <tr><th>Reason</th><th>Count</th><th>% of Raw</th></tr>
+  <tr><td>Filtered (system-filtered non-genuine)</td><td>616</td><td>32.8%</td></tr>
+  <tr><td>Spam</td><td>75</td><td>4.0%</td></tr>
+  <tr><td>Hidden</td><td>6</td><td>0.3%</td></tr>
+  <tr><td>Blank/unknown status</td><td>2</td><td>0.1%</td></tr>
+</table>
+
+<p>The filtered category (616 calls) was the largest removal group — these appear to be calls the system already flagged as non-genuine (extremely short connections, no user interaction, or system test calls). Spam (75) and hidden (6) round out the removals.</p>
+
+<hr class="section-divider">
+
+<h2>Phase 2: Language Segmentation</h2>
+
+<p>Each eligible call was classified as English or Spanish based on transcript analysis. Classification was validated against existing language labels where available, achieving 99.6% agreement (466 of 468 labeled calls matched).</p>
+
+<div class="stat-grid">
+  <div class="stat-card"><div class="number">914</div><div class="label">English (77.5%)</div></div>
+  <div class="stat-card"><div class="number">266</div><div class="label">Spanish (22.5%)</div></div>
+</div>
+
+<h3>Duration Profiles by Language</h3>
+<table>
+  <tr><th>Metric</th><th>All Eligible</th><th>English</th><th>Spanish</th></tr>
+  <tr><td>Count</td><td>1,180</td><td>914</td><td>266</td></tr>
+  <tr><td>Avg Duration</td><td>82s</td><td>85s</td><td>74s</td></tr>
+  <tr><td>Median Duration</td><td>48s</td><td>51s</td><td>41s</td></tr>
+  <tr><td>≤ 30 seconds</td><td>—</td><td>28%</td><td>45%</td></tr>
+  <tr><td>30–60 seconds</td><td>—</td><td>31%</td><td>20%</td></tr>
+  <tr><td>60–120 seconds</td><td>—</td><td>25%</td><td>21%</td></tr>
+  <tr><td>> 120 seconds</td><td>—</td><td>17%</td><td>14%</td></tr>
+</table>
+
+<div class="callout">
+  <strong>Key observation:</strong> Spanish calls have a notably higher rate of very short calls (45% under 30 seconds vs 28% for English). This may reflect a combination of the language-switch prompt adding friction at the start and potentially fewer Spanish-language conversation paths being fully developed.
+</div>
+
+<hr class="section-divider">
+
+<h2>Phase 3: Drop-Off Analysis (English Cohort)</h2>
+
+<p>Of the 914 English calls, <strong>533 (58%) ended within 60 seconds</strong> — a proxy for calls that likely did not reach a successful resolution. The remaining 381 (42%) continued past 60 seconds.</p>
+
+<h3>3.1 — When Does Drop-Off Occur?</h3>
+
+<table>
+  <tr><th>Conversation Point</th><th>Count</th><th>% of Drop-Off Calls</th></tr>
+  <tr><td>After first exchange (user says one thing, hangs up)</td><td>150</td><td>28.1%</td></tr>
+  <tr><td>During info gathering (name, address, policy details)</td><td>141</td><td>26.5%</td></tr>
+  <tr><td>During intent clarification (AI asking what they need)</td><td>116</td><td>21.8%</td></tr>
+  <tr><td>Other mid-conversation points</td><td>126</td><td>23.6%</td></tr>
+</table>
+
+<div class="callout">
+  <strong>The critical window is the first 30 seconds.</strong> Over half of all drop-offs happen before the conversation even reaches a substantive exchange — the caller either hangs up after the greeting, during initial clarification, or as soon as they realize they're speaking with an AI assistant.
+</div>
+
+<h3>3.2 — Why Does Drop-Off Occur?</h3>
+
+<p>Each drop-off call was analyzed for root cause. Calls often have multiple contributing factors, so percentages sum to more than 100%.</p>
+
+<table>
+  <tr><th>Reason</th><th>Category</th><th>Count</th><th>% of Drop-Offs</th></tr>
+  <tr><td>Wanted human transfer / asked to speak with someone</td><td><span class="tag tag-inherent">Inherent</span></td><td>321</td><td>60.2%</td></tr>
+  <tr><td>Confusion (unclear responses, "what?", "hello?")</td><td><span class="tag tag-addressable">Addressable</span></td><td>186</td><td>34.9%</td></tr>
+  <tr><td>Detected AI / asked if it's a machine</td><td><span class="tag tag-addressable">Addressable</span></td><td>172</td><td>32.3%</td></tr>
+  <tr><td>Wanted specific person by name</td><td><span class="tag tag-inherent">Inherent</span></td><td>163</td><td>30.6%</td></tr>
+  <tr><td>Wanted voicemail / to leave message</td><td><span class="tag tag-inherent">Inherent</span></td><td>112</td><td>21.0%</td></tr>
+  <tr><td>Perceived dead air (caller says "hello?" repeatedly)</td><td><span class="tag tag-addressable">Addressable</span></td><td>109</td><td>20.5%</td></tr>
+  <tr><td>Language barrier (English caller asking for Spanish)</td><td><span class="tag tag-addressable">Addressable</span></td><td>69</td><td>12.9%</td></tr>
+  <tr><td>Info-gathering fatigue (too many questions)</td><td><span class="tag tag-addressable">Addressable</span></td><td>7</td><td>1.3%</td></tr>
+  <tr><td>Wrong number</td><td><span class="tag tag-inherent">Inherent</span></td><td>6</td><td>1.1%</td></tr>
+</table>
+
+<div class="stat-grid">
+  <div class="stat-card" style="border-left: 4px solid var(--green);"><div class="number">380</div><div class="label">Addressable Drop-Offs (71%)</div></div>
+  <div class="stat-card" style="border-left: 4px solid var(--red);"><div class="number">149</div><div class="label">Inherent Drop-Offs (28%)</div></div>
+</div>
+
+<h3>3.3 — Deep Dive: Top Addressable Patterns</h3>
+
+<h4>Pattern A: Perceived Dead Air / Latency (200 calls with "Hello?")</h4>
+
+<p>This is the single most impactful addressable issue. <strong>200 English calls</strong> (22% of the entire cohort) contain the caller saying "Hello?" — indicating they perceive silence or a non-responsive line. In many cases, the AI's response arrives just as the caller is saying "Hello?", creating a talk-over effect that compounds the problem.</p>
+
+<div class="transcript-sample">assistant: Hi - Thanks for calling Dale Wagner Insurance, this is Kelly on a recorded line. How can I help?
+user: Hello?
+assistant: Yeah, I'm here. What can I…
+[caller hangs up]</div>
+
+<div class="transcript-sample">assistant: Hi - Thanks for calling Dale Wagner Insurance, this is Kelly on a recorded line. How can I help?
+user: Hello.
+assistant: Hi there. What can I help you with—
+user: Hello?
+[caller hangs up]</div>
+
+<h4>Pattern B: AI Detection & Distrust (172 calls)</h4>
+
+<p>When callers realize they're talking to an AI, the current response varies but often includes phrases like "I get that a lot" or "I'm actually a virtual assistant." Many callers hang up at this point, particularly when they need account-specific help that clearly requires a human.</p>
+
+<div class="transcript-sample">user: Oh, it's—
+assistant: Yeah, go ahead. What—
+user: machine.
+assistant: Yeah, I get that a lot. I'm actually here to help with insurance questions…
+user: He…
+[caller hangs up]</div>
+
+<h4>Pattern C: Truncated / Cut-Off Responses (170 calls)</h4>
+
+<p>In 170 calls, the final message from the assistant ends mid-sentence — the caller hung up while the AI was still speaking. This strongly suggests the AI's response pace doesn't match caller expectations; by the time it starts answering, the caller has already decided to leave.</p>
+
+<hr class="section-divider">
+
+<h3>3.4 — Recommendations: Reducing Addressable Drop-Off</h3>
+
+<div class="recommendation">
+  <h4>1. Reduce Response Latency / Add Filler Acknowledgments</h4>
+  <p><strong>Problem:</strong> Callers perceive dead air between their statement and the AI's response, leading to "Hello?" loops.</p>
+  <p><strong>Recommendation:</strong> Insert immediate, ultra-short filler responses (under 500ms) before the substantive answer. Use phrases like "Mm-hmm," "Sure," or "Got it" as instant acknowledgments while the full response generates. This mirrors natural human phone behavior where we signal we're listening before forming a full reply.</p>
+  <p><strong>Expected impact:</strong> Could reduce the 200+ "Hello?" pattern calls significantly. Even a 30% reduction would recover ~60 calls per quarter.</p>
+</div>
+
+<div class="recommendation">
+  <h4>2. Redesign the AI Disclosure Response</h4>
+  <p><strong>Problem:</strong> When callers ask "is this a machine?", current responses like "I get that a lot" or "I'm actually a virtual assistant" lead to immediate hang-ups.</p>
+  <p><strong>Recommendation:</strong> Pivot the response to lead with capability and value before the disclosure. Example: <em>"I can help you with quotes, policy questions, claims, and more — and if you need a licensed agent, I can connect you right away. I am an AI assistant, but I handle most requests start to finish. What can I help you with?"</em> The key is to answer the implicit question ("can you actually help me?") before the explicit one ("are you a robot?").</p>
+  <p><strong>Expected impact:</strong> Of the 172 AI-detection drop-offs, many callers have legitimate needs. A value-first framing could retain 20–40% of them.</p>
+</div>
+
+<div class="recommendation">
+  <h4>3. Improve the Opening Greeting for Faster Engagement</h4>
+  <p><strong>Problem:</strong> The current greeting ("Hi - Thanks for calling [Agency], this is Kelly on a recorded line. How can I help?") is long and formal. By the time the caller processes the recorded-line disclosure, there's already a perceived pause.</p>
+  <p><strong>Recommendation:</strong> Shorten the greeting and front-load the interactive prompt: <em>"Hi, this is Kelly at [Agency]. How can I help you today?"</em> Move the recorded-line notice to a brief mention after the first exchange, or embed it as a quick aside. Shorter greetings get to the conversation faster and reduce the window where callers decide to hang up.</p>
+  <p><strong>Expected impact:</strong> Incremental improvement across all calls, reducing the 6–10 second "dead zone" after the greeting.</p>
+</div>
+
+<div class="recommendation">
+  <h4>4. Proactive "Let me transfer you" for Specific-Person Requests</h4>
+  <p><strong>Problem:</strong> When callers ask for a named person (163 instances), the AI often explains the office is closed before offering alternatives, which frustrates callers who just want to be connected.</p>
+  <p><strong>Recommendation:</strong> When a caller names a specific person, immediately acknowledge and offer the next-best action: <em>"Let me check — [Name] isn't available right now. I can take a message so they call you back, or I can help you with most insurance questions directly. Which would you prefer?"</em> Lead with the action, not the obstacle.</p>
+  <p><strong>Expected impact:</strong> Won't eliminate this inherent category, but a faster, more empathetic handoff could convert some of these into message-left or question-answered outcomes.</p>
+</div>
+
+<div class="recommendation">
+  <h4>5. Streamline After-Hours Messaging Flow</h4>
+  <p><strong>Problem:</strong> Many callers who reach the AI after hours want to leave a simple message (112 calls). The current flow often asks clarifying questions before getting to the message-taking step, causing some to abandon.</p>
+  <p><strong>Recommendation:</strong> When the office is closed, offer message-taking as the first option: <em>"The office is closed right now — would you like to leave a message for a callback, or can I help you with something right now?"</em> Make message-taking a one-step process: collect name, number, and brief note, then confirm.</p>
+  <p><strong>Expected impact:</strong> Converts some of the voicemail-seeking drop-offs into captured messages.</p>
+</div>
+
+<div class="recommendation">
+  <h4>6. Faster Spanish Language Routing</h4>
+  <p><strong>Problem:</strong> 69 English-cohort calls involved a language barrier. Some callers who need Spanish are going through the English greeting before switching, adding friction.</p>
+  <p><strong>Recommendation:</strong> For agencies with significant Spanish-speaking caller bases, consider opening with a bilingual prompt that includes the Spanish option earlier: <em>"Thanks for calling [Agency]. Para español, diga 'español.' For English, how can I help?"</em></p>
+  <p><strong>Expected impact:</strong> Reduces confusion and early hang-ups from Spanish speakers who don't understand the English greeting.</p>
+</div>
+
+<div class="callout callout-success">
+  <strong>Bottom line:</strong> Of the 533 short calls in the English cohort, roughly 380 (71%) have addressable elements. The three highest-leverage improvements are reducing perceived latency (Pattern A), redesigning the AI disclosure (Pattern B), and shortening the opening greeting (Pattern C). Together, these address the root causes behind the majority of addressable drop-off.
+</div>
+
+</body>
+</html>

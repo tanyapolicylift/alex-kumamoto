@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 5: High-Frequency Tranche Analysis</title>
+<style>
+  :root { --blue: #1a5276; --accent: #2e86c1; --light-bg: #f8f9fa; --border: #dee2e6; --green: #27ae60; --orange: #f39c12; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #333; line-height: 1.65; max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+  h1 { font-size: 1.8em; color: var(--blue); border-bottom: 3px solid var(--accent); padding-bottom: 12px; margin-bottom: 12px; }
+  h2 { font-size: 1.4em; color: var(--blue); margin: 32px 0 14px; border-left: 4px solid var(--accent); padding-left: 12px; }
+  h3 { font-size: 1.1em; color: #444; margin: 22px 0 8px; }
+  p { margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 0.92em; }
+  th, td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; }
+  th { background: var(--blue); color: white; }
+  tr:nth-child(even) { background: var(--light-bg); }
+  .callout { background: #eaf2f8; border-left: 4px solid var(--accent); padding: 16px 20px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+  .callout-warn { background: #fef9e7; border-left-color: var(--orange); }
+  .callout-success { background: #eafaf1; border-left-color: var(--green); }
+  .recommendation { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 16px 0; }
+  .recommendation h4 { color: var(--accent); margin-bottom: 8px; }
+  .transcript-sample { background: #f4f4f4; padding: 12px 16px; border-radius: 6px; font-family: monospace; font-size: 0.85em; margin: 10px 0; white-space: pre-wrap; line-height: 1.5; }
+  hr { border: none; border-top: 2px solid var(--border); margin: 36px 0; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin: 18px 0; }
+  .stat-card { background: var(--light-bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center; }
+  .stat-card .number { font-size: 1.8em; font-weight: 700; color: var(--accent); }
+  .stat-card .label { font-size: 0.82em; color: #666; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<h1>Phase 5: High-Frequency Tranche Analysis</h1>
+<p style="color:#666; margin-bottom:28px;">Deep dive into the duration bands with the highest concentration of calls, with actionable recommendations for reducing early termination.</p>
+
+<h2>Top Duration Tranches by Call Volume</h2>
+
+<table>
+  <tr><th>Rank</th><th>Tranche</th><th>Call Count</th><th>% of Eligible</th></tr>
+  <tr><td>1</td><td>15–20 seconds</td><td>109</td><td>9.2%</td></tr>
+  <tr><td>2</td><td>20–25 seconds</td><td>98</td><td>8.3%</td></tr>
+  <tr><td>3</td><td>10–15 seconds</td><td>82</td><td>6.9%</td></tr>
+  <tr><td>4</td><td>40–45 seconds</td><td>66</td><td>5.6%</td></tr>
+  <tr><td>5</td><td>35–40 seconds</td><td>62</td><td>5.3%</td></tr>
+</table>
+
+<div class="callout">
+  <strong>The 10–25 second window accounts for 289 calls (24.5% of all eligible calls).</strong> This is the largest single concentration of call terminations and represents the highest-leverage improvement opportunity.
+</div>
+
+<hr>
+
+<h2>Tranche 1: 15–20 Seconds (109 Calls)</h2>
+
+<h3>What's Happening at This Point</h3>
+<p>At 15–20 seconds, the conversation is typically in one of two states: the caller has just delivered their first substantive response, or the AI has just finished its first substantive reply. This is the "first exchange" window — the moment where the caller decides whether to continue or bail.</p>
+
+<p>Transcript analysis reveals three dominant patterns in this tranche:</p>
+
+<p><strong>Pattern 1: After-hours information dump (especially Spanish cohort).</strong> Many 15–20s calls are Spanish-language callers who hear the greeting, say "Español," receive the after-hours message in Spanish, and then hang up. They got the information they needed (we're closed) and left.</p>
+
+<div class="transcript-sample">assistant: Hi this is Kelly with FOCO Insurance on a recorded line. Si desea continuar en español, diga "Español".
+user: Español.
+assistant: Hola, gracias por llamar a FOCO Insurance Services. Estamos cerrados en este momento, pero puedo ayudarte con…
+[caller disconnects]</div>
+
+<p><strong>Pattern 2: Quick informational question answered.</strong> English callers who ask a simple question (office hours, payment options) get their answer and leave. This is actually a form of success — intent was resolved — but the call ends without capturing any follow-up opportunity.</p>
+
+<div class="transcript-sample">assistant: Hi - Thanks for calling Dale Wagner Insurance, this is Kelly on a recorded line. How can I help?
+user: Hello? Are you open today?
+assistant: Hey there. We're actually open today until noon since it's Wednesday…
+[caller disconnects after getting their answer]</div>
+
+<p><strong>Pattern 3: Confusion-driven disconnect.</strong> The caller speaks, perceives a delay or odd response, and hangs up before the conversation gets traction.</p>
+
+<hr>
+
+<h2>Tranche 2: 20–25 Seconds (98 Calls)</h2>
+
+<h3>What's Happening at This Point</h3>
+<p>At 20–25 seconds, the AI has completed its first substantive response and the caller is at a decision point. The dominant pattern here is callers who heard the after-hours message and are deciding whether to leave a message or engage further. Many disconnect at this exact boundary — they've been told the office is closed and the AI hasn't yet made a compelling case for why they should stay on the line.</p>
+
+<p>This tranche also contains a significant number of Spanish-language calls following the same pattern as Tranche 1 but with slightly longer exchanges (the AI provides more detail before the caller disconnects).</p>
+
+<p>Another notable pattern: callers who are returning a missed call. They hear the greeting, say something like "returning the call" or "someone called me," and when the AI can't identify who called them, the caller sees no reason to continue.</p>
+
+<div class="transcript-sample">assistant: Hi - Thanks for calling Princeton Insurance, this is Kelly on a recorded line. How can I help?
+user: Returning the call.
+assistant: Oh, okay. We're actually closed right now. Did you want to leave a message—
+user: Oh—
+[caller disconnects]</div>
+
+<hr>
+
+<h2>Tranche 3: 10–15 Seconds (82 Calls)</h2>
+
+<h3>What's Happening at This Point</h3>
+<p>At 10–15 seconds, the caller has barely completed their first utterance. These are the fastest meaningful disconnects — the caller said something (unlike the sub-10-second calls which are mostly no-response connections) but left immediately after. Key patterns:</p>
+
+<p><strong>Immediate human request:</strong> Caller says "to talk to someone" or "representative" and when they hear the AI explain the office is closed, they hang up.</p>
+
+<p><strong>AI detection:</strong> Caller realizes it's automated within the first exchange and disconnects. The caller says "machine" or expresses surprise, and leaves before the AI can establish credibility.</p>
+
+<p><strong>Spanish language switch:</strong> The greeting plays, caller says "Español," and they receive the start of the Spanish greeting before disconnecting — often because the after-hours message begins and they decide to call back.</p>
+
+<hr>
+
+<h2>Tranches 4–5: 35–45 Seconds (128 Calls Combined)</h2>
+
+<h3>What's Happening at This Point</h3>
+<p>These are meaningfully longer calls where the conversation progressed past the initial exchange. The caller engaged, asked questions or provided information, but left before resolution. Patterns include:</p>
+
+<p><strong>Escalation frustration:</strong> Callers who asked for a specific person, were told the person isn't available, and were then asked clarifying questions they didn't want to answer. They wanted a transfer, not a Q&A session.</p>
+
+<p><strong>Mid-flow abandonment:</strong> Callers who started an inquiry (quote, claim, payment) but dropped off when the AI began collecting detailed personal information (name, address, date of birth). The shift from conversational to interrogative triggers a "this is taking too long" response.</p>
+
+<p><strong>Confused or garbled exchanges:</strong> Several calls show a pattern of mutual misunderstanding — the caller says something the AI interprets incorrectly, the AI gives an off-topic response, and the caller gives up.</p>
+
+<div class="transcript-sample">assistant: Hi - Thanks for calling Dale Wagner Insurance, this is Kelly on a recorded line. How can I help?
+user: Yes. Hi. I'm looking for commercial insurance.
+assistant: Oh, okay. Are you looking for property coverage, liability, or something else—
+user: [describes need]
+assistant: [asks for details]
+[caller disconnects during info gathering]</div>
+
+<hr>
+
+<h2>Actionable Recommendations</h2>
+
+<div class="callout-warn callout">
+  <strong>Framing note:</strong> Not all drop-off is eliminable. Callers who get their answer in 15 seconds and hang up represent a form of success. Callers who want a specific human will always exist. The goal is incremental: shift the curve rightward so more calls reach resolution, and ensure that calls which <em>could</em> have been successful aren't lost to friction.
+</div>
+
+<div class="recommendation">
+  <h4>1. Add "Speed Bumps" Before the After-Hours Dead End</h4>
+  <p>The 15–25 second tranches are dominated by callers who hear "we're closed" and immediately leave. Before delivering the closed message, insert a brief value proposition: <em>"The office is closed right now, but I can help you with most things — quotes, policy questions, filing claims, or I can take a message for a callback first thing tomorrow. What works best?"</em></p>
+  <p>Currently the flow is: greeting → closed announcement → offer to help. Restructure to: greeting → offer to help → mention closed status only if relevant.</p>
+  <p><strong>Target:</strong> 15–25s tranches (207 calls). Even a 15% conversion to longer engagement = ~31 additional calls reaching resolution per quarter.</p>
+</div>
+
+<div class="recommendation">
+  <h4>2. Instant Acknowledgment Layer to Prevent "Hello?" Loops</h4>
+  <p>Across all top tranches, the "Hello?" pattern persists. The AI needs an instant filler response (sub-500ms) to signal active listening — "Mm-hmm," "Sure," "Got it" — before the full answer generates. This prevents the perception of dead air that drives early hang-ups.</p>
+  <p><strong>Target:</strong> Estimated 200+ calls across all tranches where "Hello?" appears. A 30% reduction = ~60 recovered calls per quarter.</p>
+</div>
+
+<div class="recommendation">
+  <h4>3. Fast-Track "Returning a Call" Handling</h4>
+  <p>Callers who say "returning the call" or "someone called me" are a specific segment that the AI currently struggles with. Build a dedicated flow: <em>"Got it — let me take your name and number so the right person can call you back. What's your name?"</em> Skip the clarification step and go straight to message capture.</p>
+  <p><strong>Target:</strong> A subset of the 20–25s tranche. Small volume but high conversion potential — these callers have demonstrated intent by calling back.</p>
+</div>
+
+<div class="recommendation">
+  <h4>4. Conversational Info Gathering Instead of Interrogation</h4>
+  <p>The 35–45s tranches show callers dropping off during the information-collection phase. The current approach shifts abruptly from conversation to a series of "What is your [X]?" questions. Instead, weave information gathering into natural dialogue: <em>"And what area are you in? We see a lot of variation by zip code"</em> rather than <em>"What is your zip code?"</em></p>
+  <p><strong>Target:</strong> 35–45s tranches (128 calls). Converting even 10% = ~13 additional completions per quarter.</p>
+</div>
+
+<div class="recommendation">
+  <h4>5. Measure "Quick Resolution" Separately from "Drop-Off"</h4>
+  <p>Some 15–20s calls are genuine successes — the caller asked about hours, got an answer, and left satisfied. Currently these look like failures in duration-based metrics. Consider tagging calls where the AI resolved the caller's stated intent (even briefly) as "quick resolutions" rather than drop-offs. This will give a more accurate picture of true addressable drop-off and help you track improvement on the right metric.</p>
+</div>
+
+<div class="callout callout-success">
+  <strong>Projected impact:</strong> The five recommendations above target the 289 calls concentrated in the 10–25 second range plus the 128 calls in the 35–45 second range. At conservative conversion rates (15–30% depending on the pattern), these changes could shift 60–100+ calls per quarter from early termination toward resolution — a meaningful uplift without requiring fundamental changes to the AI system.
+</div>
+
+</body>
+</html>
