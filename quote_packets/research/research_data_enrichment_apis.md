@@ -247,14 +247,14 @@ Fenris has a well-documented REST API with OAuth2 Bearer token authentication.
 
 **Returns 80+ data points including:**
 
-| Category | Fields |
-|---|---|
-| **Primary Applicant** | gender, maritalStatus, homeOwnerStatus, lengthOfResidence |
-| **Household** | numberOfGenerations, presenceOf16Or17YearOlds, age ranges of children, up to 20 hobby interests |
-| **Drivers** | Array of drivers in household: name, DOB, age, gender, maritalStatus, memberCode |
-| **Vehicles** | Array of registered vehicles: year, make, model, type, fuelType, mileage, marketValue, confidence score |
-| **Enhanced Vehicles** | VIN, registration data (when responseType="C") |
-| **Response Types** | "M" = base data, "C" = enhanced (includes VINs) |
+| Category              | Fields                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Primary Applicant** | gender, maritalStatus, homeOwnerStatus, lengthOfResidence                                               |
+| **Household**         | numberOfGenerations, presenceOf16Or17YearOlds, age ranges of children, up to 20 hobby interests         |
+| **Drivers**           | Array of drivers in household: name, DOB, age, gender, maritalStatus, memberCode                        |
+| **Vehicles**          | Array of registered vehicles: year, make, model, type, fuelType, mileage, marketValue, confidence score |
+| **Enhanced Vehicles** | VIN, registration data (when responseType="C")                                                          |
+| **Response Types**    | "M" = base data, "C" = enhanced (includes VINs)                                                         |
 
 **Status returns**: Success, Success-Restricted State, Success-No VIN, VIN Return Only, Not Found
 
