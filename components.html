@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PolicyLift — Components</title>
+  <link href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css" rel="stylesheet">
+  <style>
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #F9F9F9;
+      --card:         #ffffff;
+      --border:       #E5E5E5;
+      --border-input: #E5E5E5;
+      --text:         #111827;
+      --text-muted:   #737373;
+      --text-dim:     #737373;
+      --muted:        #F5F5F5;
+      --primary:      #111827;
+      --primary-fg:   #ffffff;
+      --green:        #12B76D;
+      --green-fg:     #ffffff;
+      --destructive:  #dc2626;
+      --shadow-xs:    0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-sm:    0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+      --radius:       8px;
+    }
+
+    body {
+      font-family: 'Geist Sans', 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      padding: 48px 64px;
+    }
+
+    h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .page-sub { color: var(--text-muted); font-size: 14px; margin-bottom: 48px; }
+
+    /* Section */
+    .section { margin-bottom: 48px; }
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+    .col { display: flex; flex-direction: column; gap: 10px; }
+
+    /* ─── BADGE ──────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1;
+      padding: 3px 9px;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    .badge-default  { background: var(--primary); color: var(--primary-fg); }
+    .badge-outline  { background: #fff; color: var(--text); border-color: var(--border); }
+    .badge-secondary{ background: var(--muted); color: var(--text-muted); }
+    .badge-success  { background: #12B76D; color: #fff; }
+    .badge-success-outline { background: #fff; color: #12B76D; border-color: #12B76D; }
+    .badge-destructive { background: var(--destructive); color: #fff; }
+    .badge-warning  { background: #f59e0b; color: #fff; }
+    .badge-blue     { background: #2563eb; color: #fff; }
+
+    /* ─── BUTTON ─────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      border: 1px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s, opacity 0.15s, box-shadow 0.15s;
+      text-decoration: none;
+    }
+    /* sizes */
+    .btn-sm  { height: 32px; padding: 0 12px; font-size: 13px; border-radius: 6px; }
+    .btn-md  { height: 38px; padding: 0 16px; }
+    .btn-lg  { height: 44px; padding: 0 24px; font-size: 15px; }
+    .btn-icon{ width: 38px; height: 38px; padding: 0; }
+    /* variants */
+    .btn-default     { background: var(--primary); color: var(--primary-fg); }
+    .btn-default:hover { background: #1f2937; }
+    .btn-primary-green { background: var(--green); color: #fff; }
+    .btn-primary-green:hover { background: #0ea560; }
+    .btn-outline     { background: #fff; color: var(--text); border-color: var(--border); box-shadow: var(--shadow-xs); }
+    .btn-outline:hover { background: var(--muted); }
+    .btn-secondary   { background: var(--muted); color: var(--text); border-color: var(--border); }
+    .btn-secondary:hover { background: #ebebeb; }
+    .btn-ghost       { background: transparent; color: var(--text); }
+    .btn-ghost:hover { background: var(--muted); }
+    .btn-destructive { background: var(--destructive); color: #fff; }
+    .btn-destructive:hover { background: #b91c1c; }
+    .btn-link        { background: transparent; color: var(--text); text-decoration: underline; text-underline-offset: 3px; padding: 0; height: auto; }
+    .btn:disabled    { opacity: 0.5; pointer-events: none; }
+
+    /* ─── TABS ───────────────────────────────── */
+    .tabs-list {
+      display: inline-flex;
+      align-items: center;
+      background: var(--muted);
+      border-radius: var(--radius);
+      padding: 3px;
+      gap: 2px;
+    }
+    .tab-trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 400;
+      font-family: inherit;
+      color: var(--text);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+    }
+    .tab-trigger:hover { background: rgba(0,0,0,0.04); }
+    .tab-trigger.active {
+      background: #fff;
+      color: var(--text);
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+    }
+
+    /* ─── INPUT ──────────────────────────────── */
+    .input-wrap { display: flex; flex-direction: column; gap: 6px; min-width: 240px; }
+    .input-label { font-size: 13px; font-weight: 500; color: var(--text); }
+    .input-hint  { font-size: 12px; color: var(--text-muted); }
+    .input {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      box-shadow: var(--shadow-xs);
+    }
+    .input::placeholder { color: var(--text-dim); }
+    .input:focus {
+      border-color: #111;
+      box-shadow: 0 0 0 3px rgb(17 24 39 / 0.1);
+    }
+    .input:disabled { background: var(--muted); opacity: 0.6; cursor: not-allowed; }
+    .input-error { border-color: var(--destructive) !important; }
+    .input-error:focus { box-shadow: 0 0 0 3px rgb(220 38 38 / 0.15) !important; }
+    .error-msg { font-size: 12px; color: var(--destructive); }
+
+    /* input with icon */
+    .input-icon-wrap { position: relative; }
+    .input-icon-wrap .input { padding-left: 36px; }
+    .input-icon-wrap .icon-left {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      color: var(--text-dim); pointer-events: none;
+    }
+
+    /* textarea */
+    .textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      resize: vertical;
+      min-height: 90px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      box-shadow: var(--shadow-xs);
+    }
+    .textarea:focus {
+      border-color: #111;
+      box-shadow: 0 0 0 3px rgb(17 24 39 / 0.1);
+    }
+    .textarea::placeholder { color: var(--text-dim); }
+
+    /* ─── CHECKBOX ───────────────────────────── */
+    .checkbox-wrap {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .checkbox-wrap input[type="checkbox"] { display: none; }
+    .checkbox-box {
+      width: 18px; height: 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.12s, border-color 0.12s;
+      box-shadow: var(--shadow-xs);
+    }
+    .checkbox-wrap input:checked + .checkbox-box {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .checkbox-wrap input:checked + .checkbox-box svg { display: block; }
+    .checkbox-box svg { display: none; }
+    .checkbox-text { font-size: 14px; color: var(--text); line-height: 1.4; }
+    .checkbox-sub  { font-size: 12px; color: var(--text-muted); }
+    .checkbox-wrap.disabled { opacity: 0.5; pointer-events: none; }
+
+    /* ─── DROPDOWN (Select) ──────────────────── */
+    .select-wrap { position: relative; min-width: 200px; }
+    .select {
+      width: 100%;
+      height: 38px;
+      padding: 0 36px 0 12px;
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      box-shadow: var(--shadow-xs);
+    }
+    .select:focus {
+      border-color: #111;
+      box-shadow: 0 0 0 3px rgb(17 24 39 / 0.1);
+    }
+    .select-chevron {
+      position: absolute; right: 10px; top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none; color: var(--text-dim);
+    }
+
+    /* ─── COMBOBOX ───────────────────────────── */
+    .combo-wrap { position: relative; min-width: 240px; }
+    .combo-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 36px 0 12px;
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      box-shadow: var(--shadow-xs);
+    }
+    .combo-input:focus {
+      border-color: #111;
+      box-shadow: 0 0 0 3px rgb(17 24 39 / 0.1);
+    }
+    .combo-input::placeholder { color: var(--text-dim); }
+    .combo-icon {
+      position: absolute; right: 10px; top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none; color: var(--text-dim);
+    }
+    .combo-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+      z-index: 50;
+      overflow: hidden;
+      display: none;
+    }
+    .combo-wrap.open .combo-dropdown { display: block; }
+    .combo-search {
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .combo-search input {
+      width: 100%;
+      height: 32px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+    }
+    .combo-list { padding: 4px; max-height: 200px; overflow-y: auto; }
+    .combo-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .combo-item:hover { background: var(--muted); }
+    .combo-item.selected { font-weight: 500; }
+    .combo-item .check { color: var(--primary); opacity: 0; }
+    .combo-item.selected .check { opacity: 1; }
+    .combo-empty { padding: 12px 10px; font-size: 13px; color: var(--text-muted); text-align: center; }
+
+    /* ─── CARD SHELL ─────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: var(--shadow-xs);
+      padding: 24px;
+    }
+    .card-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .card-desc   { font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px; }
+
+    /* grid */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } body { padding: 24px; } }
+  </style>
+</head>
+<body>
+
+  <h1>UI Components</h1>
+  <p class="page-sub">shadcn-style components — PolicyLift design system</p>
+
+  <!-- ══ BADGES ══════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">Badge</div>
+    <div class="row">
+      <span class="badge badge-default">Default</span>
+      <span class="badge badge-outline">Outline</span>
+      <span class="badge badge-secondary">Secondary</span>
+      <span class="badge badge-success">New</span>
+      <span class="badge badge-success-outline">Quote Packet Generated</span>
+      <span class="badge badge-destructive">Destructive</span>
+      <span class="badge badge-warning">Warning</span>
+      <span class="badge badge-blue">Info</span>
+    </div>
+  </div>
+
+  <!-- ══ BUTTONS ═════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">Button — Variants</div>
+    <div class="row" style="margin-bottom:12px">
+      <button class="btn btn-md btn-default">Default</button>
+      <button class="btn btn-md btn-primary-green">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Create Quote Packet
+      </button>
+      <button class="btn btn-sm btn-outline">Small Outline</button>
+      <button class="btn btn-md btn-outline">Outline</button>
+      <button class="btn btn-md btn-secondary">Secondary</button>
+      <button class="btn btn-md btn-ghost">Ghost</button>
+      <button class="btn btn-md btn-destructive">Destructive</button>
+      <button class="btn btn-link">Link</button>
+    </div>
+
+    <div class="section-label" style="margin-top:20px">Button — Sizes</div>
+    <div class="row" style="align-items:center">
+      <button class="btn btn-sm btn-default">Small</button>
+      <button class="btn btn-sm btn-outline">Small Outline</button>
+      <button class="btn btn-md btn-default">Medium</button>
+      <button class="btn btn-lg btn-default">Large</button>
+      <button class="btn btn-icon btn-outline">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <button class="btn btn-md btn-default" disabled>Disabled</button>
+    </div>
+  </div>
+
+  <!-- ══ TABS ════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">Tabs</div>
+    <div class="col">
+      <div class="tabs-list" id="tabs1">
+        <button class="tab-trigger active" onclick="setTab('tabs1',this)">My Work</button>
+        <button class="tab-trigger" onclick="setTab('tabs1',this)">Unassigned</button>
+        <button class="tab-trigger" onclick="setTab('tabs1',this)">All</button>
+      </div>
+      <div class="tabs-list" id="tabs2">
+        <button class="tab-trigger active" onclick="setTab('tabs2',this)">Overview</button>
+        <button class="tab-trigger" onclick="setTab('tabs2',this)">Conversations</button>
+        <button class="tab-trigger" onclick="setTab('tabs2',this)">Quote Packets</button>
+        <button class="tab-trigger" onclick="setTab('tabs2',this)">Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ INPUTS ══════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">Input</div>
+    <div class="grid-2">
+
+      <div class="input-wrap">
+        <label class="input-label">Default</label>
+        <input class="input" type="text" placeholder="Enter value…">
+      </div>
+
+      <div class="input-wrap">
+        <label class="input-label">With hint</label>
+        <input class="input" type="text" placeholder="e.g. john@example.com">
+        <span class="input-hint">We'll never share your email.</span>
+      </div>
+
+      <div class="input-wrap">
+        <label class="input-label">With icon</label>
+        <div class="input-icon-wrap">
+          <svg class="icon-left" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="input" type="text" placeholder="Search…">
+        </div>
+      </div>
+
+      <div class="input-wrap">
+        <label class="input-label">Error state</label>
+        <input class="input input-error" type="text" value="invalid@">
+        <span class="error-msg">Enter a valid email address.</span>
+      </div>
+
+      <div class="input-wrap">
+        <label class="input-label">Disabled</label>
+        <input class="input" type="text" placeholder="Not editable" disabled>
+      </div>
+
+      <div class="input-wrap">
+        <label class="input-label">Textarea</label>
+        <textarea class="textarea" placeholder="Enter a description…"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ CHECKBOX ════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">Checkbox</div>
+    <div class="col">
+
+      <label class="checkbox-wrap">
+        <input type="checkbox">
+        <div class="checkbox-box">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg>
+        </div>
+        <div>
+          <div class="checkbox-text">Unchecked</div>
+        </div>
+      </label>
+
+      <label class="checkbox-wrap">
+        <input type="checkbox" checked>
+        <div class="checkbox-box">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg>
+        </div>
+        <div>
+          <div class="checkbox-text">Checked</div>
+          <div class="checkbox-sub">This option is selected by default.</div>
+        </div>
+      </label>
+
+      <label class="checkbox-wrap disabled">
+        <input type="checkbox" disabled>
+        <div class="checkbox-box">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5 6 4.5 9 10.5 3"/></svg>
+        </div>
+        <div>
+          <div class="checkbox-text">Disabled</div>
+        </div>
+      </label>
+
+    </div>
+  </div>
+
+  <!-- ══ DROPDOWN (Select) ═══════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">Dropdown / Select</div>
+    <div class="row" style="align-items:flex-end">
+
+      <div class="input-wrap">
+        <label class="input-label">Insurance Type</label>
+        <div class="select-wrap">
+          <select class="select">
+            <option value="" disabled selected>Select type…</option>
+            <option>Auto Insurance</option>
+            <option>Home Insurance</option>
+            <option>Life Insurance</option>
+            <option>Commercial Insurance</option>
+          </select>
+          <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+
+      <div class="input-wrap">
+        <label class="input-label">Status</label>
+        <div class="select-wrap">
+          <select class="select">
+            <option>All Statuses</option>
+            <option>New</option>
+            <option>In Progress</option>
+            <option>Completed</option>
+            <option>Cancelled</option>
+          </select>
+          <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ COMBOBOX ════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">Combobox</div>
+    <div class="row" style="align-items:flex-end">
+
+      <div class="input-wrap">
+        <label class="input-label">Select Agent</label>
+        <div class="combo-wrap" id="combo1">
+          <input class="combo-input" readonly placeholder="Select agent…" onclick="toggleCombo('combo1')" id="combo1-input">
+          <svg class="combo-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          <div class="combo-dropdown">
+            <div class="combo-list">
+              <div class="combo-item" onclick="selectCombo('combo1','Tanya Mau')">
+                <svg class="check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Tanya Mau
+              </div>
+              <div class="combo-item" onclick="selectCombo('combo1','Raghav Bansal')">
+                <svg class="check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Raghav Bansal
+              </div>
+              <div class="combo-item" onclick="selectCombo('combo1','Sarah Johnson')">
+                <svg class="check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Sarah Johnson
+              </div>
+              <div class="combo-item" onclick="selectCombo('combo1','David Thompson')">
+                <svg class="check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                David Thompson
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-wrap">
+        <label class="input-label">Select with search</label>
+        <div class="combo-wrap" id="combo2">
+          <input class="combo-input" readonly placeholder="Select insurance type…" onclick="toggleCombo('combo2')" id="combo2-input">
+          <svg class="combo-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          <div class="combo-dropdown">
+            <div class="combo-search">
+              <input type="text" placeholder="Search…" oninput="filterCombo('combo2', this.value)">
+            </div>
+            <div class="combo-list" id="combo2-list">
+              <div class="combo-item" onclick="selectCombo('combo2','Auto Insurance')">
+                <svg class="check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Auto Insurance
+              </div>
+              <div class="combo-item" onclick="selectCombo('combo2','Home Insurance')">
+                <svg class="check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Home Insurance
+              </div>
+              <div class="combo-item" onclick="selectCombo('combo2','Life Insurance')">
+                <svg class="check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Life Insurance
+              </div>
+              <div class="combo-item" onclick="selectCombo('combo2','Commercial Auto')">
+                <svg class="check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Commercial Auto
+              </div>
+              <div class="combo-item" onclick="selectCombo('combo2','Personal Auto')">
+                <svg class="check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Personal Auto
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+<script>
+  /* ── Tabs ── */
+  function setTab(groupId, el) {
+    document.querySelectorAll('#' + groupId + ' .tab-trigger').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  /* ── Checkbox ── */
+  document.querySelectorAll('.checkbox-wrap').forEach(wrap => {
+    wrap.addEventListener('click', () => {
+      const cb = wrap.querySelector('input[type="checkbox"]');
+      if (!cb.disabled) cb.checked = !cb.checked;
+    });
+  });
+
+  /* ── Combobox ── */
+  function toggleCombo(id) {
+    const wrap = document.getElementById(id);
+    const isOpen = wrap.classList.contains('open');
+    document.querySelectorAll('.combo-wrap').forEach(w => w.classList.remove('open'));
+    if (!isOpen) wrap.classList.add('open');
+  }
+  function selectCombo(id, value) {
+    const wrap = document.getElementById(id);
+    document.getElementById(id + '-input').value = value;
+    wrap.querySelectorAll('.combo-item').forEach(item => {
+      item.classList.toggle('selected', item.textContent.trim() === value);
+    });
+    wrap.classList.remove('open');
+  }
+  function filterCombo(id, query) {
+    const list = document.getElementById(id + '-list');
+    let hasResults = false;
+    list.querySelectorAll('.combo-item').forEach(item => {
+      const match = item.textContent.trim().toLowerCase().includes(query.toLowerCase());
+      item.style.display = match ? '' : 'none';
+      if (match) hasResults = true;
+    });
+    let empty = list.querySelector('.combo-empty');
+    if (!hasResults) {
+      if (!empty) { empty = document.createElement('div'); empty.className = 'combo-empty'; empty.textContent = 'No results found.'; list.appendChild(empty); }
+      empty.style.display = '';
+    } else if (empty) { empty.style.display = 'none'; }
+  }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.combo-wrap')) {
+      document.querySelectorAll('.combo-wrap').forEach(w => w.classList.remove('open'));
+    }
+  });
+</script>
+</html>
