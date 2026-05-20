@@ -29,6 +29,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ?compacter: dividers only between visible rows (filter-aware) */
+    .compacter-container .quote-card:not(.hidden) + .quote-card:not(.hidden) {
+      border-top: 1px solid #e5e7eb;
+    }
+  </style>
 </head>
 <body class="bg-white text-gray-900 font-sans antialiased">
 
@@ -143,11 +150,13 @@
     const filterClear = document.getElementById('filter-clear');
     const noResults   = document.getElementById('no-results');
 
-    // ?short → demo a small-agency setup: fewer cards + filter hidden
-    // ?compact → tighter cards (no description, chevron-right indicator)
-    const params    = new URLSearchParams(window.location.search);
-    const isShort   = params.has('short');
-    const isCompact = params.has('compact');
+    // ?short     → demo a small-agency setup: fewer cards + filter hidden
+    // ?compact   → tighter cards (no description, chevron-right indicator)
+    // ?compacter → grouped list rows (combined card per category, internal dividers)
+    const params      = new URLSearchParams(window.location.search);
+    const isShort     = params.has('short');
+    const isCompact   = params.has('compact');
+    const isCompacter = params.has('compacter');
 
     const SHORT_TITLES = new Set([
       'Personal Auto', 'Personal Home', 'Personal Renters', 'Personal Condo', 'Personal Umbrella',
@@ -170,9 +179,37 @@
       if (items.length === 0) return '';
       // Featured items get a green border to make them visually prominent
       const borderClass = cat.id === 'featured' ? 'border border-green-5' : 'border';
+      const heading = `<h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 px-1">${cat.label}</h2>`;
+
+      // Compacter: one bordered container per category, rows separated by dividers
+      if (isCompacter) {
+        return `
+          <section data-category="${cat.id}">
+            ${heading}
+            <div class="${borderClass} rounded-lg overflow-hidden bg-white compacter-container">
+              ${items.map(t => `
+                <a
+                  class="quote-card flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                  href="#"
+                  data-title="${t.title.toLowerCase()}"
+                  data-desc="${t.desc.toLowerCase()}"
+                >
+                  <span class="shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
+                    <i data-lucide="${t.icon}" class="h-4 w-4 text-gray-600" style="stroke-width:1.5"></i>
+                  </span>
+                  <span class="flex-1 min-w-0 font-semibold text-sm text-gray-900">${t.title}</span>
+                  <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400 shrink-0"></i>
+                </a>
+              `).join('')}
+            </div>
+          </section>
+        `;
+      }
+
+      // Default / compact: each item is its own bordered card
       return `
         <section data-category="${cat.id}">
-          <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 px-1">${cat.label}</h2>
+          ${heading}
           <div class="space-y-3">
             ${items.map(t => `
               <a
