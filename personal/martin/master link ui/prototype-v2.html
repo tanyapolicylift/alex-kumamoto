@@ -150,7 +150,7 @@
       const items = quoteTypes.filter(t => t.category === cat.id);
       if (items.length === 0) return '';
       // Featured items get a green border to make them visually prominent
-      const borderClass = cat.id === 'featured' ? 'border border-primary' : 'border';
+      const borderClass = cat.id === 'featured' ? 'border border-green-5' : 'border';
       return `
         <section data-category="${cat.id}">
           <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 px-1">${cat.label}</h2>
