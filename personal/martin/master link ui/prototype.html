@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Get a Quote | Acme Insurance Agency</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:  '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+            },
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* Placeholder hero — sage / pine gradient evoking the forest header image.
+       Replace with the agency's actual portal-header.jpg if desired. */
+    .hero-bg {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.25) 100%),
+        radial-gradient(ellipse at 30% 20%, #cfe0cf 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 80%, #a9c2a9 0%, transparent 60%),
+        linear-gradient(135deg, #b9cdbf 0%, #8aa890 60%, #5f7d68 100%);
+    }
+    /* Subtle card hover */
+    .quote-card {
+      transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+    }
+    .quote-card:hover {
+      border-color: #10b981;
+      box-shadow: 0 1px 2px rgba(16,185,129,0.06), 0 4px 12px rgba(16,185,129,0.06);
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900 font-sans antialiased">
+
+  <!-- Mobile header -->
+  <header class="md:hidden flex items-center justify-between px-4 py-3 border-b border-gray-200">
+    <div class="flex items-center gap-2 min-w-0">
+      <span class="inline-flex h-7 w-7 items-center justify-center rounded-md bg-brand-500 text-white">
+        <i data-lucide="shield-check" class="h-4 w-4"></i>
+      </span>
+      <span class="text-sm font-semibold text-slate-800 truncate">Acme Insurance Agency</span>
+    </div>
+    <div class="flex items-center gap-1 text-sm shrink-0">
+      <a class="px-2 py-1 rounded bg-brand-500 text-white" href="#">EN</a>
+      <span class="text-gray-400">|</span>
+      <a class="px-2 py-1 rounded text-gray-500 hover:text-gray-900" href="#">ES</a>
+    </div>
+  </header>
+
+  <!-- Desktop hero header -->
+  <header class="hidden md:flex relative h-48 items-center justify-center gap-3 px-4 hero-bg">
+    <div class="absolute top-3 right-3 flex items-center gap-1 text-sm">
+      <a class="px-2 py-1 rounded bg-brand-500 text-white" href="#">EN</a>
+      <span class="text-white/70">|</span>
+      <a class="px-2 py-1 rounded bg-white/70 text-gray-700 hover:bg-white" href="#">ES</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-white shadow-sm">
+        <i data-lucide="shield-check" class="h-7 w-7 text-brand-500"></i>
+      </span>
+      <span class="text-xl font-semibold text-slate-800">Acme Insurance Agency</span>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="max-w-2xl mx-auto px-4 py-10 md:py-12">
+    <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">Get a Quote</h1>
+    <p class="mt-2 text-gray-500">Select your insurance type to get started.</p>
+
+    <ul class="mt-8 space-y-3" id="quote-list">
+      <!-- cards injected here -->
+    </ul>
+  </main>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    const quoteTypes = [
+      { icon: 'car',           title: 'Auto Insurance',         desc: 'Personal auto insurance quote.' },
+      { icon: 'shield-check',  title: 'Extended Personal Auto', desc: 'Personal auto quotes.' },
+      { icon: 'car-front',     title: 'Personal Auto',          desc: 'Personal auto quote template.' },
+      { icon: 'sailboat',      title: 'Personal Boat',          desc: 'Personal boat / watercraft quote template.' },
+      { icon: 'building-2',    title: 'Personal Condo',         desc: 'Personal condo (HO-6) quote template.' },
+      { icon: 'flame',         title: 'Personal Dwelling Fire', desc: 'Personal dwelling fire (DP-1 / DP-3) quote template, typically for rental, seasonal, or vacant properties.' },
+      { icon: 'waves',         title: 'Personal Flood',         desc: 'Personal flood (NFIP / private flood) quote template.' },
+      { icon: 'house',         title: 'Personal Home',          desc: 'Personal homeowners quote template.' },
+      { icon: 'bike',          title: 'Personal Motorcycle',    desc: 'Personal motorcycle quote template.' },
+      { icon: 'key-round',     title: 'Personal Renters',       desc: 'Personal renters (HO-4) quote template.' },
+      { icon: 'caravan',       title: 'Personal RV',            desc: 'Personal recreational vehicle (RV / motorhome / travel trailer) quote template.' },
+      { icon: 'umbrella',      title: 'Personal Umbrella',      desc: 'Personal umbrella liability quote template.' },
+    ];
+
+    const list = document.getElementById('quote-list');
+    list.innerHTML = quoteTypes.map(t => `
+      <li>
+        <a href="#" class="block">
+          <div class="quote-card border border-gray-200 rounded-lg p-4 min-h-[76px] flex items-center gap-4 bg-white">
+            <span class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md bg-brand-50 text-brand-600">
+              <i data-lucide="${t.icon}" class="h-5 w-5"></i>
+            </span>
+            <div class="min-w-0">
+              <p class="font-semibold text-base leading-tight text-gray-900">${t.title}</p>
+              <p class="mt-0.5 text-sm text-gray-500 leading-snug">${t.desc}</p>
+            </div>
+          </div>
+        </a>
+      </li>
+    `).join('');
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>
