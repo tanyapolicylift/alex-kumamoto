@@ -198,7 +198,7 @@
             <div class="${containerClass} rounded-lg overflow-hidden bg-white">
               ${items.map(t => `
                 <a
-                  class="quote-card flex items-center gap-3 px-4 py-3 min-h-[76px] transition-all duration-300 hover:bg-gray-50"
+                  class="quote-card flex items-center gap-3 px-4 py-3 min-h-[60px] transition-all duration-300 hover:bg-gray-50"
                   href="#"
                   data-title="${t.title.toLowerCase()}"
                   data-desc="${t.desc.toLowerCase()}"
@@ -206,10 +206,8 @@
                   <div class="shrink-0">
                     <i data-lucide="${t.icon}" class="h-6 w-6 text-green-5" style="stroke-width:1.5"></i>
                   </div>
-                  <div>
-                    <p class="font-semibold text-base leading-normal text-gray-900">${t.title}</p>
-                    <p class="text-sm font-normal leading-5 text-gray-9">${t.desc}</p>
-                  </div>
+                  <p class="flex-1 min-w-0 font-semibold text-base leading-normal text-gray-900">${t.title}</p>
+                  <i data-lucide="chevron-right" class="h-5 w-5 text-gray-400 shrink-0"></i>
                 </a>
               `).join('')}
             </div>
