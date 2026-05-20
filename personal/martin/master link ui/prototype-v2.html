@@ -65,13 +65,37 @@
 
     <!-- Main content -->
     <div class="flex-1 flex flex-col px-6 pt-[46px] pb-4 max-w-lg mx-auto w-full">
-      <div class="mb-8">
+      <div class="mb-6">
         <h1 class="text-4xl font-bold leading-10 text-slate-800 mb-2">Get a Quote</h1>
         <p class="text-sm font-normal leading-5 text-gray-9">Select your insurance type to get started.</p>
       </div>
 
-      <div class="space-y-3" id="quote-list">
-        <!-- cards injected here -->
+      <!-- Filter -->
+      <div class="relative mb-6">
+        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"></i>
+        <input
+          type="text"
+          id="filter-input"
+          placeholder="Search coverage types..."
+          class="w-full rounded-lg border border-gray-200 bg-white pl-10 pr-10 py-3 text-sm placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+        />
+        <button
+          type="button"
+          id="filter-clear"
+          aria-label="Clear search"
+          style="display:none;"
+          class="absolute right-3 top-1/2 -translate-y-1/2 inline-flex h-5 w-5 items-center justify-center rounded text-gray-400 hover:text-gray-600"
+        >
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+
+      <!-- Grouped sections -->
+      <div class="space-y-6" id="quote-sections"></div>
+
+      <!-- Empty state -->
+      <div id="no-results" class="hidden text-center text-sm text-gray-9 py-8">
+        No matches found.
       </div>
     </div>
 
@@ -91,37 +115,97 @@
 
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
-    const quoteTypes = [
-      { icon: 'car',          title: 'Auto Insurance',         desc: 'Personal auto insurance quote.' },
-      { icon: 'shield-check', title: 'Extended Personal Auto', desc: 'Personal auto quotes.' },
-      { icon: 'car-front',    title: 'Personal Auto',          desc: 'Personal auto quote template.' },
-      { icon: 'sailboat',     title: 'Personal Boat',          desc: 'Personal boat / watercraft quote template.' },
-      { icon: 'building-2',   title: 'Personal Condo',         desc: 'Personal condo (HO-6) quote template.' },
-      { icon: 'flame',        title: 'Personal Dwelling Fire', desc: 'Personal dwelling fire (DP-1 / DP-3) quote template, typically for rental, seasonal, or vacant properties.' },
-      { icon: 'waves',        title: 'Personal Flood',         desc: 'Personal flood (NFIP / private flood) quote template.' },
-      { icon: 'house',        title: 'Personal Home',          desc: 'Personal homeowners quote template.' },
-      { icon: 'bike',         title: 'Personal Motorcycle',    desc: 'Personal motorcycle quote template.' },
-      { icon: 'key-round',    title: 'Personal Renters',       desc: 'Personal renters (HO-4) quote template.' },
-      { icon: 'caravan',      title: 'Personal RV',            desc: 'Personal recreational vehicle (RV / motorhome / travel trailer) quote template.' },
-      { icon: 'umbrella',     title: 'Personal Umbrella',      desc: 'Personal umbrella liability quote template.' },
-      { icon: 'shield',       title: 'Test',                   desc: '' },
+    const categories = [
+      { id: 'featured', label: 'Most Common' },
+      { id: 'vehicles', label: 'Vehicles' },
+      { id: 'property', label: 'Property' },
+      { id: 'other',    label: 'Other' },
     ];
 
-    document.getElementById('quote-list').innerHTML = quoteTypes.map(t => `
-      <a class="block [&>div]:min-h-[76px] [&>div]:flex [&>div]:items-center" href="#">
-        <div class="border rounded-lg py-3 px-4 transition-all duration-300 hover:bg-gray-50">
-          <div class="flex items-center gap-3 w-full text-left">
-            <div class="shrink-0">
-              <i data-lucide="${t.icon}" class="h-6 w-6 text-green-5" style="stroke-width:1.5"></i>
-            </div>
-            <div>
-              <p class="font-semibold text-base leading-normal text-gray-900">${t.title}</p>
-              <p class="text-sm font-normal leading-5 text-gray-9">${t.desc}</p>
-            </div>
+    // Each item belongs to exactly one category (move, not duplicate).
+    // To pin an item to "Most Common", set its category to 'featured'.
+    const quoteTypes = [
+      { icon: 'car',          title: 'Auto Insurance',         desc: 'Personal auto insurance quote.',                                                                                                category: 'featured' },
+      { icon: 'house',        title: 'Personal Home',          desc: 'Personal homeowners quote template.',                                                                                           category: 'featured' },
+      { icon: 'shield-check', title: 'Extended Personal Auto', desc: 'Personal auto quotes.',                                                                                                         category: 'vehicles' },
+      { icon: 'car-front',    title: 'Personal Auto',          desc: 'Personal auto quote template.',                                                                                                 category: 'vehicles' },
+      { icon: 'sailboat',     title: 'Personal Boat',          desc: 'Personal boat / watercraft quote template.',                                                                                    category: 'vehicles' },
+      { icon: 'bike',         title: 'Personal Motorcycle',    desc: 'Personal motorcycle quote template.',                                                                                           category: 'vehicles' },
+      { icon: 'caravan',      title: 'Personal RV',            desc: 'Personal recreational vehicle (RV / motorhome / travel trailer) quote template.',                                               category: 'vehicles' },
+      { icon: 'building-2',   title: 'Personal Condo',         desc: 'Personal condo (HO-6) quote template.',                                                                                         category: 'property' },
+      { icon: 'flame',        title: 'Personal Dwelling Fire', desc: 'Personal dwelling fire (DP-1 / DP-3) quote template, typically for rental, seasonal, or vacant properties.',                    category: 'property' },
+      { icon: 'waves',        title: 'Personal Flood',         desc: 'Personal flood (NFIP / private flood) quote template.',                                                                         category: 'property' },
+      { icon: 'key-round',    title: 'Personal Renters',       desc: 'Personal renters (HO-4) quote template.',                                                                                       category: 'property' },
+      { icon: 'umbrella',     title: 'Personal Umbrella',      desc: 'Personal umbrella liability quote template.',                                                                                   category: 'other'    },
+      { icon: 'shield',       title: 'Test',                   desc: '',                                                                                                                              category: 'other'    },
+    ];
+
+    const sectionsEl  = document.getElementById('quote-sections');
+    const filterInput = document.getElementById('filter-input');
+    const filterClear = document.getElementById('filter-clear');
+    const noResults   = document.getElementById('no-results');
+
+    // Render category sections (skip categories that have zero items)
+    sectionsEl.innerHTML = categories.map(cat => {
+      const items = quoteTypes.filter(t => t.category === cat.id);
+      if (items.length === 0) return '';
+      return `
+        <section data-category="${cat.id}">
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 px-1">${cat.label}</h2>
+          <div class="space-y-3">
+            ${items.map(t => `
+              <a
+                class="quote-card block [&>div]:min-h-[76px] [&>div]:flex [&>div]:items-center"
+                href="#"
+                data-title="${t.title.toLowerCase()}"
+                data-desc="${t.desc.toLowerCase()}"
+              >
+                <div class="border rounded-lg py-3 px-4 transition-all duration-300 hover:bg-gray-50">
+                  <div class="flex items-center gap-3 w-full text-left">
+                    <div class="shrink-0">
+                      <i data-lucide="${t.icon}" class="h-6 w-6 text-green-5" style="stroke-width:1.5"></i>
+                    </div>
+                    <div>
+                      <p class="font-semibold text-base leading-normal text-gray-900">${t.title}</p>
+                      <p class="text-sm font-normal leading-5 text-gray-9">${t.desc}</p>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            `).join('')}
           </div>
-        </div>
-      </a>
-    `).join('');
+        </section>
+      `;
+    }).join('');
+
+    // Filter: hide non-matching cards; collapse empty categories; show empty-state if nothing matches.
+    function applyFilter() {
+      const q = filterInput.value.trim().toLowerCase();
+      filterClear.style.display = q ? 'inline-flex' : 'none';
+
+      let anyVisible = false;
+      document.querySelectorAll('.quote-card').forEach(card => {
+        const title = card.dataset.title;
+        const desc  = card.dataset.desc;
+        const match = !q || title.includes(q) || desc.includes(q);
+        card.classList.toggle('hidden', !match);
+        if (match) anyVisible = true;
+      });
+
+      document.querySelectorAll('[data-category]').forEach(section => {
+        const visible = section.querySelectorAll('.quote-card:not(.hidden)').length;
+        section.classList.toggle('hidden', visible === 0);
+      });
+
+      noResults.classList.toggle('hidden', anyVisible);
+    }
+
+    filterInput.addEventListener('input', applyFilter);
+    filterClear.addEventListener('click', () => {
+      filterInput.value = '';
+      applyFilter();
+      filterInput.focus();
+    });
 
     lucide.createIcons();
   </script>
