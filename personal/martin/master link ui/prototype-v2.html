@@ -149,6 +149,8 @@
     sectionsEl.innerHTML = categories.map(cat => {
       const items = quoteTypes.filter(t => t.category === cat.id);
       if (items.length === 0) return '';
+      // Featured items get a green border to make them visually prominent
+      const borderClass = cat.id === 'featured' ? 'border border-primary' : 'border';
       return `
         <section data-category="${cat.id}">
           <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 px-1">${cat.label}</h2>
@@ -160,7 +162,7 @@
                 data-title="${t.title.toLowerCase()}"
                 data-desc="${t.desc.toLowerCase()}"
               >
-                <div class="border rounded-lg py-3 px-4 transition-all duration-300 hover:bg-gray-50">
+                <div class="${borderClass} rounded-lg py-3 px-4 transition-all duration-300 hover:bg-gray-50">
                   <div class="flex items-center gap-3 w-full text-left">
                     <div class="shrink-0">
                       <i data-lucide="${t.icon}" class="h-6 w-6 text-green-5" style="stroke-width:1.5"></i>
