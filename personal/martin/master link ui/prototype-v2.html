@@ -130,9 +130,9 @@
       { icon: 'shield-check', title: 'Extended Personal Auto', desc: 'Personal auto quotes.',                                                                                                         category: 'vehicles' },
       { icon: 'sailboat',     title: 'Personal Boat',          desc: 'Personal boat / watercraft quote template.',                                                                                    category: 'vehicles' },
       { icon: 'bike',         title: 'Personal Motorcycle',    desc: 'Personal motorcycle quote template.',                                                                                           category: 'vehicles' },
-      { icon: 'caravan',      title: 'Personal RV',            desc: 'Personal recreational vehicle (RV / motorhome / travel trailer) quote template.',                                               category: 'vehicles' },
+      { icon: 'caravan',      title: 'Personal RV',            desc: 'Personal RV / motorhome / travel trailer template.',                                                                            category: 'vehicles' },
       { icon: 'building-2',   title: 'Personal Condo',         desc: 'Personal condo (HO-6) quote template.',                                                                                         category: 'property' },
-      { icon: 'flame',        title: 'Personal Dwelling Fire', desc: 'Personal dwelling fire (DP-1 / DP-3) quote template, typically for rental, seasonal, or vacant properties.',                    category: 'property' },
+      { icon: 'flame',        title: 'Personal Dwelling Fire', desc: 'Personal DP-1 / DP-3 — rental, seasonal, or vacant homes.',                                                                     category: 'property' },
       { icon: 'waves',        title: 'Personal Flood',         desc: 'Personal flood (NFIP / private flood) quote template.',                                                                         category: 'property' },
       { icon: 'key-round',    title: 'Personal Renters',       desc: 'Personal renters (HO-4) quote template.',                                                                                       category: 'property' },
       { icon: 'umbrella',     title: 'Personal Umbrella',      desc: 'Personal umbrella liability quote template.',                                                                                   category: 'other'    },
@@ -143,9 +143,22 @@
     const filterClear = document.getElementById('filter-clear');
     const noResults   = document.getElementById('no-results');
 
+    // ?short → demo a small-agency setup: fewer cards + filter hidden
+    const isShort = new URLSearchParams(window.location.search).has('short');
+    const SHORT_TITLES = new Set([
+      'Personal Auto', 'Personal Home', 'Personal Renters', 'Personal Condo', 'Personal Umbrella',
+    ]);
+    const visibleTypes = isShort
+      ? quoteTypes.filter(t => SHORT_TITLES.has(t.title))
+      : quoteTypes;
+
+    if (isShort) {
+      filterInput.parentElement.style.display = 'none';
+    }
+
     // Render category sections (skip categories that have zero items)
     sectionsEl.innerHTML = categories.map(cat => {
-      const items = quoteTypes.filter(t => t.category === cat.id);
+      const items = visibleTypes.filter(t => t.category === cat.id);
       if (items.length === 0) return '';
       // Featured items get a green border to make them visually prominent
       const borderClass = cat.id === 'featured' ? 'border border-green-5' : 'border';
