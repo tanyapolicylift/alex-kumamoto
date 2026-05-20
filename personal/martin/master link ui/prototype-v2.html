@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quote | Acme Insurance Agency</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // Tokens pulled from the original page CSS
+            primary: '#12b76d',
+            'primary-foreground': '#f8fafc',
+            'muted-foreground': '#737373',
+            'gray-9': '#6b7280',
+            'green-5': '#22c55e',
+          },
+          fontFamily: {
+            sans: ['Geist', 'Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-white text-gray-900 font-sans antialiased">
+
+  <div class="flex flex-col min-h-screen">
+
+    <!-- Mobile header -->
+    <header class="md:hidden bg-white border-b border-gray-200 shadow-xs h-14 flex items-center justify-between px-4">
+      <div class="flex items-center gap-2 min-w-0">
+        <img src="./logo.webp" alt="Acme Insurance Agency logo" class="max-h-7 w-auto rounded object-contain" />
+        <span class="text-sm font-semibold text-slate-800 truncate">Acme Insurance Agency</span>
+      </div>
+      <div class="flex items-center gap-1 text-sm shrink-0">
+        <a class="px-2 py-1 rounded bg-primary text-primary-foreground" href="#">EN</a>
+        <span class="text-muted-foreground">|</span>
+        <a class="px-2 py-1 rounded text-muted-foreground hover:text-gray-900" href="#">ES</a>
+      </div>
+    </header>
+
+    <!-- Desktop hero header -->
+    <header
+      class="hidden md:flex relative h-48 items-center justify-center gap-3 px-4 bg-cover bg-center"
+      style="background-image: url('./portal-header.jpg');"
+    >
+      <div class="absolute top-3 right-3 flex items-center gap-1 text-sm">
+        <a class="px-2 py-1 rounded bg-primary text-primary-foreground" href="#">EN</a>
+        <span class="text-muted-foreground">|</span>
+        <a class="px-2 py-1 rounded text-muted-foreground hover:text-gray-900 bg-white/60" href="#">ES</a>
+      </div>
+      <div class="flex items-center gap-3">
+        <img src="./logo.webp" alt="Acme Insurance Agency logo" class="max-h-12 w-auto rounded object-contain" />
+        <span class="text-xl font-semibold text-slate-800">Acme Insurance Agency</span>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col px-6 pt-[46px] pb-4 max-w-lg mx-auto w-full">
+      <div class="mb-8">
+        <h1 class="text-4xl font-bold leading-10 text-slate-800 mb-2">Get a Quote</h1>
+        <p class="text-sm font-normal leading-5 text-gray-9">Select your insurance type to get started.</p>
+      </div>
+
+      <div class="space-y-3" id="quote-list">
+        <!-- cards injected here -->
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-4 pb-8">
+      <div class="text-center text-xs leading-4 sm:text-sm sm:leading-normal font-normal text-gray-400 space-y-1">
+        <p>Your data is encrypted and secure.</p>
+        <p>By continuing, you agree to our <a href="https://www.policylift.ai/legal/terms-of-service" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</p>
+        <div class="flex justify-center gap-4 sm:gap-12 pt-1">
+          <a href="mailto:support@policylift.ai" class="underline">Need help?</a>
+          <a href="https://www.policylift.ai/legal/privacy-policy" target="_blank" rel="noopener noreferrer" class="underline">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    const quoteTypes = [
+      { icon: 'car',          title: 'Auto Insurance',         desc: 'Personal auto insurance quote.' },
+      { icon: 'shield-check', title: 'Extended Personal Auto', desc: 'Personal auto quotes.' },
+      { icon: 'car-front',    title: 'Personal Auto',          desc: 'Personal auto quote template.' },
+      { icon: 'sailboat',     title: 'Personal Boat',          desc: 'Personal boat / watercraft quote template.' },
+      { icon: 'building-2',   title: 'Personal Condo',         desc: 'Personal condo (HO-6) quote template.' },
+      { icon: 'flame',        title: 'Personal Dwelling Fire', desc: 'Personal dwelling fire (DP-1 / DP-3) quote template, typically for rental, seasonal, or vacant properties.' },
+      { icon: 'waves',        title: 'Personal Flood',         desc: 'Personal flood (NFIP / private flood) quote template.' },
+      { icon: 'house',        title: 'Personal Home',          desc: 'Personal homeowners quote template.' },
+      { icon: 'bike',         title: 'Personal Motorcycle',    desc: 'Personal motorcycle quote template.' },
+      { icon: 'key-round',    title: 'Personal Renters',       desc: 'Personal renters (HO-4) quote template.' },
+      { icon: 'caravan',      title: 'Personal RV',            desc: 'Personal recreational vehicle (RV / motorhome / travel trailer) quote template.' },
+      { icon: 'umbrella',     title: 'Personal Umbrella',      desc: 'Personal umbrella liability quote template.' },
+      { icon: 'shield',       title: 'Test',                   desc: '' },
+    ];
+
+    document.getElementById('quote-list').innerHTML = quoteTypes.map(t => `
+      <a class="block [&>div]:min-h-[76px] [&>div]:flex [&>div]:items-center" href="#">
+        <div class="border rounded-lg py-3 px-4 transition-all duration-300 hover:bg-gray-50">
+          <div class="flex items-center gap-3 w-full text-left">
+            <div class="shrink-0">
+              <i data-lucide="${t.icon}" class="h-6 w-6 text-green-5" style="stroke-width:1.5"></i>
+            </div>
+            <div>
+              <p class="font-semibold text-base leading-normal text-gray-900">${t.title}</p>
+              <p class="text-sm font-normal leading-5 text-gray-9">${t.desc}</p>
+            </div>
+          </div>
+        </div>
+      </a>
+    `).join('');
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>
