@@ -75,6 +75,18 @@
       </div>
     </div>
 
+    <!-- Footer -->
+    <div class="px-4 pb-8">
+      <div class="text-center text-xs leading-4 sm:text-sm sm:leading-normal font-normal text-gray-400 space-y-1">
+        <p>Your data is encrypted and secure.</p>
+        <p>By continuing, you agree to our <a href="https://www.policylift.ai/legal/terms-of-service" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</p>
+        <div class="flex justify-center gap-4 sm:gap-12 pt-1">
+          <a href="mailto:support@policylift.ai" class="underline">Need help?</a>
+          <a href="https://www.policylift.ai/legal/privacy-policy" target="_blank" rel="noopener noreferrer" class="underline">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -92,6 +104,7 @@
       { icon: 'key-round',    title: 'Personal Renters',       desc: 'Personal renters (HO-4) quote template.' },
       { icon: 'caravan',      title: 'Personal RV',            desc: 'Personal recreational vehicle (RV / motorhome / travel trailer) quote template.' },
       { icon: 'umbrella',     title: 'Personal Umbrella',      desc: 'Personal umbrella liability quote template.' },
+      { icon: 'shield',       title: 'Test',                   desc: '' },
     ];
 
     document.getElementById('quote-list').innerHTML = quoteTypes.map(t => `
