@@ -144,7 +144,11 @@
     const noResults   = document.getElementById('no-results');
 
     // ?short → demo a small-agency setup: fewer cards + filter hidden
-    const isShort = new URLSearchParams(window.location.search).has('short');
+    // ?compact → tighter cards (no description, chevron-right indicator)
+    const params    = new URLSearchParams(window.location.search);
+    const isShort   = params.has('short');
+    const isCompact = params.has('compact');
+
     const SHORT_TITLES = new Set([
       'Personal Auto', 'Personal Home', 'Personal Renters', 'Personal Condo', 'Personal Umbrella',
     ]);
@@ -155,6 +159,10 @@
     if (isShort) {
       filterInput.parentElement.style.display = 'none';
     }
+
+    // Compact mode swaps card sizing + drops description + adds chevron
+    const cardMinH    = isCompact ? '[&>div]:min-h-[56px]' : '[&>div]:min-h-[76px]';
+    const cardPadding = isCompact ? 'py-2 px-4'            : 'py-3 px-4';
 
     // Render category sections (skip categories that have zero items)
     sectionsEl.innerHTML = categories.map(cat => {
@@ -168,20 +176,21 @@
           <div class="space-y-3">
             ${items.map(t => `
               <a
-                class="quote-card block [&>div]:min-h-[76px] [&>div]:flex [&>div]:items-center"
+                class="quote-card block ${cardMinH} [&>div]:flex [&>div]:items-center"
                 href="#"
                 data-title="${t.title.toLowerCase()}"
                 data-desc="${t.desc.toLowerCase()}"
               >
-                <div class="${borderClass} rounded-lg py-3 px-4 transition-all duration-300 hover:bg-gray-50">
+                <div class="${borderClass} rounded-lg ${cardPadding} transition-all duration-300 hover:bg-gray-50">
                   <div class="flex items-center gap-3 w-full text-left">
                     <div class="shrink-0">
                       <i data-lucide="${t.icon}" class="h-6 w-6 text-green-5" style="stroke-width:1.5"></i>
                     </div>
-                    <div>
+                    <div class="flex-1 min-w-0">
                       <p class="font-semibold text-base leading-normal text-gray-900">${t.title}</p>
-                      <p class="text-sm font-normal leading-5 text-gray-9">${t.desc}</p>
+                      ${isCompact ? '' : `<p class="text-sm font-normal leading-5 text-gray-9">${t.desc}</p>`}
                     </div>
+                    ${isCompact ? '<i data-lucide="chevron-right" class="h-5 w-5 text-gray-400 shrink-0"></i>' : ''}
                   </div>
                 </div>
               </a>
