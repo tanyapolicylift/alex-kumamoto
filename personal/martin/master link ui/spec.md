@@ -96,5 +96,5 @@ The exact way Case 2 is configured (URL param, separate page, an agency-level se
   - `?compact` → title-only cards with chevron
   - `?compacter` → grouped list rows per category (mock-style)
   - Params combine, e.g. `?short&compacter`
-- Captured original (the page we're improving): `Quote _ Acme Insurance Agency.html` in the same folder
-- Faithful reproduction of the original (for diffing): `prototype.html` (v1)
+- Captured original (the page we're improving): `archive/Quote _ Acme Insurance Agency.html`
+- Faithful reproduction of the original (for diffing): `archive/prototype.html` (v1)
