@@ -75,14 +75,14 @@
     </header>
 
     <!-- Main content -->
-    <div class="flex-1 flex flex-col px-6 pt-6 md:pt-10 pb-4 max-w-lg mx-auto w-full">
-      <div class="mb-6">
+    <div class="flex-1 flex flex-col px-6 pt-4 md:pt-10 pb-4 max-w-lg mx-auto w-full">
+      <div class="mb-4 md:mb-6">
         <h1 class="text-3xl font-bold leading-9 text-slate-800 mb-2">Get a Quote</h1>
         <p class="text-sm font-normal leading-5 text-gray-9">Select your insurance type to get started.</p>
       </div>
 
       <!-- Filter -->
-      <div class="relative mb-6">
+      <div class="relative mb-4 md:mb-6">
         <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"></i>
         <input
           type="text"
@@ -102,7 +102,7 @@
       </div>
 
       <!-- Grouped sections -->
-      <div class="space-y-6" id="quote-sections"></div>
+      <div class="space-y-4 md:space-y-6" id="quote-sections"></div>
 
       <!-- Empty state -->
       <div id="no-results" class="hidden text-center text-sm text-gray-9 py-8">
@@ -183,7 +183,7 @@
       if (items.length === 0) return '';
       // Featured items get a green border to make them visually prominent
       const borderClass = cat.id === 'featured' ? 'border border-green-5' : 'border';
-      const heading = `<h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 px-1">${cat.label}</h2>`;
+      const heading = `<h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 md:mb-3 px-1">${cat.label}</h2>`;
 
       // Compacter: one bordered container per category, rows separated by dividers.
       // Keeps original card content (icons, sizes, description) — just removes the
