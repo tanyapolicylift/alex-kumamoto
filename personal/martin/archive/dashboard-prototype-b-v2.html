@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolicyLift Dashboard — Prototype B v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --radius: 0.625rem;
+    --background: oklch(0.9821 0 0);
+    --foreground: oklch(0.1408 0.0044 285.8229);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.1408 0.0044 285.8229);
+    --primary: oklch(0.6865 0.1639 155.7583);
+    --primary-foreground: oklch(0.9842 0.0034 247.8575);
+    --muted: oklch(0.9626 0.0066 286.2742);
+    --muted-foreground: oklch(0.5555 0 0);
+    --accent: oklch(0.9461 0 0);
+    --accent-foreground: oklch(0.2435 0 0);
+    --border: oklch(0.9197 0.004 286.3202);
+    --sidebar: oklch(23.99% 0.004 267.86);
+    --sidebar-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(85.47% 0.178 142.29 / 0.1);
+    --sidebar-accent-foreground: oklch(85.47% 0.178 142.29);
+    --destructive: oklch(0.555 0.1905 33.4006);
+    --green-1: oklch(0.7303 0.1944 147.44);
+    --green-logo: #9BF297;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--background);
+    color: var(--foreground);
+    display: flex;
+    height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 256px;
+    background: var(--sidebar);
+    color: var(--sidebar-foreground);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+  }
+  .sidebar-header {
+    padding: 24px 24px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-header svg.logo { width: 100px; height: 27px; }
+  .sidebar-collapse {
+    width: 32px; height: 32px;
+    background: none; border: none;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .sidebar-collapse:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
+  .sidebar-nav { flex: 1; padding: 8px 8px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+  .nav-group { margin-bottom: 4px; }
+  .nav-group-label {
+    padding: 8px 12px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.38);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 12px;
+    font-size: 14px; font-weight: 400;
+    color: rgba(255,255,255,0.65);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.12s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9); }
+  .nav-item.active {
+    background: var(--sidebar-accent);
+    color: var(--sidebar-accent-foreground);
+  }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.7; }
+  .nav-item.active svg { opacity: 1; }
+  .nav-badge {
+    margin-left: auto;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.4);
+    font-weight: 500;
+  }
+  .sidebar-spacer { flex: 1; }
+  .sidebar-footer {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .user-avatar {
+    width: 34px; height: 34px;
+    background: var(--primary);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 12px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .user-info { min-width: 0; }
+  .user-name { font-size: 13px; font-weight: 500; color: #fff; }
+  .user-email { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  /* ── Main ── */
+  .main { flex: 1; overflow-y: auto; padding: 40px; }
+  .main-inner { max-width: 1200px; }
+
+  /* Header */
+  .page-header { margin-bottom: 8px; }
+  .page-title { font-size: 24px; font-weight: 700; color: var(--foreground); }
+  .page-subtitle { font-size: 14px; color: var(--muted-foreground); margin-top: 2px; }
+
+  /* ── KPI Strip ── */
+  .kpi-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 24px 0; }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    text-align: center;
+    transition: box-shadow 0.15s;
+  }
+  .kpi-card:hover { box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .kpi-value { font-size: 28px; font-weight: 700; color: var(--foreground); line-height: 1.1; }
+  .kpi-label { font-size: 11px; color: var(--muted-foreground); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 500; }
+  .kpi-delta { font-size: 10px; margin-top: 4px; font-weight: 500; }
+  .kpi-delta.up { color: var(--primary); }
+  .kpi-card.highlight { border-color: var(--primary); }
+  .kpi-card.highlight .kpi-value { color: var(--primary); }
+
+  /* ── Tabs ── */
+  .tab-bar {
+    display: flex; gap: 0;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    padding: 10px 20px;
+    font-size: 13px; font-weight: 500;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.12s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tab:hover { color: var(--foreground); }
+  .tab.active { color: var(--foreground); border-bottom-color: var(--primary); }
+  .tab-count {
+    font-size: 11px;
+    background: var(--muted);
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+    color: var(--muted-foreground);
+  }
+  .tab.active .tab-count { background: oklch(0.92 0.06 155); color: oklch(0.35 0.12 155); }
+
+  /* ── Content columns ── */
+  .content-columns { display: grid; grid-template-columns: 1fr 380px; gap: 16px; }
+
+  /* ── Card ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) + 4px);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 20px 10px;
+    display: flex; align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-title {
+    font-size: 12px; font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted-foreground);
+  }
+
+  /* ── Entity Table ── */
+  .entity-table { width: 100%; border-collapse: collapse; }
+  .entity-table th {
+    text-align: left;
+    padding: 8px 16px;
+    font-size: 11px; font-weight: 600;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    background: oklch(0.98 0 0);
+    border-bottom: 1px solid var(--border);
+  }
+  .entity-table td {
+    padding: 10px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid oklch(0.97 0 0);
+    color: var(--foreground);
+  }
+  .entity-table tr { transition: background 0.1s; }
+  .entity-table tbody tr:hover { background: oklch(0.975 0 0); cursor: pointer; }
+  .entity-table tbody tr:last-child td { border-bottom: none; }
+
+  .entity-name { font-weight: 500; }
+
+  /* Type badges */
+  .type-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .type-badge.qp { background: oklch(0.95 0.05 155); color: oklch(0.40 0.12 155); }
+  .type-badge.conv { background: oklch(0.95 0.04 70); color: oklch(0.45 0.14 50); }
+  .type-badge.book { background: oklch(0.94 0.04 255); color: oklch(0.45 0.12 255); }
+
+  /* Status badges (shadcn-style) */
+  .status-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 500;
+    padding: 2px 10px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+  }
+  .status-badge.new { background: oklch(0.96 0.04 70); color: oklch(0.50 0.14 50); border-color: oklch(0.90 0.06 60); }
+  .status-badge.progress { background: oklch(0.95 0.04 255); color: oklch(0.50 0.12 255); border-color: oklch(0.88 0.06 255); }
+  .status-badge.sent { background: oklch(0.95 0.05 310); color: oklch(0.45 0.15 310); border-color: oklch(0.88 0.07 310); }
+  .status-badge.done { background: oklch(0.95 0.05 155); color: oklch(0.40 0.12 155); border-color: oklch(0.88 0.08 155); }
+
+  .time-text { font-size: 12px; color: var(--muted-foreground); }
+  .assignee { font-size: 12px; color: var(--muted-foreground); }
+  .assignee.me { color: var(--primary); font-weight: 500; }
+
+  /* ── Activity Feed ── */
+  .activity-list { list-style: none; }
+  .activity-item { padding: 12px 20px; border-bottom: 1px solid oklch(0.97 0 0); }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-header { display: flex; align-items: flex-start; gap: 8px; }
+  .activity-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .activity-dot.system { background: var(--primary); }
+  .activity-dot.user { background: oklch(0.62 0.19 260); }
+  .activity-dot.client { background: oklch(0.75 0.16 65); }
+  .activity-text { font-size: 13px; color: var(--foreground); line-height: 1.4; flex: 1; }
+  .activity-time { font-size: 11px; color: var(--muted-foreground); margin-left: auto; white-space: nowrap; flex-shrink: 0; }
+  .activity-link {
+    font-size: 12px;
+    color: var(--primary);
+    cursor: pointer;
+    margin-top: 2px;
+    display: block;
+    margin-left: 15px;
+    text-decoration: none;
+  }
+  .activity-link:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<!-- ════════ Sidebar ════════ -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 28" fill="none">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M4.51368 2.04974C4.51368 3.18179 3.59599 4.09949 2.46394 4.09949C1.3319 4.09949 0.414198 5.01719 0.414198 6.14923V13.4021V20.6551C0.414198 21.7872 1.3319 22.7048 2.46394 22.7048C3.59599 22.7048 4.51368 23.6226 4.51368 24.7546V24.9123C4.51368 26.1314 5.50198 27.1197 6.7211 27.1197H13.8163H20.9117C22.1308 27.1197 23.119 26.1314 23.119 24.9123C23.119 23.6932 24.1073 22.7048 25.3265 22.7048C26.5456 22.7048 27.5339 21.7166 27.5339 20.4974V13.4021V6.3069C27.5339 5.08778 26.5456 4.09949 25.3265 4.09949H25.1688C24.0368 4.09949 23.119 3.18179 23.119 2.04974C23.119 0.917704 22.2014 0 21.0693 0H13.8163H6.56343C5.43139 0 4.51368 0.917704 4.51368 2.04974ZM21.1481 7.91986C20.6024 8.3271 20.281 8.96807 20.281 9.64897V14.2167V17.3667C20.281 18.7467 19.1609 19.8648 17.7809 19.8623L12.9492 19.8538L6.96648 19.8435C6.50264 19.8428 6.28991 19.2655 6.64226 18.9639L6.79471 18.8334C7.34841 18.3592 7.6671 17.6667 7.6671 16.9377V12.6697V9.75214C7.6671 8.37241 8.78662 7.25448 10.1663 7.25648L14.8412 7.26303L20.9333 7.27131C21.2795 7.27179 21.4256 7.7129 21.1481 7.91986Z" fill="#9BF297"/>
+      <path d="M34.5324 19.0771V7.76945H39.1736C39.6912 7.76945 40.1975 7.86504 40.6926 8.05635C41.1989 8.24759 41.6489 8.52324 42.0427 8.88331C42.4478 9.24338 42.7684 9.68214 43.0047 10.1997C43.2523 10.7173 43.376 11.3023 43.376 11.955C43.376 12.765 43.1848 13.4739 42.8022 14.0814C42.4197 14.689 41.9021 15.1616 41.2495 15.4992C40.6081 15.8367 39.9106 16.0054 39.1568 16.0054C38.5492 16.0054 38.0091 15.9492 37.5366 15.8367C37.0752 15.7129 36.7096 15.5723 36.4395 15.4148V13.592C36.687 13.7158 37.0302 13.8339 37.469 13.9464C37.9079 14.059 38.3635 14.1152 38.8361 14.1152C39.5561 14.1152 40.1188 13.9239 40.5238 13.5414C40.9401 13.1588 41.1482 12.63 41.1482 11.955C41.1482 11.4937 41.0357 11.1054 40.8107 10.7904C40.5969 10.4754 40.31 10.2335 39.9499 10.0647C39.5899 9.89593 39.1961 9.81159 38.7686 9.81159H36.7096V19.0771H34.5324ZM47.812 19.3303C47.1819 19.3303 46.5912 19.2177 46.0399 18.9927C45.4998 18.7564 45.0217 18.4357 44.6053 18.0307C44.189 17.6257 43.8628 17.1531 43.6265 16.613C43.3902 16.0617 43.2721 15.4766 43.2721 14.8578C43.2721 14.2277 43.3902 13.6427 43.6265 13.1026C43.8628 12.5626 44.189 12.09 44.6053 11.6849C45.0217 11.2686 45.4998 10.9479 46.0399 10.7229C46.5912 10.4866 47.1819 10.3685 47.812 10.3685C48.4308 10.3685 49.0103 10.4866 49.5503 10.7229C50.1017 10.9479 50.5854 11.2686 51.0017 11.6849C51.4293 12.09 51.7556 12.5626 51.9806 13.1026C52.2169 13.6427 52.335 14.2277 52.335 14.8578C52.335 15.4766 52.2169 16.0617 51.9806 16.613C51.7556 17.1531 51.4293 17.6257 51.0017 18.0307C50.5854 18.4357 50.1017 18.7564 49.5503 18.9927C49.0103 19.2177 48.4308 19.3303 47.812 19.3303ZM47.812 17.4063C48.2621 17.4063 48.6671 17.305 49.0271 17.1025C49.3984 16.8887 49.691 16.5906 49.9048 16.208C50.1186 15.8254 50.2254 15.3754 50.2254 14.8578C50.2254 14.329 50.1186 13.8733 49.9048 13.4908C49.691 13.1082 49.3984 12.8157 49.0271 12.6132C48.6671 12.3994 48.2621 12.2925 47.812 12.2925C47.3732 12.2925 46.9681 12.3994 46.5968 12.6132C46.2255 12.8157 45.9274 13.1082 45.7023 13.4908C45.4886 13.8733 45.3817 14.329 45.3817 14.8578C45.3817 15.3754 45.4886 15.8254 45.7023 16.208C45.9274 16.5906 46.2255 16.8887 46.5968 17.1025C46.9681 17.305 47.3732 17.4063 47.812 17.4063ZM52.8555 19.0771V6.92559H54.847V19.0771H52.8555ZM57.629 8.98455C57.2465 8.98455 56.9146 8.84959 56.6333 8.57952C56.3632 8.29828 56.2283 7.97193 56.2283 7.60069C56.2283 7.21814 56.3632 6.89182 56.6333 6.62179C56.9146 6.35175 57.2465 6.21674 57.629 6.21674C57.8879 6.21674 58.1241 6.27862 58.3379 6.40239C58.5517 6.52615 58.7204 6.69492 58.8442 6.90869C58.9792 7.12248 59.0468 7.35311 59.0468 7.60069C59.0468 7.83697 58.9792 8.06759 58.8442 8.29262C58.7204 8.50642 58.5517 8.67517 58.3379 8.79897C58.1241 8.92269 57.8879 8.98455 57.629 8.98455ZM56.8527 19.0771V10.571H58.8442V19.0771H56.8527ZM55.4857 12.2925V10.571H58.8442V12.2925H55.4857ZM63.854 19.3303C63.2127 19.3303 62.622 19.2121 62.0819 18.9758C61.5419 18.7395 61.0693 18.4132 60.6642 17.997C60.2592 17.5806 59.9441 17.1081 59.7191 16.5792C59.5053 16.0392 59.3985 15.471 59.3985 14.8747C59.3985 14.2783 59.5053 13.7101 59.7191 13.1701C59.9441 12.63 60.2592 12.1519 60.6642 11.7355C61.0693 11.308 61.5419 10.9761 62.0819 10.7398C62.622 10.4923 63.2127 10.3685 63.854 10.3685C64.4953 10.3685 65.0186 10.4698 65.4236 10.6723C65.8399 10.8748 66.1549 11.0661 66.3687 11.2461V13.1026C66.0761 12.8888 65.7443 12.7088 65.373 12.5626C65.0017 12.405 64.546 12.3263 64.0059 12.3263C63.5446 12.3263 63.1227 12.4388 62.7401 12.6638C62.3576 12.8888 62.0538 13.1926 61.8288 13.5752C61.615 13.9577 61.5081 14.3909 61.5081 14.8747C61.5081 15.3472 61.615 15.7748 61.8288 16.1574C62.0426 16.5399 62.3351 16.8437 62.7063 17.0687C63.0889 17.2937 63.5221 17.4063 64.0059 17.4063C64.546 17.4063 65.0017 17.3331 65.373 17.1868C65.7443 17.0293 66.0761 16.8437 66.3687 16.6299V18.4864C66.1549 18.6777 65.8399 18.869 65.4236 19.0602C65.0186 19.2402 64.4953 19.3303 63.854 19.3303ZM66.7879 23.1276L70.0959 17.0856L72.9648 10.571H75.2434L69.0497 23.1276H66.7879ZM69.5559 18.9758L65.6403 10.571H67.9693L71.0917 17.4906L69.5559 18.9758ZM75.5276 19.0771V7.76945H77.7048V17.1025H83.409V19.0771H75.5276ZM85.7186 8.98455C85.3359 8.98455 85.0041 8.84959 84.7228 8.57952C84.4531 8.29828 84.3179 7.97193 84.3179 7.60069C84.3179 7.21814 84.4531 6.89182 84.7228 6.62179C85.0041 6.35175 85.3359 6.21674 85.7186 6.21674C85.9772 6.21674 86.2138 6.27862 86.4276 6.40239C86.6414 6.52615 86.8103 6.69492 86.9338 6.90869C87.069 7.12248 87.1366 7.35311 87.1366 7.60069C87.1366 7.83697 87.069 8.06759 86.9338 8.29262C86.8103 8.50642 86.6414 8.67517 86.4276 8.79897C86.2138 8.92269 85.9772 8.98455 85.7186 8.98455ZM84.9421 19.0771V10.571H86.9338V19.0771H84.9421ZM83.5752 12.2925V10.571H86.9338V12.2925H83.5752ZM88.7034 19.0771V9.74407C88.7034 9.09145 88.8379 8.54014 89.1083 8.09007C89.3779 7.62876 89.7386 7.28 90.1883 7.04373C90.6386 6.79618 91.1166 6.67242 91.6228 6.67242C91.9607 6.67242 92.2641 6.7118 92.5345 6.79056C92.8041 6.86932 93.0352 6.97621 93.2262 7.11124V8.78207C93.0572 8.68076 92.8607 8.602 92.6359 8.54579C92.4104 8.47828 92.1745 8.45014 91.9269 8.46138C91.5669 8.47262 91.2683 8.58517 91.0324 8.79897C90.8069 9.01269 90.6945 9.37276 90.6945 9.87904V19.0771H88.7034ZM87.3869 12.2588V10.571H92.9559V12.2588H87.3869ZM96.6497 19.3303C96.1545 19.3303 95.7041 19.2234 95.2993 19.0096C94.9055 18.7846 94.5903 18.4751 94.3545 18.0813C94.129 17.6763 94.0166 17.2037 94.0166 16.6637V12.2588H92.5655V11.3136C93.1166 11.0999 93.5724 10.7341 93.9324 10.2166C94.2924 9.68779 94.6076 9.02959 94.8772 8.242H96.0083V10.571H98.6241V12.2588H96.0083V16.1911C96.0083 16.5737 96.1097 16.8718 96.3117 17.0856C96.5255 17.2994 96.8186 17.4063 97.1897 17.4063C97.5269 17.4063 97.82 17.3612 98.0676 17.2712C98.3262 17.17 98.551 17.0631 98.7421 16.9506V18.6552C98.54 18.8577 98.2586 19.0208 97.8986 19.1446C97.5497 19.2683 97.1331 19.3303 96.6497 19.3303Z" fill="#9BF297"/>
+    </svg>
+    <button class="sidebar-collapse" title="Toggle sidebar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+    </button>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Top group (no label) -->
+    <div class="nav-group">
+      <a class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Customers
+      </a>
+    </div>
+
+    <!-- Website -->
+    <div class="nav-group">
+      <div class="nav-group-label">Website</div>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Agency Hub
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+        Website Wizard
+      </a>
+    </div>
+
+    <!-- Trust & Reputation -->
+    <div class="nav-group">
+      <div class="nav-group-label">Trust &amp; Reputation</div>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M14 9l-2 2-2-2"/><path d="M10 13l2-2 2 2"/></svg>
+        Review Management
+      </a>
+    </div>
+
+    <!-- Marketing Auto-Pilot -->
+    <div class="nav-group">
+      <div class="nav-group-label">Marketing Auto-Pilot</div>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        Email Campaigns
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        Ads Builder
+      </a>
+    </div>
+
+    <!-- Lead Management -->
+    <div class="nav-group">
+      <div class="nav-group-label">Lead Management</div>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Conversations
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+        Quote Packets
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+        Booking &amp; Calendars
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" x2="7" y1="10" y2="10"/><line x1="15" x2="7" y1="14" y2="14"/><line x1="11" x2="7" y1="18" y2="18"/><path d="M19.5 2.5L18 4l1.5 1.5"/><path d="M3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z"/></svg>
+        Smart Forms
+        <span class="nav-badge">Coming Soon</span>
+      </a>
+    </div>
+
+    <!-- CXP -->
+    <div class="nav-group">
+      <div class="nav-group-label">CXP</div>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Accounts
+      </a>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-avatar">TM</div>
+    <div class="user-info">
+      <div class="user-name">Tanya Mau</div>
+      <div class="user-email">tanya@policylift.ai</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════ Main Content ════════ -->
+<main class="main">
+  <div class="main-inner">
+
+    <div class="page-header">
+      <div class="page-title">Good morning, Tanya</div>
+      <div class="page-subtitle">Wednesday, April 9 &middot; 5 unassigned items need attention</div>
+    </div>
+
+    <!-- KPI Strip -->
+    <div class="kpi-strip">
+      <div class="kpi-card">
+        <div class="kpi-value">8</div>
+        <div class="kpi-label">My Items</div>
+      </div>
+      <div class="kpi-card highlight">
+        <div class="kpi-value">5</div>
+        <div class="kpi-label">Unassigned</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">24</div>
+        <div class="kpi-label">Open QPs</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">3</div>
+        <div class="kpi-label">Bound Today</div>
+        <div class="kpi-delta up">+2 vs yesterday</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">15</div>
+        <div class="kpi-label">Calls Today</div>
+        <div class="kpi-delta up">+5 vs yesterday</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <div class="tab active">My Work <span class="tab-count">8</span></div>
+      <div class="tab">Unassigned <span class="tab-count">5</span></div>
+      <div class="tab">All <span class="tab-count">18</span></div>
+    </div>
+
+    <!-- Content: Table + Activity -->
+    <div class="content-columns">
+
+      <!-- Entity Table -->
+      <div class="card">
+        <table class="entity-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Updated</th>
+              <th>Assignee</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="type-badge conv">Conv</span></td>
+              <td class="entity-name">Missed call &mdash; (818) 555-0142</td>
+              <td><span class="status-badge new">New</span></td>
+              <td><span class="time-text">35m ago</span></td>
+              <td><span class="assignee me">Me</span></td>
+            </tr>
+            <tr>
+              <td><span class="type-badge qp">QP</span></td>
+              <td class="entity-name">Maria Garcia &mdash; Home + Auto</td>
+              <td><span class="status-badge progress">Info Collected</span></td>
+              <td><span class="time-text">2h ago</span></td>
+              <td><span class="assignee me">Me</span></td>
+            </tr>
+            <tr>
+              <td><span class="type-badge qp">QP</span></td>
+              <td class="entity-name">Robert Chen &mdash; Commercial GL</td>
+              <td><span class="status-badge progress">Quoting</span></td>
+              <td><span class="time-text">1h ago</span></td>
+              <td><span class="assignee me">Me</span></td>
+            </tr>
+            <tr>
+              <td><span class="type-badge book">Book</span></td>
+              <td class="entity-name">James Lee &mdash; Callback</td>
+              <td><span class="status-badge new">Today 3 PM</span></td>
+              <td><span class="time-text">2h ago</span></td>
+              <td><span class="assignee me">Me</span></td>
+            </tr>
+            <tr>
+              <td><span class="type-badge qp">QP</span></td>
+              <td class="entity-name">Sarah Kim &mdash; Auto</td>
+              <td><span class="status-badge sent">Sent</span></td>
+              <td><span class="time-text">3h ago</span></td>
+              <td><span class="assignee me">Me</span></td>
+            </tr>
+            <tr>
+              <td><span class="type-badge conv">Conv</span></td>
+              <td class="entity-name">Chat &mdash; "workers comp question"</td>
+              <td><span class="status-badge progress">Replied</span></td>
+              <td><span class="time-text">4h ago</span></td>
+              <td><span class="assignee me">Me</span></td>
+            </tr>
+            <tr>
+              <td><span class="type-badge qp">QP</span></td>
+              <td class="entity-name">David Nguyen &mdash; Personal Auto</td>
+              <td><span class="status-badge done">Bound</span></td>
+              <td><span class="time-text">5h ago</span></td>
+              <td><span class="assignee me">Me</span></td>
+            </tr>
+            <tr>
+              <td><span class="type-badge qp">QP</span></td>
+              <td class="entity-name">Lisa Wang &mdash; Home</td>
+              <td><span class="status-badge done">Bound</span></td>
+              <td><span class="time-text">Yesterday</span></td>
+              <td><span class="assignee me">Me</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Activity Sidebar -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">What Happened</span>
+        </div>
+        <ul class="activity-list">
+          <li class="activity-item">
+            <div class="activity-header">
+              <span class="activity-dot system"></span>
+              <span class="activity-text">New voicemail received</span>
+              <span class="activity-time">35m</span>
+            </div>
+            <a class="activity-link">&rarr; (818) 555-0142</a>
+          </li>
+          <li class="activity-item">
+            <div class="activity-header">
+              <span class="activity-dot client"></span>
+              <span class="activity-text">Client submitted info via form</span>
+              <span class="activity-time">1h</span>
+            </div>
+            <a class="activity-link">&rarr; Maria Garcia &mdash; Home + Auto</a>
+          </li>
+          <li class="activity-item">
+            <div class="activity-header">
+              <span class="activity-dot system"></span>
+              <span class="activity-text">QP created from voice call</span>
+              <span class="activity-time">1h</span>
+            </div>
+            <a class="activity-link">&rarr; Robert Chen &mdash; Commercial GL</a>
+          </li>
+          <li class="activity-item">
+            <div class="activity-header">
+              <span class="activity-dot client"></span>
+              <span class="activity-text">Booking confirmed by client</span>
+              <span class="activity-time">2h</span>
+            </div>
+            <a class="activity-link">&rarr; James Lee</a>
+          </li>
+          <li class="activity-item">
+            <div class="activity-header">
+              <span class="activity-dot user"></span>
+              <span class="activity-text">You changed status to "Sent"</span>
+              <span class="activity-time">3h</span>
+            </div>
+            <a class="activity-link">&rarr; Sarah Kim &mdash; Auto</a>
+          </li>
+          <li class="activity-item">
+            <div class="activity-header">
+              <span class="activity-dot system"></span>
+              <span class="activity-text">Auto-exported to TurboRater</span>
+              <span class="activity-time">5h</span>
+            </div>
+            <a class="activity-link">&rarr; David Nguyen &mdash; Auto</a>
+          </li>
+          <li class="activity-item">
+            <div class="activity-header">
+              <span class="activity-dot user"></span>
+              <span class="activity-text">Ana assigned to herself</span>
+              <span class="activity-time">6h</span>
+            </div>
+            <a class="activity-link">&rarr; Park &mdash; Home</a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

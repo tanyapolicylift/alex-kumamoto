@@ -1,21 +1,18 @@
 ---
 langfuse: voice/shared/tools/hang-up-description
-version: 3
-labels: [production]
+version: 4
+labels: [latest, hang-up-v2, production]
 type: text
-note: "2-step closing flow. Simplified from v2. Always start with confirmed=false."
+note: "v4 reframes from a 2-step confirmed=false/true flow to a single tool description. Tool now plays system closing prompt automatically; call again on user confirmation to disconnect."
 ---
 
-Ends the current call using a required 2-step closing flow.
+The only way to end the current call. The call stays active until this tool ends it.
 
-Required flow:
-1. First, call hangUp(confirmed=false).
-   This plays the required system-provided closing prompt that asks whether the user needs anything else before ending the call.
+This tool automatically plays a system-provided closing prompt that asks whether the user needs anything else — do not ask this question yourself, the tool asks it for you. When the user confirms they are done, call this tool again — it will play a farewell message and disconnect.
 
-2. After Step 1 has already happened in this conversation, call hangUp(confirmed=true)
-   if the user agrees they do not need anything else.
+Call this tool whenever the conversation is finishing — for example:
+- You are done helping the user and want to check if they need anything else — call this tool directly, do not ask the question yourself.
+- The user says they are done, says goodbye, or confirms they have no more questions.
+- The user has been asked if they need anything else and said no.
 
-Important rules:
-- Always begin the hang-up flow with hangUp(confirmed=false).
-- Only use hangUp(confirmed=true) after Step 1 has already been completed in the same conversation.
-- If the user responds with a clear negative after the system closing prompt (for example: "no", "nothing else", "that's it"), use confirmed=true.
+This tool handles all closing messages. Do not generate any closing messages yourself, always call this tool instead.

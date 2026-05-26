@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quote | Acme Insurance Agency</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // Tokens pulled from the original page CSS
+            primary: '#12b76d',
+            'primary-foreground': '#f8fafc',
+            'muted-foreground': '#737373',
+            'gray-9': '#6b7280',
+            'green-5': '#22c55e',
+          },
+          fontFamily: {
+            sans: ['Geist', 'Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ?compacter: dividers only between visible rows (filter-aware) */
+    .compacter-container .quote-card:not(.hidden) + .quote-card:not(.hidden) {
+      border-top: 1px solid #e5e7eb;
+    }
+    /* Featured (Most Popular) section: green dividers to match the outer green border */
+    .compacter-container.featured-container .quote-card:not(.hidden) + .quote-card:not(.hidden) {
+      border-top: 1px solid #22c55e;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900 font-sans antialiased">
+
+  <div class="flex flex-col min-h-screen">
+
+    <!-- Mobile header -->
+    <header class="md:hidden bg-white border-b border-gray-200 shadow-xs h-14 flex items-center justify-between px-4">
+      <div class="flex items-center gap-2 min-w-0">
+        <img src="./logo.webp" alt="Acme Insurance Agency logo" class="max-h-7 w-auto rounded object-contain" />
+        <span class="text-sm font-semibold text-slate-800 truncate">Acme Insurance Agency</span>
+      </div>
+      <div class="flex items-center gap-1 text-sm shrink-0">
+        <a class="px-2 py-1 rounded bg-primary text-primary-foreground" href="#">EN</a>
+        <span class="text-muted-foreground">|</span>
+        <a class="px-2 py-1 rounded text-muted-foreground hover:text-gray-900" href="#">ES</a>
+      </div>
+    </header>
+
+    <!-- Desktop hero header -->
+    <header
+      class="hidden md:flex relative h-48 items-center justify-center gap-3 px-4 bg-cover bg-center"
+      style="background-image: url('./portal-header.jpg');"
+    >
+      <div class="absolute top-3 right-3 flex items-center gap-1 text-sm">
+        <a class="px-2 py-1 rounded bg-primary text-primary-foreground" href="#">EN</a>
+        <span class="text-muted-foreground">|</span>
+        <a class="px-2 py-1 rounded text-muted-foreground hover:text-gray-900 bg-white/60" href="#">ES</a>
+      </div>
+      <div class="flex items-center gap-3">
+        <img src="./logo.webp" alt="Acme Insurance Agency logo" class="max-h-12 w-auto rounded object-contain" />
+        <span class="text-xl font-semibold text-slate-800">Acme Insurance Agency</span>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col px-6 pt-4 md:pt-10 pb-4 max-w-lg mx-auto w-full">
+      <div class="mb-4 md:mb-6">
+        <h1 class="text-3xl font-bold leading-9 text-slate-800 mb-2">Get a Quote</h1>
+        <p class="text-sm font-normal leading-5 text-gray-9">Select your insurance type to get started.</p>
+      </div>
+
+      <!-- Filter -->
+      <div class="relative mb-4 md:mb-6">
+        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"></i>
+        <input
+          type="text"
+          id="filter-input"
+          placeholder="Search coverage types..."
+          class="w-full rounded-lg border border-gray-200 bg-white pl-10 pr-10 py-3 text-sm placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+        />
+        <button
+          type="button"
+          id="filter-clear"
+          aria-label="Clear search"
+          style="display:none;"
+          class="absolute right-3 top-1/2 -translate-y-1/2 inline-flex h-5 w-5 items-center justify-center rounded text-gray-400 hover:text-gray-600"
+        >
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+
+      <!-- Grouped sections -->
+      <div class="space-y-4 md:space-y-6" id="quote-sections"></div>
+
+      <!-- Empty state -->
+      <div id="no-results" class="hidden text-center text-sm text-gray-9 py-8">
+        No matches found.
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-4 pb-8">
+      <div class="text-center text-xs leading-4 sm:text-sm sm:leading-normal font-normal text-gray-400 space-y-1">
+        <p>Your data is encrypted and secure.</p>
+        <p>By continuing, you agree to our <a href="https://www.policylift.ai/legal/terms-of-service" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</p>
+        <div class="flex justify-center gap-4 sm:gap-12 pt-1">
+          <a href="mailto:support@policylift.ai" class="underline">Need help?</a>
+          <a href="https://www.policylift.ai/legal/privacy-policy" target="_blank" rel="noopener noreferrer" class="underline">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    const categories = [
+      { id: 'featured', label: 'Most Popular' },
+      { id: 'vehicles', label: 'Vehicles' },
+      { id: 'property', label: 'Property' },
+      { id: 'other',    label: 'Other' },
+    ];
+
+    // Each item belongs to exactly one category (move, not duplicate).
+    // To pin an item to "Most Common", set its category to 'featured'.
+    const quoteTypes = [
+      { icon: 'car-front',    title: 'Personal Auto',          desc: 'Standard auto policy',                  category: 'featured' },
+      { icon: 'house',        title: 'Personal Home',          desc: 'Homeowners (HO-3)',                     category: 'featured' },
+      { icon: 'shield-check', title: 'Extended Personal Auto', desc: 'Higher-limit auto coverage',            category: 'vehicles' },
+      { icon: 'sailboat',     title: 'Personal Boat',          desc: 'Boat or watercraft',                    category: 'vehicles' },
+      { icon: 'bike',         title: 'Personal Motorcycle',    desc: 'Motorcycle policy',                     category: 'vehicles' },
+      { icon: 'caravan',      title: 'Personal RV',            desc: 'RV, motorhome, or trailer',             category: 'vehicles' },
+      { icon: 'building-2',   title: 'Personal Condo',         desc: 'Condo (HO-6)',                          category: 'property' },
+      { icon: 'flame',        title: 'Personal Dwelling Fire', desc: 'Rental or vacant homes (DP-1 / DP-3)',  category: 'property' },
+      { icon: 'waves',        title: 'Personal Flood',         desc: 'Flood (NFIP or private)',               category: 'property' },
+      { icon: 'key-round',    title: 'Personal Renters',       desc: 'Renters (HO-4)',                        category: 'property' },
+      { icon: 'umbrella',     title: 'Personal Umbrella',      desc: 'Umbrella liability',                    category: 'other'    },
+    ];
+
+    const sectionsEl  = document.getElementById('quote-sections');
+    const filterInput = document.getElementById('filter-input');
+    const filterClear = document.getElementById('filter-clear');
+    const noResults   = document.getElementById('no-results');
+
+    // ?short     → demo a small-agency setup: fewer cards + filter hidden
+    // ?compact   → tighter cards (no description, chevron-right indicator)
+    // ?compacter → grouped list rows (combined card per category, internal dividers)
+    const params      = new URLSearchParams(window.location.search);
+    const isShort     = params.has('short');
+    const isCompact   = params.has('compact');
+    const isCompacter = params.has('compacter');
+
+    const SHORT_TITLES = new Set([
+      'Personal Auto', 'Personal Home', 'Personal Renters', 'Personal Condo', 'Personal Umbrella',
+    ]);
+    const visibleTypes = isShort
+      ? quoteTypes.filter(t => SHORT_TITLES.has(t.title))
+      : quoteTypes;
+
+    if (isShort) {
+      filterInput.parentElement.style.display = 'none';
+    }
+
+    // Compact mode swaps card sizing + drops description + adds chevron
+    const cardMinH    = isCompact ? '[&>div]:min-h-[56px]' : '[&>div]:min-h-[76px]';
+    const cardPadding = isCompact ? 'py-2 px-4'            : 'py-3 px-4';
+
+    // Render category sections (skip categories that have zero items)
+    sectionsEl.innerHTML = categories.map(cat => {
+      const items = visibleTypes.filter(t => t.category === cat.id);
+      if (items.length === 0) return '';
+      // Featured items get a green border to make them visually prominent
+      const borderClass = cat.id === 'featured' ? 'border border-green-5' : 'border';
+      const heading = `<h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 md:mb-3 px-1">${cat.label}</h2>`;
+
+      // Compacter: one bordered container per category, rows separated by dividers.
+      // Keeps original card content (icons, sizes, description) — just removes the
+      // per-card gaps and shares a single outer border.
+      if (isCompacter) {
+        const containerClass = cat.id === 'featured'
+          ? `${borderClass} compacter-container featured-container`
+          : `${borderClass} compacter-container`;
+        return `
+          <section data-category="${cat.id}">
+            ${heading}
+            <div class="${containerClass} rounded-lg overflow-hidden bg-white">
+              ${items.map(t => `
+                <a
+                  class="quote-card flex items-center gap-3 px-4 py-3 min-h-[60px] transition-all duration-300 hover:bg-gray-50"
+                  href="#"
+                  data-title="${t.title.toLowerCase()}"
+                  data-desc="${t.desc.toLowerCase()}"
+                >
+                  <div class="shrink-0">
+                    <i data-lucide="${t.icon}" class="h-6 w-6 text-green-5" style="stroke-width:1.5"></i>
+                  </div>
+                  <p class="flex-1 min-w-0 font-semibold text-base leading-normal text-gray-900">${t.title}</p>
+                  <i data-lucide="chevron-right" class="h-5 w-5 text-gray-400 shrink-0"></i>
+                </a>
+              `).join('')}
+            </div>
+          </section>
+        `;
+      }
+
+      // Default / compact: each item is its own bordered card
+      return `
+        <section data-category="${cat.id}">
+          ${heading}
+          <div class="space-y-3">
+            ${items.map(t => `
+              <a
+                class="quote-card block ${cardMinH} [&>div]:flex [&>div]:items-center"
+                href="#"
+                data-title="${t.title.toLowerCase()}"
+                data-desc="${t.desc.toLowerCase()}"
+              >
+                <div class="${borderClass} rounded-lg ${cardPadding} transition-all duration-300 hover:bg-gray-50">
+                  <div class="flex items-center gap-3 w-full text-left">
+                    <div class="shrink-0">
+                      <i data-lucide="${t.icon}" class="h-6 w-6 text-green-5" style="stroke-width:1.5"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="font-semibold text-base leading-normal text-gray-900">${t.title}</p>
+                      ${isCompact ? '' : `<p class="text-sm font-normal leading-5 text-gray-9">${t.desc}</p>`}
+                    </div>
+                    ${isCompact ? '<i data-lucide="chevron-right" class="h-5 w-5 text-gray-400 shrink-0"></i>' : ''}
+                  </div>
+                </div>
+              </a>
+            `).join('')}
+          </div>
+        </section>
+      `;
+    }).join('');
+
+    // Filter: hide non-matching cards; collapse empty categories; show empty-state if nothing matches.
+    function applyFilter() {
+      const q = filterInput.value.trim().toLowerCase();
+      filterClear.style.display = q ? 'inline-flex' : 'none';
+
+      let anyVisible = false;
+      document.querySelectorAll('.quote-card').forEach(card => {
+        const title = card.dataset.title;
+        const desc  = card.dataset.desc;
+        const match = !q || title.includes(q) || desc.includes(q);
+        card.classList.toggle('hidden', !match);
+        if (match) anyVisible = true;
+      });
+
+      document.querySelectorAll('[data-category]').forEach(section => {
+        const visible = section.querySelectorAll('.quote-card:not(.hidden)').length;
+        section.classList.toggle('hidden', visible === 0);
+      });
+
+      noResults.classList.toggle('hidden', anyVisible);
+    }
+
+    filterInput.addEventListener('input', applyFilter);
+    filterClear.addEventListener('click', () => {
+      filterInput.value = '';
+      applyFilter();
+      filterInput.focus();
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

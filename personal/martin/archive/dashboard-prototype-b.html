@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolicyLift Dashboard - Prototype B (Stacked / Full-Width)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #1a1a1a; display: flex; height: 100vh; }
+
+  /* Sidebar */
+  .sidebar { width: 220px; background: #1e1e1e; color: #ccc; display: flex; flex-direction: column; flex-shrink: 0; }
+  .sidebar-logo { padding: 20px 16px; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; color: #fff; }
+  .sidebar-logo .icon { width: 28px; height: 28px; background: #4caf50; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; }
+  .sidebar-section { padding: 8px 0; }
+  .sidebar-section-title { padding: 8px 16px 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; color: #666; letter-spacing: 0.5px; }
+  .sidebar-item { padding: 8px 16px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #aaa; transition: all 0.15s; }
+  .sidebar-item:hover { background: #2a2a2a; color: #fff; }
+  .sidebar-item.active { background: #4caf50; color: #fff; border-radius: 4px; margin: 0 8px; padding: 8px; }
+  .sidebar-item .item-icon { width: 18px; text-align: center; font-size: 14px; }
+  .sidebar-spacer { flex: 1; }
+  .sidebar-user { padding: 16px; border-top: 1px solid #333; display: flex; align-items: center; gap: 10px; }
+  .sidebar-user .avatar { width: 32px; height: 32px; background: #4caf50; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 600; }
+  .sidebar-user .user-info { font-size: 12px; }
+  .sidebar-user .user-name { color: #fff; font-weight: 500; }
+  .sidebar-user .user-email { color: #666; }
+
+  /* Main Content */
+  .main { flex: 1; overflow-y: auto; padding: 24px 32px; }
+  .greeting { font-size: 22px; font-weight: 600; margin-bottom: 4px; color: #1a1a1a; }
+  .greeting-sub { font-size: 13px; color: #888; margin-bottom: 24px; }
+
+  /* KPI Strip */
+  .kpi-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+  .kpi-card { background: #fff; border-radius: 10px; border: 1px solid #e5e5e5; padding: 16px; text-align: center; }
+  .kpi-value { font-size: 26px; font-weight: 700; color: #1a1a1a; }
+  .kpi-label { font-size: 11px; color: #999; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .kpi-delta { font-size: 10px; margin-top: 4px; }
+  .kpi-delta.up { color: #4caf50; }
+  .kpi-delta.down { color: #e53935; }
+  .kpi-card.highlight { border-color: #4caf50; border-width: 2px; }
+  .kpi-card.highlight .kpi-value { color: #4caf50; }
+
+  /* Tabs */
+  .tab-bar { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid #e5e5e5; }
+  .tab { padding: 10px 20px; font-size: 13px; font-weight: 500; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+  .tab:hover { color: #1a1a1a; }
+  .tab.active { color: #1a1a1a; border-bottom-color: #4caf50; }
+  .tab .tab-count { font-size: 11px; background: #f0f0f0; padding: 1px 7px; border-radius: 10px; margin-left: 6px; }
+  .tab.active .tab-count { background: #e8f5e9; color: #2e7d32; }
+
+  /* Two Column Content */
+  .content-columns { display: grid; grid-template-columns: 1fr 360px; gap: 20px; }
+
+  /* Cards */
+  .card { background: #fff; border-radius: 10px; border: 1px solid #e5e5e5; overflow: hidden; }
+  .card-header { padding: 14px 20px 10px; display: flex; align-items: center; border-bottom: 1px solid #f0f0f0; }
+  .card-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #999; }
+  .card-badge { font-size: 11px; background: #f0f0f0; padding: 2px 8px; border-radius: 10px; margin-left: 8px; color: #888; }
+
+  /* Entity Table */
+  .entity-table { width: 100%; border-collapse: collapse; }
+  .entity-table th { text-align: left; padding: 8px 16px; font-size: 11px; font-weight: 600; color: #bbb; text-transform: uppercase; letter-spacing: 0.3px; background: #fafafa; border-bottom: 1px solid #f0f0f0; }
+  .entity-table td { padding: 10px 16px; font-size: 13px; border-bottom: 1px solid #f5f5f5; }
+  .entity-table tr:hover { background: #fafafa; cursor: pointer; }
+  .entity-table tr:last-child td { border-bottom: none; }
+  .type-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+  .type-badge.qp { background: #e8f5e9; color: #2e7d32; }
+  .type-badge.conv { background: #fff3e0; color: #e65100; }
+  .type-badge.book { background: #e3f2fd; color: #1565c0; }
+  .status-badge { font-size: 11px; padding: 2px 10px; border-radius: 12px; }
+  .status-badge.new { background: #fff3e0; color: #e65100; }
+  .status-badge.progress { background: #e3f2fd; color: #1565c0; }
+  .status-badge.sent { background: #f3e5f5; color: #7b1fa2; }
+  .status-badge.done { background: #e8f5e9; color: #2e7d32; }
+  .time-text { font-size: 11px; color: #aaa; }
+  .assign-btn { font-size: 11px; padding: 4px 12px; border-radius: 6px; border: 1px solid #4caf50; background: #fff; color: #4caf50; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+  .assign-btn:hover { background: #4caf50; color: #fff; }
+  .assignee { font-size: 11px; color: #888; }
+  .assignee.me { color: #4caf50; font-weight: 500; }
+
+  /* Activity Feed */
+  .activity-list { list-style: none; }
+  .activity-item { padding: 10px 16px; border-bottom: 1px solid #f5f5f5; }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-header { display: flex; align-items: center; gap: 6px; }
+  .activity-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .activity-dot.system { background: #4caf50; }
+  .activity-dot.user { background: #2196f3; }
+  .activity-dot.client { background: #ff9800; }
+  .activity-text { font-size: 12px; color: #555; }
+  .activity-link { font-size: 11px; color: #4caf50; cursor: pointer; margin-top: 2px; display: block; }
+  .activity-link:hover { text-decoration: underline; }
+  .activity-time { font-size: 10px; color: #ccc; margin-left: auto; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar (same as A) -->
+<nav class="sidebar">
+  <div class="sidebar-logo"><div class="icon">P</div> PolicyLift</div>
+  <div class="sidebar-section">
+    <a class="sidebar-item active"><span class="item-icon">&#9632;</span> Dashboard</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Operations</div>
+    <a class="sidebar-item"><span class="item-icon">&#9743;</span> Conversations</a>
+    <a class="sidebar-item"><span class="item-icon">&#9993;</span> Quote Packets</a>
+    <a class="sidebar-item"><span class="item-icon">&#128197;</span> Booking & Calendars</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Contacts</div>
+    <a class="sidebar-item"><span class="item-icon">&#128101;</span> Accounts</a>
+    <a class="sidebar-item"><span class="item-icon">&#128100;</span> Contacts</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Marketing</div>
+    <a class="sidebar-item"><span class="item-icon">&#9733;</span> Reviews</a>
+    <a class="sidebar-item"><span class="item-icon">&#9993;</span> Campaigns</a>
+    <a class="sidebar-item"><span class="item-icon">&#128226;</span> Ads Manager</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Settings</div>
+    <a class="sidebar-item"><span class="item-icon">&#127760;</span> Website</a>
+  </div>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-user">
+    <div class="avatar">TM</div>
+    <div class="user-info">
+      <div class="user-name">Tanya Mau</div>
+      <div class="user-email">tanya@policylift.ai</div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+  <div class="greeting">Good morning, Tanya</div>
+  <div class="greeting-sub">Tuesday, April 8 &middot; 5 unassigned items need attention</div>
+
+  <!-- KPI Strip -->
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-value">8</div>
+      <div class="kpi-label">My Items</div>
+    </div>
+    <div class="kpi-card highlight">
+      <div class="kpi-value">5</div>
+      <div class="kpi-label">Unassigned</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">24</div>
+      <div class="kpi-label">Open QPs</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">3</div>
+      <div class="kpi-label">Bound Today</div>
+      <div class="kpi-delta up">+2 vs yesterday</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value">15</div>
+      <div class="kpi-label">Calls Today</div>
+      <div class="kpi-delta up">+5 vs yesterday</div>
+    </div>
+  </div>
+
+  <!-- Tabs: My Work / Unassigned / All -->
+  <div class="tab-bar">
+    <div class="tab active">My Work <span class="tab-count">8</span></div>
+    <div class="tab">Unassigned <span class="tab-count">5</span></div>
+    <div class="tab">All <span class="tab-count">18</span></div>
+  </div>
+
+  <!-- Content: Table + Activity Sidebar -->
+  <div class="content-columns">
+
+    <!-- Entity Table -->
+    <div class="card">
+      <table class="entity-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Updated</th>
+            <th>Assignee</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="type-badge conv">Conv</span></td>
+            <td>Missed call — (818) 555-0142</td>
+            <td><span class="status-badge new">New</span></td>
+            <td><span class="time-text">35m ago</span></td>
+            <td><span class="assignee me">Me</span></td>
+          </tr>
+          <tr>
+            <td><span class="type-badge qp">QP</span></td>
+            <td>Maria Garcia — Home + Auto</td>
+            <td><span class="status-badge progress">Info Collected</span></td>
+            <td><span class="time-text">2h ago</span></td>
+            <td><span class="assignee me">Me</span></td>
+          </tr>
+          <tr>
+            <td><span class="type-badge qp">QP</span></td>
+            <td>Robert Chen — Commercial GL</td>
+            <td><span class="status-badge progress">Quoting</span></td>
+            <td><span class="time-text">1h ago</span></td>
+            <td><span class="assignee me">Me</span></td>
+          </tr>
+          <tr>
+            <td><span class="type-badge book">Book</span></td>
+            <td>James Lee — Callback</td>
+            <td><span class="status-badge new">Today 3 PM</span></td>
+            <td><span class="time-text">2h ago</span></td>
+            <td><span class="assignee me">Me</span></td>
+          </tr>
+          <tr>
+            <td><span class="type-badge qp">QP</span></td>
+            <td>Sarah Kim — Auto</td>
+            <td><span class="status-badge sent">Sent</span></td>
+            <td><span class="time-text">3h ago</span></td>
+            <td><span class="assignee me">Me</span></td>
+          </tr>
+          <tr>
+            <td><span class="type-badge conv">Conv</span></td>
+            <td>Chat — "workers comp question"</td>
+            <td><span class="status-badge progress">Replied</span></td>
+            <td><span class="time-text">4h ago</span></td>
+            <td><span class="assignee me">Me</span></td>
+          </tr>
+          <tr>
+            <td><span class="type-badge qp">QP</span></td>
+            <td>David Nguyen — Personal Auto</td>
+            <td><span class="status-badge done">Bound</span></td>
+            <td><span class="time-text">5h ago</span></td>
+            <td><span class="assignee me">Me</span></td>
+          </tr>
+          <tr>
+            <td><span class="type-badge qp">QP</span></td>
+            <td>Lisa Wang — Home</td>
+            <td><span class="status-badge done">Bound</span></td>
+            <td><span class="time-text">Yesterday</span></td>
+            <td><span class="assignee me">Me</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Activity Sidebar -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">What Happened</span>
+      </div>
+      <ul class="activity-list">
+        <li class="activity-item">
+          <div class="activity-header">
+            <span class="activity-dot system"></span>
+            <span class="activity-text">New voicemail received</span>
+            <span class="activity-time">35m</span>
+          </div>
+          <a class="activity-link">&#8594; (818) 555-0142</a>
+        </li>
+        <li class="activity-item">
+          <div class="activity-header">
+            <span class="activity-dot client"></span>
+            <span class="activity-text">Client submitted info via form</span>
+            <span class="activity-time">1h</span>
+          </div>
+          <a class="activity-link">&#8594; Maria Garcia — Home + Auto</a>
+        </li>
+        <li class="activity-item">
+          <div class="activity-header">
+            <span class="activity-dot system"></span>
+            <span class="activity-text">QP created from voice call</span>
+            <span class="activity-time">1h</span>
+          </div>
+          <a class="activity-link">&#8594; Robert Chen — Commercial GL</a>
+        </li>
+        <li class="activity-item">
+          <div class="activity-header">
+            <span class="activity-dot client"></span>
+            <span class="activity-text">Booking confirmed by client</span>
+            <span class="activity-time">2h</span>
+          </div>
+          <a class="activity-link">&#8594; James Lee</a>
+        </li>
+        <li class="activity-item">
+          <div class="activity-header">
+            <span class="activity-dot user"></span>
+            <span class="activity-text">You changed status to "Sent"</span>
+            <span class="activity-time">3h</span>
+          </div>
+          <a class="activity-link">&#8594; Sarah Kim — Auto</a>
+        </li>
+        <li class="activity-item">
+          <div class="activity-header">
+            <span class="activity-dot system"></span>
+            <span class="activity-text">Auto-exported to TurboRater</span>
+            <span class="activity-time">5h</span>
+          </div>
+          <a class="activity-link">&#8594; David Nguyen — Auto</a>
+        </li>
+        <li class="activity-item">
+          <div class="activity-header">
+            <span class="activity-dot user"></span>
+            <span class="activity-text">Ana assigned to herself</span>
+            <span class="activity-time">6h</span>
+          </div>
+          <a class="activity-link">&#8594; Park — Home</a>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>
