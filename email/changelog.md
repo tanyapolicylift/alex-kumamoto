@@ -2,7 +2,38 @@
 
 Running log of brainstorm decisions, doc restructures, research artifacts, and client signal — reverse-chronological (newest first). Tag with `[brainstorm]`, `[docs]`, `[research]`, `[client-call]` so slices are grep-able.
 
-For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working_doc.md). For research, see [`research_segment_builder_ux.md`](research_segment_builder_ux.md). For companion docs, see [`segments.md`](segments.md), [`templates.md`](templates.md), and [`broadcasts.md`](broadcasts.md).
+For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working_doc.md). For research, see [`research_segment_builder_ux.md`](research_segment_builder_ux.md). For companion docs, see [`segments.md`](segments.md), [`templates.md`](templates.md), [`broadcasts.md`](broadcasts.md), and [`automations.md`](automations.md).
+
+---
+
+## 2026-05-27 — `[docs]` Fourth companion doc (short version): `automations.md`
+
+Created [`automations.md`](automations.md) — fourth companion doc, intentionally a **starter / short version** at Martin's request. Captures the concepts we've aligned on so far without committing to schema, send pipeline, step-type implementation, or builder UX. Those land incrementally as decisions firm up.
+
+### Why the short version
+
+Automation is the heaviest of the four primitives (15 items under AU in the working doc concept map). Trying to write the full vision doc before we've actually onboarded a client on the simpler primitives would be premature — we don't yet know which Automation surfaces matter most in practice. The starter doc captures what's settled so it isn't lost, and lays out an explicit "still TBD" list so the unfinished work is visible.
+
+### Structure
+
+Non-technical only. Six parts of an Automation, entry trigger categories, enrollment policy (the "lock recipients?" question explained again), Segment reference, Sequence of Steps with PoC step types (email + wait + exit) and beyond-PoC step types flagged, exit conditions + re-enrollment rules, sender + recipient resolution (cross-referenced to Broadcast), pre-launch verification (cross-referenced to Broadcast), and the three concrete Marker PoC Automations (Cancellation by 2026-05-29, Welcome Kit + Renewal in ~2 weeks).
+
+No "Implementation details" section. Instead a "What's settled vs what's still TBD" section that explicitly lists what's deferred: schema, send-pipeline integration, step-type semantics in detail, branching design, calendar-driven sub-pattern fit, approval mode, re-enrollment defaults, builder UX, per-Automation reporting, in-flight editing.
+
+8 open questions at the bottom — most notably "is email + wait + exit really enough for PoC step types" (yes for Marker's three Automations; revisit as second-agency signal lands), the calendar-driven sub-pattern fit, and the Cancellation Automation Friday deadline practicalities.
+
+### Decisions baked in
+
+- **Three enrollment policies: at-launch / newly-entering / continuous.** Already in working doc; re-stated here.
+- **PoC step types: email, wait, exit.** Other step types (SMS, postcard, branching, tag-add/remove, internal notification, action item, webhook) explicitly post-PoC.
+- **One entry trigger per Automation at PoC.** Multi-trigger Automations probable long-term, deferred for now.
+- **Linear Sequence ordering.** DAG / branching deferred until that step type lands.
+- **Pre-launch verification = shared surface with Broadcast.**
+- **Sender + recipient resolution = same chain + defaults as Broadcast**, with per-Automation and per-Step overrides allowed.
+- **Stop-on-reply** likely yes for PoC since Resend already tracks replies.
+- **Hidden-trigger anti-pattern** explicitly called out (surface entry trigger at the header, never bury in step list — observed in AR per Marker §12.1).
+
+Working doc Companion docs + Reference section updated.
 
 ---
 
