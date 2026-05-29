@@ -1,0 +1,14 @@
+/* PolicyLift webfonts for the prototype.
+
+   The platform ships Inter + Geist via next/font. The page saves don't include
+   the woff2 files (their @font-face src points at ../media/*.woff2, which isn't
+   captured), so each proto page loads Inter + Geist from Google Fonts in <head>.
+
+   The compiled bundle (app.css) references the fonts as var(--font-inter) /
+   var(--font-geist). Those vars are set by two next/font CSS-module classes the
+   platform puts on <body>; we re-declare them here so the vars resolve. */
+
+.inter_fe8b9d92-module__LINzvG__variable { --font-inter: "Inter", "Inter Fallback"; }
+.geist_91de93b2-module__aTViIa__variable { --font-geist: "Geist", "Geist Fallback"; }
+
+body { font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }

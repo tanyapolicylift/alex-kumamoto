@@ -6,3 +6,6 @@ private/
 
 # Workspace View
 .obsidian/workspace.json
+
+# Prototype source captures (saved platform HTML — local only, large/regenerable)
+proto-skeleton/html refs/
