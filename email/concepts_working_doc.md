@@ -470,6 +470,25 @@ Full UX walkthroughs of AR + Lev. Angles weighted by what matters for the new di
 
 > "Here's what AR / Lev look like at full UX-walkthrough depth. Their Segment builders work like [X], their Automation builders like [Y], their recipient verification is [Z]. Here's what I think PolicyLift's answer should differ on. Now let's drill into [canonical field examples / catalog seed / composition mechanics / verification UX / enrollment state shape]."
 
+### 8.7 Competition finding — Levitate is a relationship tool, not a segmentation engine (2026-06-01)
+
+First finding from the competition walkthrough (Martin, live Levitate access). **Levitate's segmentation is genuinely shallow vs. AR — and that's by design, not a missing screen.** Don't benchmark our segmentation against Levitate; the real comparison is AR.
+
+**What Levitate's segmentation actually is:** tags + a fixed "Advanced Filters" panel. Tags are the primary primitive (include-to-expand / must-also-have / exclude); the panel covers standard contact fields only (status checkboxes, ownership, city/state/zip, creation date, last communication, key fact). It is **contact-anchored and flat** — no anchor concept, no child collections, no quantifiers, no AND/OR group tree, no policy-level/relational segmentation. **Custom fields aren't filterable** (Levitate's own docs confirm; a primitive exact-match custom-field box now appears in the panel but with no operators/ranges). Matches our teardown: `research_feature_list.md` 4.6.1 ("Segment Match — rule-based query over 100+ data points": AR ✅, Lev ⚠️) and 3.2.6 / 13.2.17 (custom fields not searchable/filterable).
+
+**The positioning that explains it.** AR and Levitate sit at opposite ends of a spectrum, and "parity" conflates them:
+
+- **AR (and us): data-driven precision** — deep segmentation over insurance data, policy-level triggers, audience verification.
+- **Levitate: relationship warmth + AI ease** — the rep *tags* contacts and sends warm, AI-drafted personal plain-text messages to stay top-of-mind. Segmentation depth isn't the product; low-effort relationship maintenance is. On *its* axis Lev beats AR (AI-personal email, AI tagging game, colored tags + categories, tag logic, keep-in-touch cadence, visual-canvas branching, YOLO mode — all ✅ Lev in the teardown).
+
+**Takeaways for PL:**
+
+1. **Our segmentation differentiator targets AR, not Levitate.** Beating Levitate at segmentation is a non-goal — they don't play that game.
+2. **Levitate validates how much load tags carry.** A whole successful product runs segmentation on tags + a fixed panel — reinforcing our PL-side tags being load-bearing and the **tag→segment bridge** ([`segments.md`](segments.md) PL-side data + the Tags condition category, plus Marker's HawkSoft-tag case in §12.1). For many agencies, tags *are* the segmentation.
+3. **The strategic sweet spot is "Levitate ease + AR depth" — which is exactly tier-1.** PL-authored named Segments give clients Levitate-like pick-from-a-list simplicity on top of an AR-depth engine. Levitate proves agencies will accept (often prefer) a simple segmentation surface; we put the hard part on our side rather than dumbing the engine down.
+
+Sources: [Levitate — Contacts & Search](https://help.levitate.ai/article/24-contacts-and-search), [Custom Fields](https://help.levitate.ai/article/326-custom-fields), [Tags & Tag Logic](https://help.levitate.ai/article/224-tag-logic); `research_feature_list.md` rows 4.6.1, 3.2.6, 13.2.17.
+
 ---
 
 ## 9. Recipient resolution + Sender resolution (properties shared by Broadcast & Automation)

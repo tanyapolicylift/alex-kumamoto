@@ -6,6 +6,28 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-01 — `[research]` `[brainstorm]` Competition finding — Levitate is a relationship tool, not a segmentation engine
+
+Added §8.7 to `concepts_working_doc.md`. First finding from the competition walkthrough — Martin got live Levitate access and was surprised by how shallow its segmentation is ("Advanced Filters" = tags + a fixed field panel). Confirmed against Levitate's docs and our own teardown that this is real and by design.
+
+### The finding
+
+Levitate segmentation = **tags + a fixed Advanced-Filters panel** over standard contact fields only (status / ownership / location / creation date / last communication / key fact). Contact-anchored and flat: no anchor, no child collections, no quantifiers, no AND/OR group tree, no policy-level/relational segmentation. Custom fields not filterable (Lev docs confirm; a primitive exact-match box now exists but no operators). Matches teardown rows 4.6.1 (Segment Match rule-builder: AR ✅ / Lev ⚠️) and 3.2.6 / 13.2.17.
+
+### The positioning
+
+AR and Levitate sit at opposite ends of a spectrum; "parity" conflates them. **AR (and us) = data-driven precision; Levitate = relationship warmth + AI ease** (tag + AI-personal content, keep-in-touch). On segmentation AR ≫ Lev; on its own axis Lev wins (AI email, AI tagging game, tag logic, branching, YOLO mode).
+
+### Takeaways
+
+1. Our segmentation differentiator targets **AR, not Levitate** — beating Lev at segmentation is a non-goal.
+2. Levitate validates how much load **tags** carry → reinforces the tag→segment bridge and PL-side tags as load-bearing.
+3. The sweet spot — **"Levitate ease + AR depth" — is exactly tier-1** (PL-authored named Segments: simple surface, deep engine underneath).
+
+Placed in §8 (competition area, after the §8.4–8.6 investigation subsections) rather than §12, which is reserved for undiluted client voice.
+
+---
+
 ## 2026-06-01 — `[research]` `[brainstorm]` `[docs]` Condition categories (category-first builder) added to `segments.md`
 
 Continuing the Klaviyo teardown (Martin driving, screenshots + their condition reference doc). Added a "Beyond PoC: condition categories (category-first builder)" subsection to the predicate-AST area of `segments.md`, refined the tier-2 builder sketch to be category-first, and added open question #11.
