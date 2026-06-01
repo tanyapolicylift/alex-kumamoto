@@ -429,6 +429,30 @@ Why this isn't a loss of expressive power, only of shape:
 - **DNF — a *union of distinct personas*, `(A AND B) OR (C AND D)` — is deliberately *not* expressed in the predicate.** It's a [composition](#combining-segments--composition): build each AND-group as its own Segment and `union` them via tier-3. Klaviyo's own escape hatch for this case is "make separate segments"; our composition layer is the first-class version. Every boolean formula *has* a CNF, so nothing is strictly inexpressible inside one Segment — but DNF-shaped intent expands combinatorially when forced into CNF, which is exactly the signal that it belongs in composition instead.
 - **Relational complexity stays out of the boolean layer.** Counting and existence ("≥ 2 auto policies under $1k") live in the `quantifier` node / leaf condition (the Mixpanel-sentence, "placed order ≥ 2 times" pattern), not in the AND/OR structure — so the group tree never has to nest to express a relational fact. The boolean layer and the [complexity ladder](#the-complexity-ladder--flat-predicates-to-quantified-relations)'s relational axis are kept orthogonal.
 
+### Beyond PoC: condition categories (category-first builder)
+
+A leaf condition is **not** a uniform `(field, operator, value)` triple. Different *kinds* of condition have fundamentally different grammars — a behavioral/engagement condition needs frequency + recency, a consent condition has fixed semantics and no free operators, a related-record condition needs a quantifier. The clean way to model this — validated by Klaviyo's segment builder (verified 2026-06-01) and Adobe's Attributes/Events/Audiences tabs — is to make the **condition category the first, explicit choice**, and have it select the sub-builder (and the AST node type) underneath. This supersedes the tier-2 sketch's "pick a field, then we infer whether it's a quantifier" approach: pick the *category* first, and the field picker, operators, and value editor follow from it.
+
+Klaviyo's seven categories anchor on Person and query "kinds of facts about a person." Ours anchor on Account / Policy / Contact / … and query facts about the anchor *and its related insurance records*, so the category set differs:
+
+| PL condition category | Klaviyo analog | Builder shape | AST node | PoC? |
+|---|---|---|---|---|
+| **Properties about the [anchor]** | Properties about someone | canonical/raw field → type-driven operator → value editor | `rule` | ✅ core |
+| **Related insurance records (quantified)** | What someone has done | child entity (policy/claim/quote) → `any`/`all`/`none` + count → nested predicate (+ same-row scoping prompt) | `quantifier` | ✅ the differentiator |
+| **Email/SMS engagement** | What someone has done (events) | message event (opened/clicked/bounced/replied) → frequency + recency | `quantifier` over sends | ⏳ needs send history |
+| **Consent / marketing eligibility** | Can/cannot receive marketing | channel → consent state (fixed semantics, no free operators) | specialized `rule` | ✅ critical (exclude unsubscribed) |
+| **In / not in another Segment** | In or not in a list | pick a Segment → in / not-in | composition / `rule` | ✅ (≈ tier-3) |
+| **Tags / PL-side annotations** | (folded into properties) | tag / custom field → has / doesn't-have | PL-side `rule` | ✅ (Marker inspection tag) |
+| **Location** | Proximity / EU GDPR | state (a property) / radius from zip | `rule` / geo | state ✅ (as property); proximity ❌ |
+| **Predictive** | Predictive analytics | ML metrics | — | ❌ (no near-term plan) |
+
+Three categories — consent, segment-membership, tags — confirm that those aren't generic field predicates but distinct condition kinds with their own semantics. And the "Related records" category *is* the [complexity-ladder](#the-complexity-ladder--flat-predicates-to-quantified-relations) quantifier surfaced as a first-class category — Klaviyo's "What someone has done" (frequency + recency over an event collection) is the same machinery, which reinforces keeping the quantifier in the category/leaf and the boolean layer flat (CNF, above).
+
+Two wrinkles Klaviyo's single-anchor model doesn't have:
+
+- **Categories are anchor-dependent.** The available fields ("Properties about the *Policy*" vs "*Account*") and child collections ("Related records" on an Account = policies/claims/quotes; on a Policy = claims + parent account) change with the anchor. The category list and its sub-pickers must be filtered by the Segment's anchor.
+- **Engagement and consent live on *contacts*, but the anchor often isn't a contact.** "Account has a contact who opened the May email" or "…who hasn't unsubscribed" is itself a *quantifier over the account's contacts*. So when anchor ≠ Contact, the engagement and consent categories silently become quantified — and "exclude unsubscribed" on an Account- or Policy-anchored Broadcast is an everyday case, so this needs a sensible default (e.g. "any contact" / "the primary contact") rather than forcing the user to express the quantifier.
+
 ### Beyond PoC: canonical field catalog as first-class
 
 Stored as a table with per-AMS resolution functions:
@@ -471,7 +495,7 @@ The client-facing rule composer. Sketch:
 
 - Anchor entity selector at the top (default Account)
 - Group combinator below ("Match **all** of the following" / "Match **any**")
-- "Add rule" opens a hybrid field picker: categorized panel + search bar on top
+- "Add rule" opens a **condition-category** picker first (see [condition categories](#beyond-poc-condition-categories-category-first-builder) above) — the chosen category selects the sub-builder. Within a category, a hybrid field picker: categorized panel + search bar on top
 - Once a field is picked, operator dropdown filtered by type, value editor adapts to type
 - For many-cardinality fields (e.g. `policies.*` on an Account-anchored Segment), an explicit micro-prompt: "Where the policy [is / is not / there's no policy where] ..." mapping to `any / none / all`
 - When adding a second rule on the same child collection, ask "Same policy as above? Or any matching policy?" → resolves to single-quantifier-group vs separate-quantifier-groups
@@ -495,3 +519,4 @@ Composition UI (tier 3 in the builder world) is a separate authoring mode that c
 8. **Resolution function location.** Where do per-AMS resolutions live in code/config when the catalog ships? TypeScript? Config table? Expression language? See `concepts_working_doc.md` §8.2 open question #1.
 9. **Segments that span agencies.** Mostly out of scope — segments are agency-scoped — but the global Segment case (PL-built, `agency_id = null`) needs explicit ownership / change-control rules.
 10. **Boolean shape — CNF-pinned vs. general tree.** Leaning **CNF (AND-of-OR-groups, one nesting level) inside a Segment, with DNF / union-of-personas pushed to tier-3 composition** — matching Klaviyo and the research doc's nesting cap. Open: confirm tier-1 PL-authored SQL Segments are never forced into this shape (they aren't — raw SQL is unconstrained), and that the tier-2 builder UI never silently distributes a user's DNF intent into a combinatorial CNF blow-up instead of nudging them to composition. Also: do agencies ever genuinely need DNF *within* one Segment in a way composition handles awkwardly (e.g. reporting wants it as one Segment)?
+11. **Condition categories — the PL category set.** Adopting Klaviyo's category-first model (category selects the sub-builder + AST node). Open: lock the PL category list (the table above is the candidate); decide whether Tags is its own category or folds into Properties; decide the default contact-quantifier for engagement/consent conditions on non-Contact anchors ("any contact" vs "primary contact"); and where "in / not in another Segment" lives — an inline condition category vs. only the tier-3 composition recipe (avoid two ways to do the same thing).

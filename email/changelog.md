@@ -6,6 +6,28 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-01 — `[research]` `[brainstorm]` `[docs]` Condition categories (category-first builder) added to `segments.md`
+
+Continuing the Klaviyo teardown (Martin driving, screenshots + their condition reference doc). Added a "Beyond PoC: condition categories (category-first builder)" subsection to the predicate-AST area of `segments.md`, refined the tier-2 builder sketch to be category-first, and added open question #11.
+
+### The finding
+
+Klaviyo's segment builder makes the **condition category the first choice**, and the category swaps the entire sub-builder underneath — field source, operators, quantifiers, value editor. A leaf condition is *not* a uniform `(field, operator, value)` triple; different condition *kinds* have different grammars. Klaviyo's seven categories (per their docs): What someone has done (events: frequency + recency), Properties about someone (attributes), Proximity to a location, In/not in the EU (GDPR), In/not in a list (membership + temporal), Can/cannot receive marketing (consent, fixed semantics), Predictive analytics. Same idea as Adobe's Attributes/Events/Audiences tabs.
+
+### Applied to PL
+
+Adopted the model; the **category set is domain-specific** because we anchor on Account/Policy/Contact/… (not always Person) and query the anchor *plus its related insurance records*. Candidate PL categories (table in the doc): Properties about the anchor (`rule`), Related insurance records / quantified (`quantifier` — the differentiator), Email/SMS engagement (`quantifier` over sends), Consent/marketing eligibility (specialized `rule`, critical for "exclude unsubscribed"), In/not in another Segment (≈ tier-3), Tags/PL-side annotations (PL-side `rule`), Location, Predictive (out).
+
+Key points captured:
+- **Category selects the AST node + sub-builder.** Supersedes the old tier-2 sketch's "pick a field, then infer if it's a quantifier" — now category-first.
+- The "Related records" category *is* the complexity-ladder quantifier surfaced as a first-class category (Klaviyo's "has done" = same machinery), reinforcing the CNF decision (quantifier in the category/leaf, boolean layer flat).
+- Consent / segment-membership / tags being distinct categories confirms they're not generic field predicates.
+- **Two PL-only wrinkles:** (a) categories are **anchor-dependent** (available fields + child collections change with the anchor); (b) **engagement & consent live on contacts**, so on a non-Contact anchor they silently become a quantifier over the account's contacts — "exclude unsubscribed" on an Account-anchored Broadcast needs a sensible default contact-quantifier rather than forcing the user to express it.
+
+Open question #11 logs what's left to lock: the final category list, Tags-as-category vs folded-into-Properties, the default contact-quantifier for engagement/consent on non-Contact anchors, and whether "in/not in another Segment" is an inline category or only the tier-3 recipe (avoid two ways to do one thing).
+
+---
+
 ## 2026-06-01 — `[research]` `[brainstorm]` `[docs]` Boolean shape pinned to CNF (Klaviyo segment-builder teardown)
 
 Refined `segments.md`'s predicate-AST design after pulling apart Klaviyo's segment builder live (Martin driving, screenshots) and confirming against Klaviyo's docs. Added a "Boolean shape: CNF within a Segment, union across Segments" subsection to the predicate-AST section + open question #10.
