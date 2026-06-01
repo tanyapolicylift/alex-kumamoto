@@ -6,6 +6,27 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-01 — `[research]` `[docs]` AR dynamic-content mechanism verified — Path B, not Path C
+
+Resolved the previously-unverified "AR might use Path C" flag in `dynamic-content.md` by checking AR's help docs (merge-field availability + advanced segments). Updated three spots in the doc + resolved open question #3.
+
+### What AR actually does
+
+AR runs sequences on a **per-entity basis** — its **four entity bases: per-account / per-policy / per-contact / per-claim** (confirms Martin's "4 anchors"; we add Quote as a 5th). The basis lives on the **sequence**, set by what triggers/enrolls it — *not* on the segment — and it **gates which merge fields are available**. To merge `{{policy.*}}` the sequence must enroll per-policy; AR's docs: claim merge fields are unavailable unless the sequence enrolls on the New Claim Event, *"since it is possible for customers to have more than one claim … the system will not know which claim it is basing the campaign on."*
+
+This is **Path B (re-anchor to the entity) enforced at the merge-field layer** — there's never more than one record in context, so merge fields resolve unambiguously. It is *not* Path C: there is no render-time query inside the template. For the enumerate-a-list case AR doesn't loop a matched set — it ships a fixed **active-policies component** (teardown 1.1.8) + sequence-level conditional content via Segment Match (1.1.18).
+
+### Doc changes
+
+- **Path B** gains a "Verified precedent — AR works this way" callout (per-entity basis, merge-field gating, the active-policies-widget ceiling).
+- **Path C**'s "possible AR parallel (unverified)" callout flipped to "Not how AR does it (verified)" — no insurance precedent for Path C; SFMC `LookupRows` is the only reference.
+- **PoC recommendation** notes Path B is the *proven* model (AR ships it) and that Path A's general matched-set loop is exactly where we'd beat AR (AR falls back to a fixed widget).
+- **Open question #3** marked RESOLVED.
+
+Architectural contrast captured: AR puts the anchor on the **sequence/enrollment** (gates content); PolicyLift puts the anchor on the **Segment** with fanout on Broadcast/Automation — which is what makes Path A (carry the matched set into the template, loop it) a first-class option AR structurally can't match.
+
+---
+
 ## 2026-06-01 — `[research]` `[brainstorm]` Competition finding — Levitate is a relationship tool, not a segmentation engine
 
 Added §8.7 to `concepts_working_doc.md`. First finding from the competition walkthrough — Martin got live Levitate access and was surprised by how shallow its segmentation is ("Advanced Filters" = tags + a fixed field panel). Confirmed against Levitate's docs and our own teardown that this is real and by design.
