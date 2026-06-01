@@ -6,6 +6,33 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-01 — `[brainstorm]` `[docs]` Fifth companion doc (cross-cutting): `dynamic-content.md`
+
+Created [`dynamic-content.md`](dynamic-content.md) — a cross-cutting companion doc (not tied to one primitive) for rendering related data into a message. Driven by Martin's question: a Segment anchored on Account returns *accounts*, but the email body needs to list each account's *renewing policies* — a filtered child collection, a different dataset than the one the Segment returned.
+
+### The framing that anchors the doc
+
+**Existence vs. enumeration.** A `count(...) > 0` / `any` Account-anchored Segment computes a yes/no test ("does at least one matching policy exist?") and returns accounts. It does not return *which* policies matched. The email needs the actual rows. Same predicate underneath, used as a boolean filter by the Segment vs. an enumerated list by the Template.
+
+**The governing principle:** the list shown in the email must be exactly the set that qualified the recipient — so the displayed collection must be *derived from the same condition* that established membership, never authored separately (or the two drift and you email someone "your policies are renewing: [all of them]").
+
+**The mental model:** a message renders against a *recipient context* = one recipient + the records that resolved to them + that set's related data. Both viable paths converge on this one abstraction.
+
+### Three paths captured (C added at Martin's request)
+
+- **Path A — Account-anchored, expose the matched child set.** `json_agg` the matching policies in the resolve query; Template loops the collection. One email per account falls out free; set is non-empty by construction. **PoC recommendation** (one query change, no new fanout machinery).
+- **Path B — Policy-anchored, roll up to the account.** Segment returns the policies directly; recipient resolution groups by account → one email listing all matches. Cleaner long-term; needs roll-up fanout (N rows → 1 message) as a first-class capability.
+- **Path C — render-time lookup from inside the Template (SFMC `LookupRows` model).** Added this round. Maximally flexible (can pull data the Segment never matched on) but puts a filter *inside the Template*, separate from the Segment → drift risk, so it violates the governing principle for the qualifying-set case. **Posture:** A/B for the qualifying list; C reserved for *supplementary* related data (claims history, last payment) where there's no qualifying-set to stay in sync with.
+  - **Flagged unverified:** Martin's recollection that AR may expose something in the Path-C family — logged as a research item to confirm against an AR walkthrough, not asserted as fact.
+
+### Other content
+
+Template contract extended (declare expected *collection slots*, not just anchor; aggregates + conditionals/pluralization over the collection). Where-it-fits section assigning ownership across the four primitives (Segment = what matched + the matched set; Template = how it renders; Broadcast/Automation = recipient resolution + fanout/roll-up). Implementation details: Path-A `json_agg` query, Path-B group-by-fanout, Path-C render-time lookup, and the normalized `recipient_context` object. 7 open questions — most notably matched-set ownership (Segment vs. campaign wiring), A-vs-B PoC default, and confirming the AR/Path-C parallel.
+
+Working doc Companion docs header + Reference section updated to point at the new doc.
+
+---
+
 ## 2026-06-01 — `[brainstorm]` `[docs]` Segment complexity ladder added to `segments.md`
 
 Added a new section to [`segments.md`](segments.md), **"The complexity ladder — flat predicates to quantified relations"**, placed right after the three-tiers (authorship) section and before the library section. Driven by Martin wanting to understand the Segment concept in depth — specifically the spectrum from "select accounts where status = X" to "accounts with at least N policies of type Y with premium < Z."

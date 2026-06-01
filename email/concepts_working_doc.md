@@ -3,7 +3,7 @@
 **Status:** Live brainstorming notes. Captures framing settled, concepts queued, decisions made, open threads. Eventually breaks into per-concept vision docs (style: Fairs.com `specs/kiosk/kiosk.md` + `specs/registrations/crm-vision.md`).
 **Created:** 2026-05-26
 **Updated:** 2026-05-27 (v5 — restructured around four primitives)
-**Companion docs:** [`segments.md`](segments.md) · [`templates.md`](templates.md) · [`broadcasts.md`](broadcasts.md) · [`automations.md`](automations.md)
+**Companion docs:** [`segments.md`](segments.md) · [`templates.md`](templates.md) · [`broadcasts.md`](broadcasts.md) · [`automations.md`](automations.md) · [`dynamic-content.md`](dynamic-content.md)
 **Related:** [`research_segment_builder_ux.md`](research_segment_builder_ux.md) · [`client_feedback.md`](client_feedback.md) · [`data_object_map.md`](data_object_map.md) · [`research_feature_list.md`](research_feature_list.md) · [`email_automation_system_requirements.md`](email_automation_system_requirements.md) · [`changelog.md`](changelog.md)
 
 > **How to use:** Read top-to-bottom on first pickup. After that, jump to "The four primitives" (§5) for vocabulary, "Concept map" (§7) for status, "Active thread" (§8) for the current question, "Client signal" (§12) for real-world grounding. Doc-level changelog lives in [`changelog.md`](changelog.md).
@@ -623,6 +623,7 @@ Pulled from `client_feedback.md` plus live onboarding signal (§12). These are s
 - [`templates.md`](templates.md) — companion doc, the Template primitive in full detail (non-technical → implementation details)
 - [`broadcasts.md`](broadcasts.md) — companion doc, the Broadcast primitive in full detail (non-technical → implementation details)
 - [`automations.md`](automations.md) — companion doc, the Automation primitive (short / starter version; implementation details deferred)
+- [`dynamic-content.md`](dynamic-content.md) — cross-cutting companion doc: rendering related data (filtered child collections) into a message — the "list of renewing policies" problem
 - [`changelog.md`](changelog.md) — running narrative log of brainstorm decisions, doc restructures, research, client signal
 - [`research_segment_builder_ux.md`](research_segment_builder_ux.md) — segment builder UX patterns across ~15 products (2026-05-26)
 - [`client_feedback.md`](client_feedback.md) — feedback from 5 named clients
