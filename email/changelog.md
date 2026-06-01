@@ -6,6 +6,31 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-01 — `[research]` `[brainstorm]` `[docs]` Boolean shape pinned to CNF (Klaviyo segment-builder teardown)
+
+Refined `segments.md`'s predicate-AST design after pulling apart Klaviyo's segment builder live (Martin driving, screenshots) and confirming against Klaviyo's docs. Added a "Boolean shape: CNF within a Segment, union across Segments" subsection to the predicate-AST section + open question #10.
+
+### What the Klaviyo teardown established
+
+Klaviyo's standard segment builder is **pinned to CNF** — a top-level AND of OR-groups, exactly one level of nesting. Confirmed from their docs:
+
+- *"the OR connector acts as if it's contained within parentheses … sandwiched between 2 AND connectors"* — OR binds tighter; it's the **inner** operator.
+- Condition groups are **joined by a hardwired AND** (Klaviyo's API model); there is no top-level OR.
+- Consequence observed in the UI: flipping an inner OR to AND **ejects** the condition to the top level. So `(A OR B) AND (C OR D)` is buildable; **`(A AND B) OR (C AND D)` is not.** A Klaviyo community thread confirms the standard builder doesn't support that DNF shape.
+
+(Process note: took two wrong turns reading the toggle states off screenshots before going to the docs — the docs settled it. Lesson logged: go to source earlier for behavioral claims.)
+
+### Decision captured
+
+- **Single-Segment predicate = CNF** (AND-of-OR-groups, one nesting level). Not a freely-nested AND/OR tree. Matches both Klaviyo and the research doc's "cap visible nesting at 2 levels."
+- **DNF / union-of-personas (`(A AND B) OR (C AND D)`) is handled by tier-3 composition** (build each AND-group as a Segment, `union` them), not inside the predicate. Klaviyo's own escape hatch is "make separate segments"; our composition layer is the first-class version. Every formula has a CNF, so nothing is strictly inexpressible in one Segment — but DNF intent blows up combinatorially in CNF, which is the signal it belongs in composition.
+- **Quantifier / counting stays in the leaf** (Mixpanel-sentence "≥ 2 times" pattern), keeping the relational axis (the complexity ladder) orthogonal to the boolean axis so the group tree never has to nest for a relational fact.
+- Resolves the prior vague "Mixing AND with OR requires nesting" note in the AST section to *exactly one level — CNF*.
+
+This is a beyond-PoC AST refinement (PoC tier-1 SQL Segments are unconstrained); the relevance is for the tier-2 client builder and the eventual AST compiler.
+
+---
+
 ## 2026-06-01 — `[brainstorm]` `[docs]` Fifth companion doc (cross-cutting): `dynamic-content.md`
 
 Created [`dynamic-content.md`](dynamic-content.md) — a cross-cutting companion doc (not tied to one primitive) for rendering related data into a message. Driven by Martin's question: a Segment anchored on Account returns *accounts*, but the email body needs to list each account's *renewing policies* — a filtered child collection, a different dataset than the one the Segment returned.

@@ -413,11 +413,21 @@ Each Segment stores a serialized predicate (JSON), not raw SQL. A compiler turns
 Format:
 
 - `anchor` at the top — every Segment has one anchor entity
-- `type: "group"` — AND/OR composition. Mixing AND with OR requires nesting, in line with research best practice.
+- `type: "group"` — boolean composition. **Pinned to CNF: a top-level AND of OR-groups, exactly one level of nesting** (see below). Not a freely-nested AND/OR tree.
 - `type: "quantifier"` — explicit existence / universal predicates over child collections. `scope` is `any | all | none`. This is the cleaner version of AR's "set of sets" UI pattern.
 - `type: "rule"` — leaf predicates with `field` referencing a canonical field ID or raw AMS path.
 
 PoC SQL Segments can migrate to AST form via a synthetic "raw SQL rule" type if backward compatibility is needed during the transition.
+
+#### Boolean shape: CNF within a Segment, union across Segments
+
+A single Segment's predicate is **pinned to CNF — a top-level AND of OR-groups, with exactly one level of nesting** (`AND( OR(...), OR(...), ... )`). This is *not* a freely-nestable AND/OR tree. The decision follows both the research doc's "cap visible nesting at 2 levels" guidance and Klaviyo's segment builder, which pins to the same shape: groups are joined by a hardwired AND, and OR lives only *inside* a group (OR binds tighter, auto-parenthesized between ANDs — so flipping an inner OR to AND ejects the condition to the top level). Verified against Klaviyo's docs, 2026-06-01 (see `changelog.md`).
+
+Why this isn't a loss of expressive power, only of shape:
+
+- **CNF is the natural form for *narrowing one audience*** — keep adding required gates with AND, each gate allowing alternatives with OR ("engaged (opened OR clicked) AND is a customer AND in (CA OR NY)"). This is how agencies actually reason about who a campaign is for.
+- **DNF — a *union of distinct personas*, `(A AND B) OR (C AND D)` — is deliberately *not* expressed in the predicate.** It's a [composition](#combining-segments--composition): build each AND-group as its own Segment and `union` them via tier-3. Klaviyo's own escape hatch for this case is "make separate segments"; our composition layer is the first-class version. Every boolean formula *has* a CNF, so nothing is strictly inexpressible inside one Segment — but DNF-shaped intent expands combinatorially when forced into CNF, which is exactly the signal that it belongs in composition instead.
+- **Relational complexity stays out of the boolean layer.** Counting and existence ("≥ 2 auto policies under $1k") live in the `quantifier` node / leaf condition (the Mixpanel-sentence, "placed order ≥ 2 times" pattern), not in the AND/OR structure — so the group tree never has to nest to express a relational fact. The boolean layer and the [complexity ladder](#the-complexity-ladder--flat-predicates-to-quantified-relations)'s relational axis are kept orthogonal.
 
 ### Beyond PoC: canonical field catalog as first-class
 
@@ -484,3 +494,4 @@ Composition UI (tier 3 in the builder world) is a separate authoring mode that c
 7. **Tier-3 operator vocabulary.** Going with "include / intersect / except." If a customer trips on this, revisit (`union` vs `or`, `except` vs `not`, etc.).
 8. **Resolution function location.** Where do per-AMS resolutions live in code/config when the catalog ships? TypeScript? Config table? Expression language? See `concepts_working_doc.md` §8.2 open question #1.
 9. **Segments that span agencies.** Mostly out of scope — segments are agency-scoped — but the global Segment case (PL-built, `agency_id = null`) needs explicit ownership / change-control rules.
+10. **Boolean shape — CNF-pinned vs. general tree.** Leaning **CNF (AND-of-OR-groups, one nesting level) inside a Segment, with DNF / union-of-personas pushed to tier-3 composition** — matching Klaviyo and the research doc's nesting cap. Open: confirm tier-1 PL-authored SQL Segments are never forced into this shape (they aren't — raw SQL is unconstrained), and that the tier-2 builder UI never silently distributes a user's DNF intent into a combinatorial CNF blow-up instead of nudging them to composition. Also: do agencies ever genuinely need DNF *within* one Segment in a way composition handles awkwardly (e.g. reporting wants it as one Segment)?
