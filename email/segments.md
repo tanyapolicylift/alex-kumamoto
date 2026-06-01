@@ -75,6 +75,53 @@ Tier 3 ships with PoC. Combining Segments is straightforward to build and immedi
 
 ---
 
+## The complexity ladder — flat predicates to quantified relations
+
+The three tiers above are about *who* authors a Segment. This section is about *what the criteria can express* — and that's a separate axis. Criteria range from trivial ("accounts where status = active") to genuinely demanding ("accounts with at least 2 auto policies under $1,000 each"), and understanding the rungs between them is the single most important concept in the whole Segment design. It's the gap that Reach's too-simple Segment shape couldn't cross, and it's why we anchor Segments on an entity in the first place.
+
+The governing rule is simple: **complexity is driven by the relationship between a criterion and the anchor.** A criterion that lives *on the anchor itself* is flat and easy. A criterion that lives on a *different, related* entity forces a question that flat filtering never has to answer. Here's the ladder, with anchor = **Account** held constant so the escalation is visible.
+
+**Rung 0 — single predicate on the anchor.** `status = active`. One entity, one field, one operator.
+
+**Rung 1 — several predicates on the anchor, AND/OR combined.** `status = active AND state = CA`. Still all fields *of the account*. Flat. This is where most marketing tools max out.
+
+**Rung 2 — a predicate on a *related* entity (the leap).** "Accounts that have an auto policy." The anchor is Account, but `type = auto` is a fact about **Policy**, a child collection. Crossing that boundary forces a question that didn't exist below: an account has *many* policies — how many have to match? That's the **quantifier**, with three settings (`any` / `all` / `none`):
+
+- **any** — has at least one auto policy
+- **all** — *every* policy is auto
+- **none** — has no auto policy
+
+Rungs 0–1 are "filtering a table." Rung 2 and up are "asking a question about a related set." This is the conceptual cliff.
+
+**Rung 3 — multiple conditions on the child, and the same-row trap.** "Accounts that have a policy of type auto **with premium < $1,000**." Two conditions now live on the policy, and a subtle, bug-prone question appears: *do both conditions have to hold on the **same** policy, or can they be satisfied by **different** policies?* "Same policy" = the account has one auto policy that is also cheap. "Any policy" = the account has *some* auto policy *and* *some* cheap policy — possibly two different ones. These return different account sets, and getting it wrong silently sends the wrong campaign. This is the *"Same policy as above? Or any matching policy?"* micro-prompt in the tier-2 builder sketch (see Implementation details). It is the #1 footgun in relational segmentation.
+
+**Rung 4 — counting.** "Accounts with **at least 2** auto policies under $1,000." This upgrades the quantifier from *existence* (`any` = "at least 1") to a *threshold count* (≥ 2, exactly 1, between 2 and 5…). Most marketing tools can't do this at all. Rungs 3 + 4 stacked — "at least X policies of type Y with premium < Z, same policy" — is a genuinely demanding query.
+
+**Rung 5 — multiple child collections, mixed quantifiers, negation.** "Accounts with an auto policy (`any`) **AND** no open claims (`none`) **AND** all policies in force (`all`)." Each child collection gets its own independent quantifier. Negation interacts with the quantifier in a way people get wrong: "no policy of type X" (`none` over `type = X`) is **not** the same as "a policy that is not type X" (`any` over `type ≠ X`). Same words, opposite meaning.
+
+**Rung 6 — computed / canonical fields + status guards.** Swap a raw column for a derived concept: `renewing_in_days <= 30`. Not a stored field — computed per-AMS (see [Canonical fields](#canonical-fields--same-concept-different-ams-shapes) below) and dragging along a status guard (`status = active`) so stale dates on canceled policies don't leak in. The complexity here isn't structural; it's that the field hides a per-AMS resolution plus a companion predicate.
+
+**Rung 7 — cross-source (AMS + PolicyLift-side data in one expression).** "…renewing in 30 days [AMS] **AND** has 'Inspection Pending' tag [PL] **AND** not unsubscribed [PL suppression]." The engine joins two data sources in one predicate; the client never has to know which fact came from where. (See [PolicyLift-side data in Segments](#policylift-side-data-in-segments) below.)
+
+**Rung 8 — composition (a different *level* entirely).** This is tier 3. You're no longer building one predicate tree — you're combining whole *answers* with set operators: `(Auto below state min) ∩ (in California) − (contacted this month)`. It sits *above* the ladder because each operand is itself a Segment that internally can be anywhere from rung 0 to rung 7. (See [Combining Segments](#combining-segments--composition) below.)
+
+### The insight that ties it together — anchor choice moves the complexity
+
+The same real-world intent can land on different rungs depending on the anchor, because **the anchor decides which predicates are flat and which require a quantifier:**
+
+- Anchor = **Account**: "has ≥ X auto policies under $Z" is a *quantified, counted* predicate over a child collection — rungs 3–4. Hard.
+- Anchor = **Policy**: "type = auto AND premium < Z" is a *flat* predicate on the anchor itself — rung 1. Easy. And the same-row question vanishes, because each row *is* one policy.
+
+Same intent, wildly different query complexity — and a different result *shape* (accounts vs policies). This is why the anchor is a first-class, immutable property of a Segment, and why **cross-anchor lifting** ("which accounts have ≥ 1 matching policy?" — see Implementation details) is the bridge between the two views. Choosing the anchor *is* choosing where the complexity lands.
+
+### Why this maps onto the tiers
+
+At **PoC, none of this is exposed to clients** — PolicyLift hand-writes the SQL, including the quantifiers, same-row joins, and counts, so every rung is reachable on day one *for PL authors*. The ladder only becomes a *UI* problem at tier 2, and rungs 2–5 are brutal to expose safely (the same-row trap and the negation/quantifier interaction are where untrained users send the wrong campaign). That difficulty is the concrete reason tier 2 is deferred until we have client signal on which rungs they actually reach for.
+
+One orthogonal note: **operators are gated by field type** (number → `gt`/`lte`/`between`; enum → `eq`/`in`; date → `before`/`within N days`). That constrains the leaves of any predicate but adds no structural depth — it's a separate axis from the ladder.
+
+---
+
 ## Browsing Segments — the library
 
 The Segment library is one of the four screens clients touch in the email product (alongside the Template editor, Broadcast builder, and Automation builder). It's a list view of every Segment available to the client's agency — both PolicyLift-built and any client-saved compositions.

@@ -6,6 +6,34 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-01 — `[brainstorm]` `[docs]` Segment complexity ladder added to `segments.md`
+
+Added a new section to [`segments.md`](segments.md), **"The complexity ladder — flat predicates to quantified relations"**, placed right after the three-tiers (authorship) section and before the library section. Driven by Martin wanting to understand the Segment concept in depth — specifically the spectrum from "select accounts where status = X" to "accounts with at least N policies of type Y with premium < Z."
+
+### The core distinction the section draws
+
+Authorship tier (*who* builds a Segment) and predicate complexity (*what* the criteria can express) are **orthogonal axes**. The doc already covered tiers; this section covers the second axis explicitly for the first time.
+
+### The ladder (anchor = Account held constant)
+
+- **Rung 0** — single predicate on the anchor (`status = active`)
+- **Rung 1** — several anchor predicates, AND/OR (flat; where most marketing tools max out)
+- **Rung 2** — predicate on a *related* entity → forces the **quantifier** (`any`/`all`/`none`). The conceptual cliff: filtering a table vs. asking a question about a related set.
+- **Rung 3** — multiple conditions on the child → the **same-row trap** ("same policy?" vs "any policy?"). Flagged as the #1 footgun in relational segmentation.
+- **Rung 4** — counting (existence → threshold count, "at least 2")
+- **Rung 5** — multiple child collections, mixed quantifiers, **negation/quantifier interaction** ("no policy of type X" ≠ "a policy that is not type X")
+- **Rung 6** — computed / canonical fields + status guards
+- **Rung 7** — cross-source (AMS + PL-side data in one expression)
+- **Rung 8** — composition (tier 3; a different *level*, combining whole answers)
+
+### Load-bearing insight
+
+**Anchor choice moves the complexity.** The same intent ("auto policies under $Z") is a flat rung-1 predicate when anchored on Policy but a quantified rung-3/4 predicate when anchored on Account — and returns a different result shape. This is why anchor is immutable and why cross-anchor lifting is the bridge. Section closes by mapping the ladder back onto the tiers: every rung is reachable by PL authors at PoC (hand-written SQL), but rungs 2–5 are exactly what makes tier-2 client authoring hard to expose safely — the concrete reason tier 2 is deferred.
+
+No new decisions to ratify — this consolidates and names concepts already implicit in the doc (quantifiers, same-row scoping, canonical fields, composition). Pure conceptual clarification. Open spots noted for later: same-row scoping default, count-threshold UX, and vacuous-truth behavior of `all` over an empty collection.
+
+---
+
 ## 2026-05-27 — `[docs]` Fourth companion doc (short version): `automations.md`
 
 Created [`automations.md`](automations.md) — fourth companion doc, intentionally a **starter / short version** at Martin's request. Captures the concepts we've aligned on so far without committing to schema, send pipeline, step-type implementation, or builder UX. Those land incrementally as decisions firm up.
