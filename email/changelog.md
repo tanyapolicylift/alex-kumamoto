@@ -6,6 +6,32 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-02 — `[brainstorm]` `[docs]` Defer canonical fields; reframe around `ams.` / `pl.` / `calc.`
+
+Bigger simplification at Martin's push: do we need canonical fields + cross-AMS mapping at all, vs. just exposing AMS data directly? Answer: **no, not at PoC** — and it's even cleaner than that, because the field-by-source model is the simplest correct framing.
+
+### The reframe
+
+Reference fields by **source**, not by a canonical abstraction:
+- **`ams.*`** — data from the AMS (a *source* label, not storage — invisible whether it's a normalized CXP column or raw `ams_data` JSONB underneath).
+- **`pl.*`** — data from PolicyLift (conversations, tags, NPS, suppression, custom fields).
+
+Martin's example: `count(ams.policy where status='active') > 0 AND count(pl.conversation where type='chat') = 0`.
+
+**At PoC there's no canonical/normalization layer at all:** one AMS (HawkSoft) → nothing to map across; PL-only authoring → no need for a friendly vocabulary. Segments reference `ams.*`/`pl.*` directly; computed concepts (days-until-renewal, days-since-sold) are written **inline**, not as named fields. This is close to what AR does (raw per-AMS field access + selective normalization).
+
+**Derived fields** answer ("ams, pl, or sth else?"): a third namespace, **`calc.*`** — a *named expression* over `ams.`/`pl.` inputs (e.g. `calc.policy.days_until_renewal`). A `calc.*` field is exactly the old "canonical field"; per-AMS resolution lives *inside* its definition. Staged path: **(1) `ams.`/`pl.` raw + inline math [PoC] → (2) name a `calc.*` field [when reused / tier-2] → (3) per-AMS resolution inside it [when 2nd AMS needs it]**. Complicate only where forced.
+
+### Doc changes
+
+- `segments.md`: "Canonical fields — same concept, different AMS shapes" → **"Fields by source — `ams.`, `pl.`, and (later) `calc.`"**; canonical demoted to deferred `calc.*`. Rung-6 reworded (computed, not "canonical"). Anchor link updated.
+- `segment_library_poc.md`: retitled (dropped "+ Canonical-Field Seed"); Part 1 → "The fields these segments read" with `ams.*`/`pl.*` field table (dropped the derived `renewing_in_days`/`days_since_sold` rows — they're inline); field notes reframed HawkSoft-concrete (no cross-AMS "mapping TBD"); Part 2 predicates rewritten in `ams.`/`pl.` + `count(...)` quantifier syntax + inline renewal math; open questions refocused on confirming HawkSoft paths.
+- `concepts_working_doc.md` §4.3: added a "reframed — deferred" note pointing to the new model (content kept as the eventual `calc.*` design); §13 reference line updated.
+
+Consistent with the simplification preference saved to memory. Watch item unchanged: introduce `calc.*` / per-AMS resolution at the 2nd-AMS threshold (segments.md open Q1).
+
+---
+
 ## 2026-06-02 — `[brainstorm]` `[docs]` Cut "status guard" as a concept — it's just a condition
 
 Simplification at Martin's push ("isn't a guard just another condition? I want to simplify as much as possible"). It is — `status = active` compiles to a plain `AND` with no special behavior — so we removed "guard" as a named concept/column/vocabulary while **keeping the domain knowledge** (canceled policies have stale dates → renewal-type segments must filter `status = active`; Marker §12.1).

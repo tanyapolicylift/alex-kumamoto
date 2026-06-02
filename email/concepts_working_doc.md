@@ -101,6 +101,8 @@ These advance independently. Convenience-goal improvements (richer Carrier entit
 
 ### 4.3 Canonical field vocabulary — the unifying layer
 
+> **Reframed 2026-06-02 — deferred (Martin).** This whole layer is now **post-PoC**. At PoC we reference fields by *source* — `ams.*` (from the AMS) and `pl.*` (from PolicyLift) — directly, with computed concepts written inline; with one AMS and PL-only authoring there's nothing to unify. The "canonical field" described below is renamed `calc.*` (a named expression over `ams.`/`pl.` inputs) and introduced only when a concept is reused, exposed to tier-2, or needed across a 2nd AMS. See [`segments.md` → Fields by source](segments.md) for the staged model. The content below is the *eventual* `calc.*` design.
+
 (Working name; we may rename.) The conceptual layer the client sees in the Segment builder. The user picks "Policy age > 365 days," not `ams_data->>'policy_inception_dt' < now() - 365` — because under the hood, "policy age" resolves differently across the 6+ AMSes.
 
 A canonical field has:
@@ -662,7 +664,7 @@ Alex relayed the concrete Segment / Automation use cases clients have asked for,
 - [`broadcasts.md`](broadcasts.md) — companion doc, the Broadcast primitive in full detail (non-technical → implementation details)
 - [`automations.md`](automations.md) — companion doc, the Automation primitive (short / starter version; implementation details deferred)
 - [`dynamic-content.md`](dynamic-content.md) — cross-cutting companion doc: rendering related data (filtered child collections) into a message — the "list of renewing policies" problem
-- [`segment_library_poc.md`](segment_library_poc.md) — the concrete tier-1 PoC Segments (from §12.2 use cases) + the canonical-field seed they require; per-AMS resolutions provisional
+- [`segment_library_poc.md`](segment_library_poc.md) — the concrete tier-1 PoC Segments (from §12.2 use cases) + the `ams.`/`pl.` fields they read; HawkSoft field paths provisional
 - [`changelog.md`](changelog.md) — running narrative log of brainstorm decisions, doc restructures, research, client signal
 - [`research_segment_builder_ux.md`](research_segment_builder_ux.md) — segment builder UX patterns across ~15 products (2026-05-26)
 - [`client_feedback.md`](client_feedback.md) — feedback from 5 named clients

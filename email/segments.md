@@ -4,7 +4,7 @@
 
 **Created:** 2026-05-27
 
-**Related:** [`concepts_working_doc.md`](concepts_working_doc.md) · [`segment_library_poc.md`](segment_library_poc.md) (concrete tier-1 Segments + canonical-field seed) · [`research_segment_builder_ux.md`](research_segment_builder_ux.md) · [`changelog.md`](changelog.md)
+**Related:** [`concepts_working_doc.md`](concepts_working_doc.md) · [`segment_library_poc.md`](segment_library_poc.md) (concrete tier-1 Segments + the `ams.`/`pl.` fields they read) · [`research_segment_builder_ux.md`](research_segment_builder_ux.md) · [`changelog.md`](changelog.md)
 
 ---
 
@@ -99,7 +99,7 @@ Rungs 0–1 are "filtering a table." Rung 2 and up are "asking a question about 
 
 **Rung 5 — multiple child collections, mixed quantifiers, negation.** "Accounts with an auto policy (`any`) **AND** no open claims (`none`) **AND** all policies in force (`all`)." Each child collection gets its own independent quantifier. Negation interacts with the quantifier in a way people get wrong: "no policy of type X" (`none` over `type = X`) is **not** the same as "a policy that is not type X" (`any` over `type ≠ X`). Same words, opposite meaning.
 
-**Rung 6 — computed / canonical fields.** Swap a raw column for a derived concept: `renewing_in_days <= 30`. Not a stored field — computed per-AMS (see [Canonical fields](#canonical-fields--same-concept-different-ams-shapes) below). You'll usually pair it with a plain `status = active` condition (canceled policies have stale dates — see the "policy in force" note below). The complexity here isn't structural; it's that the field hides a per-AMS resolution.
+**Rung 6 — computed fields.** Swap a raw column for a derived concept: "days until renewal `<= 30`". Not a stored field — computed from `ams.policy.renewal_date` (or `effective_date + term`); written inline at PoC, a named `calc.*` field later (see [Fields by source](#fields-by-source--ams-pl-and-later-calc) below). You'll usually pair it with a plain `ams.policy.status = active` condition (canceled policies have stale dates — see the "policy in force" note below). The complexity here isn't structural; it's that the value is computed, not stored.
 
 **Rung 7 — cross-source (AMS + PolicyLift-side data in one expression).** "…renewing in 30 days [AMS] **AND** has 'Inspection Pending' tag [PL] **AND** not unsubscribed [PL suppression]." The engine joins two data sources in one predicate; the client never has to know which fact came from where. (See [PolicyLift-side data in Segments](#policylift-side-data-in-segments) below.)
 
@@ -198,26 +198,30 @@ Treating Segments as questions instead of lists keeps the data model simple and 
 
 ---
 
-## Canonical fields — same concept, different AMS shapes
+## Fields by source — `ams.`, `pl.`, and (later) `calc.`
 
-Insurance agencies don't all use the same agency management system. PolicyLift currently integrates with seven (HawkSoft, EZLynx, Sentry, QQCatalyst, Momentum, AgencyMatrix, NASA Eclipse) and each stores its data differently. "Policy renewal date" lives in seven different places, sometimes computed differently, sometimes named differently, sometimes missing entirely.
+A Segment's predicate references fields, and the simplest useful model names them by **source**:
 
-Clients don't want to know about that. When they ask for a "renewal in 30 days" Segment, they expect it to work the same way regardless of their AMS.
+- **`ams.*`** — data that originates in the AMS: `ams.policy.status`, `ams.policy.renewal_date`, `ams.policy.substatus`. This is a *source* label, not a storage one — whether PolicyLift keeps a field in a normalized CXP column or reads it from raw `ams_data` JSONB is invisible *under* the `ams.` name; the author doesn't care.
+- **`pl.*`** — data that originates in PolicyLift: `pl.conversation.type`, tags, NPS responses, consent/suppression, custom fields, lifecycle markers.
 
-The unifying layer is what we call a **canonical field** — a client-facing concept ("Policy renewing in N days") that resolves per-AMS underneath. The client picks "renewal in N days"; PolicyLift's Segment engine knows how to compute that for HawkSoft vs EZLynx vs NASA.
+So "accounts with an active policy and no chats" is `count(ams.policy where status = 'active') > 0 AND count(pl.conversation where type = 'chat') = 0`.
 
-A canonical field carries:
+### At PoC: no canonical / mapping layer
 
-- A **display name + definition** ("Policy age" = days since the policy was first written)
-- The **AMSes it works on** — sometimes a field is genuinely missing from one AMS, and the Segment builder should grey out gracefully rather than pretend
-- A **type** (number, date, true/false, currency, list-of-values) — drives which operators apply
-- Per-AMS **resolution functions** — the actual logic that turns the raw AMS data into the canonical value
+PoC onboards one agency on one AMS (Marker / HawkSoft) and only PolicyLift authors Segments (tier-1 SQL). With **one** AMS there is nothing to map *across*, and with **PL-only** authoring nobody needs a friendly vocabulary that hides field names — so we **don't build a normalization layer**. Segments reference `ams.*` / `pl.*` fields directly, and each `ams.*` field resolves to one concrete HawkSoft location (a CXP column or a JSONB path). Computed concepts are written **inline** in the SQL — e.g. `ams.policy.renewal_date BETWEEN now() AND now() + 30d`, or `ams.policy.effective_date + <term>` where a reliable renewal date is missing. Clunky but honest — and PL writes it, not clients.
 
-Some canonical fields are simple lookups ("the policy's status"). Some are computed from raw AMS data ("days until renewal," derived from one of three possible date fields per AMS). Some depend on reference data PolicyLift maintains ("Is at or below state minimum," which uses a state-by-state minimum-limits table that gets updated when states change their requirements).
+This is close to what Agency Revolution does: its Advanced Segment exposes raw per-AMS fields directly (an "AMS/BMS section… [that] varies from system to system"), normalizing only selectively (policy-type, renewal proxy).
 
-For PoC, PolicyLift writes per-AMS logic by hand directly into each Segment's query. There's no canonical-field catalog as a separate concept yet — the complexity lives in PL's Segment library, which is OK because PL is the only one authoring at PoC. The canonical-field catalog as a first-class concept ships before client-built Segments (tier 2), because the moment clients can pick fields, they need a unified field vocabulary that doesn't expose AMS internals.
+### Later: `calc.*` — the unified / computed layer (deferred)
 
-The deeper canonical-field design — shape, catalog model, versioning, agency extensions — lives in [`concepts_working_doc.md > §4.3`](concepts_working_doc.md) until it deserves its own companion doc.
+When a computed concept is reused enough to deserve a name, or is exposed to tier-2 self-serve clients who can't write raw expressions, promote it to a **`calc.*` field** — a *named expression* over `ams.` / `pl.` inputs (e.g. `calc.policy.days_until_renewal`). The prefix flags "computed, possibly approximate / AMS-dependent." A `calc.` field is exactly what earlier drafts called a *canonical field*: it carries a definition, a type, the AMSes it works on, and — **only when a second AMS needs that same field** — a per-AMS resolution inside its definition. (Some are reference-data-backed, e.g. "at or below state minimum" against a state-minimums table.) So the model complicates only where forced:
+
+1. **`ams.` / `pl.` raw, math inline** ← PoC (one AMS, PL authors)
+2. **name a `calc.` field** ← when reused, or exposed to tier-2
+3. **per-AMS resolution inside a `calc.` field** ← only when a 2nd AMS needs that field
+
+The "seven AMSes store renewal date seven different ways" problem is real — but it's a *step-2/3, multi-AMS* problem, not a PoC one. The deeper design (catalog, versioning, agency extensions) lives in [`concepts_working_doc.md > §4.3`](concepts_working_doc.md), deferred until that step actually arrives.
 
 ### A note on the "policy in force" filter
 
