@@ -57,7 +57,7 @@ PolicyLift's team writes Segments on the client's behalf. The client picks from 
 
 This is the only tier we ship at PoC, and the only one we need to onboard real customers. Why: insurance segmentation is hard and AMSes vary wildly. The first time a client gets to author a Segment from scratch is also the first time they get to author it *wrong* — and a wrong Segment sends a wrong campaign to real customers. Starting with PL-authored Segments lets us onboard fast and learn what clients actually need before exposing them to authoring.
 
-When a client needs a Segment that doesn't exist yet, they file a service request. PolicyLift creates it, sends a preview link or a Loom showing how it works, and the client approves. This concierge model is operational at PoC, not a fallback.
+When a client needs a Segment that doesn't exist yet, they arrange it with the PolicyLift ops team **directly, out of band** (clients are already in regular contact with ops); PolicyLift creates it as a **Managed** Segment, shares a preview or a Loom, and the client confirms. This concierge model is operational at PoC, not a fallback — and there's deliberately **no in-product request flow** in the first cut.
 
 ### Tier 2 — clients build their own simple Segments
 
@@ -124,21 +124,22 @@ One orthogonal note: **operators are gated by field type** (number → `gt`/`lte
 
 ## Browsing Segments — the library
 
-The Segment library is one of the four screens clients touch in the email product (alongside the Template editor, Broadcast builder, and Automation builder). It's a list view of every Segment available to the client's agency — both PolicyLift-built and any client-saved compositions.
+The Segment library is one of the four screens clients touch in the email product (alongside the Template editor, Broadcast builder, and Automation builder). It's a list view of every Segment available to the client's agency. There are two kinds, marked in each row (Reach-style): **Managed** — PolicyLift/ops-built, read-only to the client — and **Regular** — client-built and editable.
 
 Each row in the library shows:
 
 - **Name** and short description
+- **Kind** — a **Managed** / **Regular** badge: Managed are PL-built and read-only; Regular are client-built and editable
 - **Category badge** — Renewal / Cross-sell / Lifecycle / Marketing / Hygiene / etc.
 - **Anchor type** — small icon indicating whether it returns accounts, policies, contacts, etc.
 - **Current count** — "284 matches" as of the last refresh
 - **AMS compatibility** — a small chip showing which AMSes the Segment works on. Most work on all; some are AMS-specific.
 
-Clients can filter by anchor type, category, or AMS compatibility, search by name + description, and sort by name / count / recently used. Clicking a row opens a detail view.
+Clients can filter by anchor type, category, kind (Managed / Regular), or AMS compatibility, search by name + description, and sort by name / count / recently used. Clicking a row opens a detail view.
 
-The detail view shows the full description, the current count with a refresh button, a sample preview (covered next), and a "Use in Broadcast" / "Use in Automation" CTA. There's no editing affordance for clients — only PolicyLift staff can change a Segment's underlying logic, via a service request from the client.
+The detail view shows the full description, the current count with a refresh button, a sample preview (covered next), and a "Use in Broadcast" / "Use in Automation" CTA. **Managed** Segments are read-only here (a "Managed by PolicyLift" note, no edit) — their logic is maintained by PolicyLift; **Regular** Segments show an **Edit** action that opens the builder.
 
-The library is also where clients realize a Segment they want doesn't exist. The flow is: search → don't find what they need → click "Request a new Segment" → fill out a short form describing the criteria → PolicyLift builds it and sends back a preview link.
+When a client needs a Managed Segment created or changed, they arrange it with the PolicyLift ops team **directly, out of band** — there is no in-product request flow (clients are already in regular contact with ops). An in-product "request a segment" surface may come later, but it's deliberately not in the first cut.
 
 ---
 

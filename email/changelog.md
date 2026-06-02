@@ -6,6 +6,17 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-02 — `[brainstorm]` `[docs]` Managed vs Regular segments; drop in-product request flow
+
+Two segment-library decisions (Martin):
+
+- **Drop "Request a Segment" from the product (first cut).** Clients are already in regular contact with the ops team, so new/changed Managed segments are arranged **out of band** — no in-product request screen yet (may come later).
+- **Managed vs Regular kinds (Reach-style).** **Managed** = PolicyLift/ops-built, **read-only** to the client; **Regular** = client-built, **editable**. Each library row is marked; the edit affordance is gated by kind. This replaces the vaguer "PL-built / yours" source badge and ties editability to kind. (Maps onto the tiers: Managed ≈ tier-1; Regular ≈ tier-2/3.)
+
+Updated `prototype/v1/blueprint.md` (model picture, screen list — removed the Request screen, kind badge + read-only/edit gating, build steps: Step 4 is now Compose-only, mock data marks most segments Managed + 1–2 Regular) and `segments.md` (library + detail framing, tier-1 concierge note → out-of-band, no in-product request flow).
+
+---
+
 ## 2026-06-02 — `[brainstorm]` `[docs]` Defer canonical fields; reframe around `ams.` / `pl.` / `calc.`
 
 Bigger simplification at Martin's push: do we need canonical fields + cross-AMS mapping at all, vs. just exposing AMS data directly? Answer: **no, not at PoC** — and it's even cleaner than that, because the field-by-source model is the simplest correct framing.
