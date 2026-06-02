@@ -6,6 +6,21 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-02 — `[brainstorm]` `[docs]` Cut "status guard" as a concept — it's just a condition
+
+Simplification at Martin's push ("isn't a guard just another condition? I want to simplify as much as possible"). It is — `status = active` compiles to a plain `AND` with no special behavior — so we removed "guard" as a named concept/column/vocabulary while **keeping the domain knowledge** (canceled policies have stale dates → renewal-type segments must filter `status = active`; Marker §12.1).
+
+### Changes
+
+- `segment_library_poc.md`: dropped the **Guard** column from the canonical-field table; removed the per-segment **"Status guard:"** lines (the predicates already include `status = active`); folded the *why* into an authoring note on `renewing_in_days`.
+- `segments.md`: rewrote "Companion predicates (status guards)" → "A note on the 'policy in force' filter" — it's just another condition; PL hand-writes it as a `WHERE` line at PoC. The auto-include behavior is marked a **deferred, invisible tier-2 catalog convenience**, not a user-facing concept. Softened the rung-6 mention; renamed the beyond-PoC catalog field `status_guard` → `default_condition` (labeled "just an AND'd predicate, not special"). Tidied stray "guard" noun usages to "filter."
+
+The "guard"-as-verb usages for the vacuous-truth trap (S4 `any(Home)` guards against empty-collection `none(Auto)`) are normal English and left as-is.
+
+Captured the underlying preference to memory: don't introduce concepts/abstractions unless absolutely needed; check whether a "new" thing is just an existing primitive in disguise.
+
+---
+
 ## 2026-06-02 — `[brainstorm]` `[docs]` Tier-1 PoC Segment library + canonical-field seed
 
 Created [`segment_library_poc.md`](segment_library_poc.md) — the concrete tier-1 (PL-authored) Segments we ship at PoC, derived from the §12.2 use cases, plus the canonical-field seed they require. This turns the segmentation *model* (built across this week's brainstorm) into actual segment definitions, and is the long-flagged "canonical-field catalog seed" (working-doc §8.3 #2 / §8.5). Chosen as the next segmentation move because it ships the PoC deliverable *and* validates the whole model against real predicates.

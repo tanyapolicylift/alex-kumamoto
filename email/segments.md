@@ -53,7 +53,7 @@ There are three ways a Segment gets created. They build on each other.
 
 ### Tier 1 — PolicyLift creates them
 
-PolicyLift's team writes Segments on the client's behalf. The client picks from a list of pre-built Segments curated for their agency and AMS. The complexity of insurance segmentation — the AMS-specific data shapes, the "policy in force" guards, the canonical-field resolution — lives entirely on PolicyLift's side. The client doesn't see it.
+PolicyLift's team writes Segments on the client's behalf. The client picks from a list of pre-built Segments curated for their agency and AMS. The complexity of insurance segmentation — the AMS-specific data shapes, the "policy in force" filters, the canonical-field resolution — lives entirely on PolicyLift's side. The client doesn't see it.
 
 This is the only tier we ship at PoC, and the only one we need to onboard real customers. Why: insurance segmentation is hard and AMSes vary wildly. The first time a client gets to author a Segment from scratch is also the first time they get to author it *wrong* — and a wrong Segment sends a wrong campaign to real customers. Starting with PL-authored Segments lets us onboard fast and learn what clients actually need before exposing them to authoring.
 
@@ -99,7 +99,7 @@ Rungs 0–1 are "filtering a table." Rung 2 and up are "asking a question about 
 
 **Rung 5 — multiple child collections, mixed quantifiers, negation.** "Accounts with an auto policy (`any`) **AND** no open claims (`none`) **AND** all policies in force (`all`)." Each child collection gets its own independent quantifier. Negation interacts with the quantifier in a way people get wrong: "no policy of type X" (`none` over `type = X`) is **not** the same as "a policy that is not type X" (`any` over `type ≠ X`). Same words, opposite meaning.
 
-**Rung 6 — computed / canonical fields + status guards.** Swap a raw column for a derived concept: `renewing_in_days <= 30`. Not a stored field — computed per-AMS (see [Canonical fields](#canonical-fields--same-concept-different-ams-shapes) below) and dragging along a status guard (`status = active`) so stale dates on canceled policies don't leak in. The complexity here isn't structural; it's that the field hides a per-AMS resolution plus a companion predicate.
+**Rung 6 — computed / canonical fields.** Swap a raw column for a derived concept: `renewing_in_days <= 30`. Not a stored field — computed per-AMS (see [Canonical fields](#canonical-fields--same-concept-different-ams-shapes) below). You'll usually pair it with a plain `status = active` condition (canceled policies have stale dates — see the "policy in force" note below). The complexity here isn't structural; it's that the field hides a per-AMS resolution.
 
 **Rung 7 — cross-source (AMS + PolicyLift-side data in one expression).** "…renewing in 30 days [AMS] **AND** has 'Inspection Pending' tag [PL] **AND** not unsubscribed [PL suppression]." The engine joins two data sources in one predicate; the client never has to know which fact came from where. (See [PolicyLift-side data in Segments](#policylift-side-data-in-segments) below.)
 
@@ -219,13 +219,15 @@ For PoC, PolicyLift writes per-AMS logic by hand directly into each Segment's qu
 
 The deeper canonical-field design — shape, catalog model, versioning, agency extensions — lives in [`concepts_working_doc.md > §4.3`](concepts_working_doc.md) until it deserves its own companion doc.
 
-### Companion predicates (status guards)
+### A note on the "policy in force" filter
 
-One specific pattern worth calling out: some canonical fields only make sense when paired with another filter. The most common case is date-based fields and the "policy in force" status. When a policy is canceled in HawkSoft, the expiration date becomes unreliable (it may persist with a stale value or disappear entirely), but other date fields stick around. A naive "renewal in 30 days" segment that doesn't filter on `status = active` will start emailing canceled policies, which is bad.
+Some canonical fields only make sense paired with another condition. The main case is date-based fields and policy status: when a policy is canceled in HawkSoft, the renewal/expiration date becomes unreliable (stale value or gone), but other date fields stick around. A naive "renewal in 30 days" segment that doesn't *also* filter `status = active` will start emailing canceled policies — bad.
 
-The fix: canonical fields that have this problem declare a **status guard** — a companion predicate the Segment engine adds automatically. "Renewal in N days" carries `policy.status = active` as a guard; PolicyLift staff don't have to remember to add it.
+The fix is **just another condition** — include `status = active` in the predicate. It's not a special construct: at PoC, PL hand-writes the SQL, so it's one more line in the `WHERE` clause. We deliberately don't model "guards" as a separate concept (it would only ever compile to a plain `AND`).
 
-This was surfaced by Marker Insurance during their 2026-05-27 onboarding call (captured in `concepts_working_doc.md` §12.1).
+*Deferred, tier-2 only:* once non-experts author segments, a canonical field could quietly **auto-include** this companion condition so a self-serve author who picks "days until renewal" doesn't forget it and footgun. That's an invisible convenience of the field in the future catalog — not a user-facing concept, and nothing to build at PoC.
+
+Surfaced by Marker Insurance during their 2026-05-27 onboarding (`concepts_working_doc.md` §12.1).
 
 ---
 
@@ -322,7 +324,7 @@ JOIN accounts a ON p.account_id = a.id
 JOIN policy_types pt ON p.policy_type_id = pt.id
 WHERE a.agency_id = :agency_id
   AND pt.type = 'personal_auto'
-  AND p.status = 'active'                    -- "policy in force" guard
+  AND p.status = 'active'                    -- "policy in force" filter (just a condition)
   AND CASE a.ams_type
     WHEN 'hawksoft' THEN p.effective_date + INTERVAL '300 days'
                           BETWEEN now() AND now() + INTERVAL '30 days'
@@ -469,7 +471,7 @@ canonical_fields
 ├── cardinality                     -- 'single' | 'many'
 ├── type                            -- 'number' | 'date' | 'boolean' | 'currency' | 'string' | 'enum'
 ├── domain                          -- for enum types, the allowed values
-├── status_guard                    -- optional companion predicate (e.g. policy.status = 'active')
+├── default_condition               -- optional companion condition the field auto-includes (tier-2 convenience, e.g. policy.status = 'active'); just an AND'd predicate, not special
 ├── predicates                      -- ['eq', 'lte', 'gte', 'between']
 ├── per_ams_resolutions             -- jsonb:
                                     --   { hawksoft: { kind: 'expr', sql: '...' },

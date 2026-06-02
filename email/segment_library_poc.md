@@ -10,31 +10,31 @@
 
 > **⚠️ Provisional per-AMS resolutions.** The field paths and per-AMS logic below are a **seed**, derived from brainstorm signal (Marker / HawkSoft), the worked example in `segments.md`, and §12.2 — **not verified against the live CXP schema.** The CXP data-model docs may be stale; confirm every resolution against the actual `accounts.ams_data` JSONB and the sync code before implementing. Where a resolution isn't known for an AMS, it's marked **TBD** rather than guessed. PoC onboards Marker (HawkSoft), so HawkSoft is specced concretely and other AMSes are stubs.
 
-At PoC, only **tier 1** (PL-authored Segments) and **tier 3** (composition) ship — clients pick from this library and combine, but don't author from scratch (see [`segments.md`](segments.md) authorship tiers). PL hand-writes the SQL, including the per-AMS branching, quantifiers, and status guards; there is no canonical-field *catalog* as a separate system yet. This doc's Part 1 is the **proto-catalog**: the fields that recur across the library, named once so the SQL is consistent.
+At PoC, only **tier 1** (PL-authored Segments) and **tier 3** (composition) ship — clients pick from this library and combine, but don't author from scratch (see [`segments.md`](segments.md) authorship tiers). PL hand-writes the SQL, including the per-AMS branching, quantifiers, and any `status = active` filters; there is no canonical-field *catalog* as a separate system yet. This doc's Part 1 is the **proto-catalog**: the fields that recur across the library, named once so the SQL is consistent.
 
 ---
 
 ## Part 1 — Canonical-field seed
 
-The fields the §12.2 use cases need. Type drives operators; the status guard is a companion predicate auto-added (see [`segments.md`](segments.md) → companion predicates).
+The fields the §12.2 use cases need. Type drives operators.
 
-| Field id | Display | Entity | Type | Operators | Guard |
-|---|---|---|---|---|---|
-| `policy.status` | Policy status | Policy | enum | `eq` / `in` | — |
-| `policy.substatus` | Policy substatus | Policy | enum | `eq` / `in` | only meaningful on certain statuses (see notes) |
-| `policy.type` | Line of business | Policy | enum | `eq` / `in` | — |
-| `policy.carrier` | Carrier | Policy | enum/string | `eq` / `in` | — |
-| `policy.effective_date` | Effective date | Policy | date | `before` / `after` / `between` | — |
-| `policy.renewal_date` | Renewal date | Policy | date | `before` / `after` / `between` | — |
-| `policy.renewing_in_days` | Days until renewal | Policy | number (derived) | `lte` / `gte` / `between` | `policy.status = active` |
-| `policy.sold_date` | Sold date | Policy | date | `before` / `after` / `between` | — |
-| `policy.days_since_sold` | Days since sold | Policy | number (derived) | `lte` / `gte` / `between` | — |
-| `account.status` | Account status | Account | enum | `eq` / `in` | — |
-| `contact.nps_score` | Latest NPS score | Contact | number (PL-side) | `gte` / `lte` / `eq` | response within window (see notes) |
+| Field id | Display | Entity | Type | Operators |
+|---|---|---|---|---|
+| `policy.status` | Policy status | Policy | enum | `eq` / `in` |
+| `policy.substatus` | Policy substatus | Policy | enum | `eq` / `in` |
+| `policy.type` | Line of business | Policy | enum | `eq` / `in` |
+| `policy.carrier` | Carrier | Policy | enum/string | `eq` / `in` |
+| `policy.effective_date` | Effective date | Policy | date | `before` / `after` / `between` |
+| `policy.renewal_date` | Renewal date | Policy | date | `before` / `after` / `between` |
+| `policy.renewing_in_days` | Days until renewal | Policy | number (derived) | `lte` / `gte` / `between` |
+| `policy.sold_date` | Sold date | Policy | date | `before` / `after` / `between` |
+| `policy.days_since_sold` | Days since sold | Policy | number (derived) | `lte` / `gte` / `between` |
+| `account.status` | Account status | Account | enum | `eq` / `in` |
+| `contact.nps_score` | Latest NPS score | Contact | number (PL-side) | `gte` / `lte` / `eq` |
 
 ### Resolution notes (per-AMS, provisional)
 
-- **`policy.renewing_in_days`** — *prefer* `renewal_date` directly where the AMS carries it reliably; *fall back* to `effective_date + term` where it doesn't (AR's approach — Effective Date is more universal/consistent). **The term is agency-configurable, not a constant** (agencies represent renewal differently; not every book is a clean 1-year term) — see the renewal-proxy note in [`segments.md`](segments.md). HawkSoft: confirm whether a reliable renewal date exists; if not, `effective_date + <agency_term>`. EZLynx: `renewal_date` direct (per the `segments.md` example). Other AMSes: **TBD**. Carries the `status = active` guard so stale dates on canceled policies don't leak in.
+- **`policy.renewing_in_days`** — *prefer* `renewal_date` directly where the AMS carries it reliably; *fall back* to `effective_date + term` where it doesn't (AR's approach — Effective Date is more universal/consistent). **The term is agency-configurable, not a constant** (agencies represent renewal differently; not every book is a clean 1-year term) — see the renewal-proxy note in [`segments.md`](segments.md). HawkSoft: confirm whether a reliable renewal date exists; if not, `effective_date + <agency_term>`. EZLynx: `renewal_date` direct (per the `segments.md` example). Other AMSes: **TBD**. *Authoring note:* renewal-type segments using this field should also include `status = active` — a plain condition, not special machinery — because canceled policies carry stale/unreliable dates and you'd otherwise email canceled customers (Marker §12.1).
 - **`policy.status` / `policy.substatus`** — HawkSoft: status values include `"Cancelled (Pending)"`; **substatus is editable/readable only on certain statuses** (Cancellation / Non-Renewed / Moved / Rejected — *not* New Business / Rewrite; working-doc N1). Substatus value `"Non-Payment"` is the missed-payment signal. The canonical `status` enum must map per-AMS status strings to a normalized set; **mapping TBD** beyond HawkSoft.
 - **`policy.type` (LOB)** — requires a **policy-type mapping** per AMS (AR has an explicit "map your policy types" step; we need the equivalent). Normalized values e.g. `personal_auto`, `home`, `umbrella`, … Mapping **TBD**; seed with the LOBs §12.2 needs (`personal_auto`, `home`).
 - **`policy.carrier`** — normalized carrier identity; the agency's *bundle set* (carriers it bundles home+auto with) is **agency-configured**, not global.
@@ -45,13 +45,12 @@ The fields the §12.2 use cases need. Type drives operators; the status guard is
 
 ## Part 2 — The tier-1 Segments
 
-Each block: anchor · category · predicate (plain + shape) · status guard · per-AMS notes · display columns · default fanout · how it's used (Broadcast / Automation, enrollment + dynamic-content posture). Predicates are **CNF** (AND of OR-groups) per [`segments.md`](segments.md); quantifiers over child collections are named explicitly.
+Each block: anchor · category · predicate (plain + shape) · per-AMS notes · display columns · default fanout · how it's used (Broadcast / Automation, enrollment + dynamic-content posture). Predicates are **CNF** (AND of OR-groups) per [`segments.md`](segments.md); quantifiers over child collections are named explicitly. (`status = active` etc. are just conditions in the predicate — no separate "guard" concept.)
 
 ### S1 — Policies renewing in N days  *(Renewal Reminders — highest priority)*
 
 - **Anchor:** Policy · **Category:** Renewal
-- **Predicate:** `status = active` **AND** `renewing_in_days BETWEEN 0 AND N` (default N = 30) — optionally **AND** `type IN {…}` to scope to a line of business.
-- **Status guard:** `status = active` (carried by `renewing_in_days`).
+- **Predicate:** `status = active` **AND** `renewing_in_days BETWEEN 0 AND N` (default N = 30) — optionally **AND** `type IN {…}` to scope to a line of business. (The `status = active` is here for the canceled-policy-stale-date reason in Part 1 — just a condition.)
 - **Per-AMS:** the `renewing_in_days` resolution above (prefer renewal_date, else effective + agency term).
 - **Display (Policy):** policy_number, type, carrier, effective_date, renewal_date, account name.
 - **Fanout:** Policy → named insured on that policy.
@@ -61,8 +60,7 @@ Each block: anchor · category · predicate (plain + shape) · status guard · p
 ### S2 — Pending cancellation, non-payment  *(Cancellations — highest priority; Marker)*
 
 - **Anchor:** Policy · **Category:** Lifecycle / Retention
-- **Predicate:** `status = "Cancelled (Pending)"` **AND** `substatus = "Non-Payment"`.
-- **Status guard:** none needed — `status` *is* the filter (and substatus is only readable on this status, so it's self-consistent; N1).
+- **Predicate:** `status = "Cancelled (Pending)"` **AND** `substatus = "Non-Payment"`. (Substatus is only readable on this status, so the predicate is self-consistent; N1.)
 - **Per-AMS:** HawkSoft concrete (above). Substatus is a HawkSoft concept — **the equivalent on other AMSes is TBD**; this Segment may be HawkSoft-only at first (mark `ams_scope = ['hawksoft']`).
 - **Display (Policy):** policy_number, type, carrier, account name, cancellation/effective date.
 - **Fanout:** Policy → named insured.
