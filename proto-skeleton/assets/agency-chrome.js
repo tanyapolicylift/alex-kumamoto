@@ -61,8 +61,9 @@ function wireSidebarToggle() {
 // Collapsible nav groups (Marketing, Tools): each is a [data-slot="sidebar-group"]
 // whose direct <ul> holds a toggle <button> and whose direct <div> holds the
 // submenu. Clicking the button shows/hides the submenu and rotates the chevron.
-// Groups start expanded. Using display='' (not 'block') when open lets the
-// icon-collapsed CSS rule still hide submenus.
+// Groups start collapsed, except the group that contains the active page.
+// Using display='' (not 'block') when open lets the icon-collapsed CSS rule
+// still hide submenus.
 function wireGroups() {
   document.querySelectorAll('[data-slot="sidebar-group"]').forEach(group => {
     const btn = group.querySelector(':scope > ul button[data-slot="sidebar-menu-button"]');
@@ -73,7 +74,8 @@ function wireGroups() {
       submenu.style.display = open ? '' : 'none';
       if (chevron) chevron.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
     };
-    setOpen(true);
+    // Collapsed by default; open only the group holding the active page.
+    setOpen(!!submenu.querySelector('[data-nav][data-active="true"]'));
     btn.addEventListener('click', () => setOpen(submenu.style.display === 'none'));
   });
 }
