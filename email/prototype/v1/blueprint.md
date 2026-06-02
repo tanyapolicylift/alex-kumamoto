@@ -45,7 +45,7 @@ LIBRARY ── browse/search/filter saved segments  (each marked Managed / Regul
 
 ### Screens to build
 
-1. **Segment Library** *(list)* — rows: name · description · category badge · anchor icon · current count · **kind badge (Managed / Regular)**. Toolbar: search, filter (anchor / category / kind), sort. "New Segment" button (creates a Regular segment). Row click → Detail.
+1. **Segment Library** *(list)* — mirrors Reach's segment list (clients already know it). Columns: status dot · **name + description** · **Kind** (Managed / Regular badge) · **count** *labeled with its unit* — "284 policies" / "150 customers" (the unit conveys the anchor, so no separate anchor column) · **Last Modified** · **Edit** (Regular) / view (Managed). Toolbar: search + **Kind filter** (Managed / Regular); pagination. "New Segment" button (creates a Regular segment). Row click → Detail. *Dropped vs. earlier draft: category, AMS chip, owner, separate anchor column.*
 2. **Segment Detail** — full description; current count + refresh; **sample preview** table using the per-anchor display columns (Account: name/primary contact/status/premium · Policy: number/type/carrier/effective/renewal/account · Contact: name/email/role/account); "Use in Broadcast/Automation" CTA. **Managed → read-only** (no edit; a subtle "Managed by PolicyLift" note). **Regular → Edit** opens the Builder.
 3. **Segment Builder** *(the real authoring UI — the hard one; Regular segments only)* —
    - **Anchor selector** at top (Account / Policy / Contact) — sets result shape + available fields.

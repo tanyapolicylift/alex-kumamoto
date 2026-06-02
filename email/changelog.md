@@ -6,6 +6,16 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-02 — `[brainstorm]` `[docs]` Lean segment-library columns (mirror Reach); design detail → blueprint, not vision prose
+
+Two related calls (Martin), prompted by comparing real tools (Klaviyo, AR, and especially **Reach** — the tool we're replacing, whose list is Name+desc · Type(Managed) · Users · Last Modified · Edit):
+
+**Lean column set.** Dropped **Category** (clutter; no tool shows it — at most a tag-filter later) and **AMS chip** (meaningless at single-AMS PoC), plus **Owner** and a separate **Anchor** column. Final library columns mirror Reach: status dot · name + description · Kind (Managed/Regular) · count (*labeled with its unit* — "284 policies" / "150 customers", which conveys the anchor for free) · Last Modified · Edit (Regular) / view (Managed). Toolbar: search + Kind filter + pagination. Mirroring Reach minimizes migration friction and validates the Managed badge.
+
+**Doc-structure convention.** Design/UI specifics shouldn't live in the vision prose. The column/row spec now lives in `prototype/v1/blueprint.md` (the disposable design artifact); trimmed the enumerated columns + filter/sort behavior out of `segments.md`'s "Browsing the library" section back to concept-level (with a pointer to the blueprint). The existing fenced `## Implementation details` section in `segments.md` is fine — a separate section satisfies the rule. Saved the convention to memory: concept docs stay conceptual; UI/layout/schema goes in the blueprint or a fenced Implementation section.
+
+---
+
 ## 2026-06-02 — `[brainstorm]` `[docs]` Managed vs Regular segments; drop in-product request flow
 
 Two segment-library decisions (Martin):

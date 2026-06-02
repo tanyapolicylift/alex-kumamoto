@@ -126,16 +126,7 @@ One orthogonal note: **operators are gated by field type** (number → `gt`/`lte
 
 The Segment library is one of the four screens clients touch in the email product (alongside the Template editor, Broadcast builder, and Automation builder). It's a list view of every Segment available to the client's agency. There are two kinds, marked in each row (Reach-style): **Managed** — PolicyLift/ops-built, read-only to the client — and **Regular** — client-built and editable.
 
-Each row in the library shows:
-
-- **Name** and short description
-- **Kind** — a **Managed** / **Regular** badge: Managed are PL-built and read-only; Regular are client-built and editable
-- **Category badge** — Renewal / Cross-sell / Lifecycle / Marketing / Hygiene / etc.
-- **Anchor type** — small icon indicating whether it returns accounts, policies, contacts, etc.
-- **Current count** — "284 matches" as of the last refresh
-- **AMS compatibility** — a small chip showing which AMSes the Segment works on. Most work on all; some are AMS-specific.
-
-Clients can filter by anchor type, category, kind (Managed / Regular), or AMS compatibility, search by name + description, and sort by name / count / recently used. Clicking a row opens a detail view.
+Each row identifies a Segment, marks it **Managed** or **Regular**, and shows its size at a glance; clients search and filter the list and click into a Segment for the full detail view. (Exact columns, filters, and layout are a design concern — see the prototype blueprint, `prototype/v1/blueprint.md`.)
 
 The detail view shows the full description, the current count with a refresh button, a sample preview (covered next), and a "Use in Broadcast" / "Use in Automation" CTA. **Managed** Segments are read-only here (a "Managed by PolicyLift" note, no edit) — their logic is maintained by PolicyLift; **Regular** Segments show an **Edit** action that opens the builder.
 
