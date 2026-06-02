@@ -49,6 +49,9 @@ resolve.)
 | Conversations   | ✅          | `agency/conversations.html` — 4 stat cards + Calls/Chats/Forms sub-tabs + call list |
 | Quote Packets   | ✅          | `agency/quote-packets.html` — Packets/AOP tabs, search/filter, table/kanban toggle, 6-column kanban board |
 | My Forms        | ✅          | `agency/my-forms.html` — Master Form Link card + per-insurance-type form-link cards (Copy Agency/Personal Link) |
+| **Campaigns** ▸ | group       | **new email-tool group** (collapsible) — the tool replacing Reach |
+| Campaigns ▸ Segments        | ✅       | `agency/segments.html` — segment library list (Managed/Regular kind badge, count with unit, last modified, search + kind filter, New Segment) |
+| Campaigns ▸ Templates / Broadcasts / Automations | ⏳ stub | dimmed `#` links — to build |
 | **Marketing** ▸ | group       | collapsible group (expandable).               |
 | Marketing ▸ E-Mails        | ⛔ skipped | current **Reach**-backed feature (`/campaigns`) — being *replaced* by the new email tool, so not rebuilt |
 | Marketing ▸ Reviews        | ⛔ skipped | current **Reach**-backed feature — out of scope for now |

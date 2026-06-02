@@ -45,7 +45,7 @@ LIBRARY ── browse/search/filter saved segments  (each marked Managed / Regul
 
 ### Screens to build
 
-1. **Segment Library** *(list)* — mirrors Reach's segment list (clients already know it). Columns: status dot · **name + description** · **Kind** (Managed / Regular badge) · **count** *labeled with its unit* — "284 policies" / "150 customers" (the unit conveys the anchor, so no separate anchor column) · **Last Modified** · **Edit** (Regular) / view (Managed). Toolbar: search + **Kind filter** (Managed / Regular); pagination. "New Segment" button (creates a Regular segment). Row click → Detail. *Dropped vs. earlier draft: category, AMS chip, owner, separate anchor column.*
+1. **Segment Library** *(list)* — Reach-style. Columns: **name + description** (a **Managed** pill sits inline *after* the name; **no pill for Regular**) · **Type** = the anchor as a plural noun (Policies / Accounts / Contacts) · **Count** = a pure number, **right-aligned** (Type now carries the anchor, so the count drops its unit) · **Last modified** = **right-aligned** (trailing column — a date as last column reads better right-aligned, per Tanya/Fairs). **The whole row is clickable → Detail** (`cursor-pointer` + onclick; no per-row Edit/View button). Toolbar: search + **Kind filter** (Managed / Regular); "New Segment" button. *No status dot, no actions column, no category/AMS/owner columns.* **Managed pill style: pending the exact "Quote Packet Generated" pill HTML from Martin — placeholder uses `bg-green-100`/`text-green-700`.* Layout: Name column is greedy (`w-full`, `table-auto`); Type/Count/Last are content-width and cluster at the right edge (the Fairs Documents pattern) rather than floating in fixed-width boxes.
 2. **Segment Detail** — full description; current count + refresh; **sample preview** table using the per-anchor display columns (Account: name/primary contact/status/premium · Policy: number/type/carrier/effective/renewal/account · Contact: name/email/role/account); "Use in Broadcast/Automation" CTA. **Managed → read-only** (no edit; a subtle "Managed by PolicyLift" note). **Regular → Edit** opens the Builder.
 3. **Segment Builder** *(the real authoring UI — the hard one; Regular segments only)* —
    - **Anchor selector** at top (Account / Policy / Contact) — sets result shape + available fields.
@@ -61,7 +61,7 @@ A fictional agency. Need: ~8–10 library segments across categories (our S1–S
 
 ### Build steps (ordered)
 
-- **Step 1 — Nav group + Segment Library page.** Add the email-tool group to `agency-shell.html`; build `agency/segments.html` as the library list with mock segments. ← *start here*
+- **Step 1 — Nav group + Segment Library page.** ✅ *Done (2026-06-02).* Added the **Campaigns** group to `agency-shell.html`; built `agency/segments.html` (library list, Managed/Regular badges, 9 mock segments). Nav label chosen: **Campaigns** (may roll into Marketing later).
 - **Step 2 — Segment Detail page.** `agency/segment-detail.html` (or a representative one): count + sample preview.
 - **Step 3 — Segment Builder.** `agency/segment-builder.html`: anchor → category conditions → CNF groups → quantifier → count/preview → save. The big one; may need minimal inline JS for add-condition / category-switch interactions.
 - **Step 4 — Compose mode.** Combine saved segments (include / intersect / except) into a new Regular segment.

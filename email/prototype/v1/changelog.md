@@ -8,6 +8,18 @@ See `README.md` for what's in the skeleton today and how to use it.
 
 ---
 
+## 2026-06-02 — `[proto]` Campaigns nav group + Segment Library page (email tool, Step 1)
+
+First email-tool screen. Added a **new collapsible "Campaigns" sidebar group** (the tool replacing Reach) to `assets/chrome/agency-shell.html`, between the top-level items and Marketing — modeled exactly on the Marketing group so `wireGroups()` handles it. Sub-items: **Segments** (live → `/agency/segments.html`), Templates / Broadcasts / Automations (`#`, auto-dimmed). Icon: lucide `send`.
+
+Built **`agency/segments.html`** — the Segment Library list, mirroring Reach's segment list (clients know it): search + Kind filter + New Segment button; table = status dot · name + description · **Kind badge (Managed / Regular)** · count *with unit* ("284 policies" / "150 customers" — unit conveys the anchor) · last modified · row action (**View** for Managed, **Edit** for Regular). 9 mock segments (7 Managed from `../../segment_library_poc.md` S1–S5 + extras, 2 Regular). Static (no JS) — search/filter are display-only for now.
+
+Reused the captured pages' exact table/toolbar/input/select markup. Verified every non-obvious utility class against the compiled `app.css` before using it (badge colors `bg-green-100`/`text-green-700` + `bg-gray-100`/`text-gray-700`, `text-primary-foreground`, `tabular-nums`, etc.) — `bg-primary/10` and shadcn's `badge` component are **not** in the bundle, so badges are built from base utilities.
+
+Blueprint Step 1 done; next is Step 2 (Segment Detail) per `blueprint.md`.
+
+---
+
 ## 2026-05-29 — `[proto]` Website Wizard page + preview-iframe handling
 
 From `html refs/agency website wizard.html` (Marketing ▸ Website Wizard). Wrapper
