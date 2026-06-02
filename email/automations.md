@@ -119,6 +119,45 @@ These rules are configurable per Automation. The default should depend on the tr
 
 ---
 
+## Enrollment state & drift over time
+
+A Broadcast fires once, so the world can't change underneath it — it snapshots its audience at send and that's that. An Automation persists: it can enroll someone today and email them across the next month, and the data that justified enrolling them *will* change in between. This section is about what happens then.
+
+The first thing to untangle: "the Segment changes over time" is really **three independent clocks**, and only the last two are about drift:
+
+1. **Who enters, and when** — the [enrollment policy](#enrollment-policy--the-lock-recipients-question) above (at-launch / newly-entering / continuous). Already decided.
+2. **Do they still qualify** — *membership drift*. They matched at enrollment; do they still match later?
+3. **What each send shows** — *data drift*. A Sequence sends several emails; the specific records pulled into the content (e.g. "your 2 policies renewing soon") can change between enrollment and a later Step.
+
+The framing that keeps this sane: **the Segment stays a stateless question (it's never "locked" — see [`segments.md`](segments.md)); the *enrollment* is the stateful thing.** When an Automation enrolls a subject it creates a per-subject record (where they are in the Sequence, their status). The real design choice is *how much that enrollment record freezes vs. re-derives over its life.* Two kinds of drift, two answers:
+
+- **Membership drift → exit conditions.** Re-evaluate matching; if the subject no longer matches, exit (the *Segment-no-longer-matches* exit above). For lifecycle Automations (renewal, cancellation) the sensible default is **exit-on-no-longer-match** — the moment a renewal isn't happening or a policy is canceled, stop emailing about it.
+- **Data drift → re-resolve at each send, never freeze at enrollment.** Recompute the content's records right before each email renders, against current truth. Stale insurance data ("your 2 policies are renewing" when one was canceled last week) is a worse failure than the content shifting. Each Send record immutably captures *what it actually rendered* (the audit trail); the *next* Send recomputes.
+
+### The partial-bundle subtlety is really an anchor decision
+
+The messy case — *"we pulled an account + 2 matching policies into the email, then one policy stops matching"* — is messy **specifically because the account was anchored and 2 policies were bundled into one enrollment and one email.** Whether you hit this at all is the same Path A vs. Path B choice from [`dynamic-content.md`](dynamic-content.md), now seen along the time axis:
+
+- **Per-entity enrollment (Path B — how AR works).** Enroll *per policy*: each renewing policy is its own enrollment. One policy stops matching → *that* enrollment exits; the others are untouched. No partial bundle, no surprises. Clean drift semantics. Cost: an account with 2 renewing policies gets 2 emails.
+- **Account-anchored bundle (Path A — "your 2 policies").** The account stays enrolled while *any* policy still matches, so the bundle can mutate underneath the Sequence. With re-resolve-at-send, the next email shows whatever currently matches — which means:
+  - it can shrink (2 → 1): the surrounding prose must tolerate a changing count (the pluralization / conditional requirement from [`dynamic-content.md`](dynamic-content.md) — "a policy" vs "your policies");
+  - it can go empty (2 → 0): that's itself an **exit signal** — nothing to say, so exit;
+  - it can grow (a *new* third policy starts matching mid-Sequence): re-resolve would silently fold it into the next email, which is usually *not* what you want for an in-flight narrative (see open questions).
+
+So the choice of how to anchor the Automation *is* the choice of how much drift complexity you take on — the same "anchor moves the complexity" lever, in the time dimension. Bundling buys the nice consolidated email and pays for it with count-tolerant content and empty-set-as-exit.
+
+### PoC stance
+
+Marker's three Automations (Cancellation, Welcome Kit, Renewal) are each *about one policy or event*, so:
+
+- **Per-entity (per-policy) enrollment is the default** — clean drift, matches AR, and none of them needs a bundled "list" email. (This is the per-`(subject, automation, trigger_event)` granularity flagged in open question #4.)
+- **Re-resolve at each send** is the universal render rule — content always reflects current truth.
+- **Exit-on-no-longer-match** is the default exit for lifecycle Automations.
+
+The account-anchored *bundled* "all your renewing policies in one email" Automation (re-resolve + count-tolerant prose + empty-set-exit + a rule for new mid-flight matches) is reserved for when an agency explicitly asks for it — **post-PoC**, since it needs that extra handling.
+
+---
+
 ## Sender resolution and recipient resolution
 
 Same as Broadcast (see [`broadcasts.md`](broadcasts.md)).
@@ -182,6 +221,8 @@ We've aligned on:
 - Pre-launch verification surface shared with Broadcast
 - The hidden-trigger anti-pattern to avoid
 - The three concrete Marker Automations as the operational scope
+- **Drift handling**: Segment stays stateless, the enrollment is the stateful object; membership drift → exit conditions, data drift → re-resolve at each send (never freeze merge data at enrollment)
+- **PoC drift defaults**: per-entity (per-policy) enrollment, re-resolve-at-send, exit-on-no-longer-match for lifecycle Automations; bundled account-anchored "list" Automations deferred post-PoC
 
 Still to work through (incrementally, in this doc as decisions land):
 
@@ -208,3 +249,5 @@ Still to work through (incrementally, in this doc as decisions land):
 6. **Cancellation Automation deadline** — Marker's Friday 2026-05-29 commitment. Practical question: how much Automation infrastructure does PL need to ship by then vs. wire up manually? Probably manual wiring for the first Automation since the full builder won't exist; documented in the concierge workflow.
 7. **Stop-on-reply** — does an Automation Step support "if the recipient replies, exit them from the Automation"? Lev convention; useful. Probably yes for PoC since Resend tracks replies via webhooks.
 8. **Per-Step override of recipient resolution.** Could a multi-Step Automation send Step 1 to the primary contact, Step 2 to the spouse? Probably overkill for PoC; revisit if a real use case lands.
+9. **Matched set grows mid-Sequence (bundle case).** For an account-anchored bundled Automation that re-resolves at send, a *new* matching record (e.g. a third policy enters the renewal window after enrollment) would silently join the next email. Probably we want to *not* retroactively add it to an in-flight narrative — render only the records present at enrollment, or only-shrink-never-grow — but that needs deciding. (Doesn't arise with per-entity enrollment, the PoC default, where the new match just starts its own enrollment per the enrollment policy.)
+10. **Re-evaluation cadence.** How often is membership / matched-data re-evaluated for enrolled subjects — nightly (aligned with the Segment count refresh in `segments.md`), or lazily at each Step's send time, or both? Lazy-at-send is simplest and guarantees the email reflects truth at the moment it goes out; a nightly pass is needed if exits should fire *between* sends (e.g. exit the day a policy cancels, not at the next scheduled email). Likely: re-resolve lazily at send for content + a nightly membership pass for timely exits. Confirm.

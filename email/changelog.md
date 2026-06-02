@@ -6,6 +6,26 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-02 — `[brainstorm]` `[docs]` Enrollment state & drift over time added to `automations.md`
+
+Added an "Enrollment state & drift over time" section to `automations.md` (after Exit conditions), answering Martin's question: what happens when the Segment matching changes *after* an Automation has enrolled someone — e.g. an account + 2 matching policies were pulled into a template and then one policy stops matching.
+
+### The decomposition
+
+"The Segment changes over time" is **three independent clocks**: (1) who enters & when = enrollment policy (already decided); (2) *membership drift* — do they still qualify; (3) *data drift* — what each send renders. The question is clocks 2 & 3, which the enrollment-policy decision doesn't cover. So it's separate from enrollment policy — but it turns out to be the **time-dimension face of the dynamic-content anchor choice (Path A vs B)**, not a new orthogonal axis.
+
+### Decisions captured
+
+- **Framing:** the Segment stays a stateless question (never "locked"); the **enrollment** is the stateful object. Design choice = how much the enrollment freezes vs. re-derives.
+- **Membership drift → exit conditions** (default exit-on-no-longer-match for lifecycle Automations).
+- **Data drift → re-resolve at each send**, never freeze merge data at enrollment (stale insurance data is the worse failure); each Send immutably records what it rendered, the next Send recomputes.
+- **The partial-bundle mess is an anchor decision.** Per-entity enrollment (Path B / AR) → drift is trivial (a record stops matching → that enrollment exits). Account-anchored bundle (Path A) → can shrink (count-tolerant prose needed), go empty (→ exit signal), or grow (usually unwanted mid-flight). Same "anchor moves the complexity" lever, on the time axis.
+- **PoC defaults:** per-entity (per-policy) enrollment for the three Marker Automations, re-resolve-at-send universally, exit-on-no-longer-match for lifecycle; bundled account-anchored "list" Automation deferred post-PoC.
+
+Cross-links `segments.md` (stateless question) and `dynamic-content.md` (matched set, Path A/B). Settled/TBD list updated. Two new open questions: #9 matched-set-grows-mid-Sequence (bundle case), #10 re-evaluation cadence (lazy-at-send for content + nightly membership pass for timely exits, to confirm). Connects to existing open question #4 (enrollment-state granularity — per-entity enrollment = the per-`(subject, automation, trigger_event)` option).
+
+---
+
 ## 2026-06-01 — `[research]` `[docs]` AR dynamic-content mechanism verified — Path B, not Path C
 
 Resolved the previously-unverified "AR might use Path C" flag in `dynamic-content.md` by checking AR's help docs (merge-field availability + advanced segments). Updated three spots in the doc + resolved open question #3.
