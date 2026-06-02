@@ -46,7 +46,32 @@ LIBRARY ── browse/search/filter saved segments  (each marked Managed / Regul
 ### Screens to build
 
 1. **Segment Library** *(list)* — Reach-style. Columns: **name + description** (a **Managed** pill sits inline *after* the name; **no pill for Regular**) · **Type** = the anchor as a plural noun (Policies / Accounts / Contacts) · **Count** = a pure number, **right-aligned** (Type now carries the anchor, so the count drops its unit) · **Last modified** = **right-aligned** (trailing column — a date as last column reads better right-aligned, per Tanya/Fairs). **The whole row is clickable → Detail** (`cursor-pointer` + onclick; no per-row Edit/View button). Toolbar: search + **Kind filter** (Managed / Regular); "New Segment" button. *No status dot, no actions column, no category/AMS/owner columns.* **Managed pill = the platform's shadcn green badge** (`bg-green-50 text-green-700 border-green-200`, the "Quote Packet Generated" style). Layout: Name column is greedy (`w-full`, `table-auto`); Type/Count/Last are content-width and cluster at the right edge (the Fairs Documents pattern) rather than floating in fixed-width boxes.
-2. **Segment Detail** — full description; current count + refresh; **sample preview** table using the per-anchor display columns (Account: name/primary contact/status/premium · Policy: number/type/carrier/effective/renewal/account · Contact: name/email/role/account); "Use in Broadcast/Automation" CTA. **Managed → read-only** (no edit; a subtle "Managed by PolicyLift" note). **Regular → Edit** opens the Builder.
+2. **Segment Detail** — the screen a row-click lands on. **Decisions below are pending Martin's comp review (~2026-06-03).**
+
+   Proposed anatomy:
+   ```
+   ← Segments
+   ┌──────────────────────────────────────────────────────────────┐
+   │ Auto policies renewing in 30 days   [Managed]                  │
+   │ Policies · Active auto policies renewing in the next 30 days   │
+   │                        [ Use in Broadcast ] [ Use in Automation ]
+   ├──────────────────────────────────────────────────────────────┤
+   │  284 policies      ~240 customers       Updated 2 days ago     │  ← stat strip
+   │  (as of 8:42am ↻)  reachable (est.)     Owner: PolicyLift      │
+   ├──────────────────────────────────────────────────────────────┤
+   │  Criteria   • Policy type is Auto • Status is Active           │  ← read-only conditions
+   │             • Renews within 30 days                            │
+   ├──────────────────────────────────────────────────────────────┤
+   │  Sample (showing 25 of 284)                                    │
+   │  Policy #  Type  Carrier  Effective  Renewal  Account          │  ← anchor-specific table
+   └──────────────────────────────────────────────────────────────┘
+   ```
+
+   Open decisions (with current lean):
+   - **(1) Criteria display** — show the conditions rendered **read-only** (lean: yes — transparency for Managed; reuses the builder's condition rendering, sets up Step 3) vs. just the prose description.
+   - **(2) Sample preview** — make it the main body; anchor-specific columns (Account: name/primary contact/status/premium · Policy: number/type/carrier/effective/renewal/account · Contact: name/email/role/account); ~25 mock rows + "showing 25 of N." (lean: yes — load-bearing trust surface, the Ley/Marker "let me see who's in it.")
+   - **(3) Reachable-contacts estimate** — show "~240 customers reachable (est., default fanout)" in the stat strip (lean: yes, clearly labeled) vs. leave it to the audience-verification step (fanout is chosen there, not on the Segment).
+   - **(4) Managed vs Regular** — Managed → read-only + "Managed by PolicyLift" chip, no Edit; Regular → **Edit** opens the Builder. "Use in Broadcast/Automation" are stubs until those screens exist. (lean: as stated.)
 3. **Segment Builder** *(the real authoring UI — the hard one; Regular segments only)* —
    - **Anchor selector** at top (Account / Policy / Contact) — sets result shape + available fields.
    - **Condition groups** — two-level CNF (AND of OR-groups); "Add condition" / "Add group".
