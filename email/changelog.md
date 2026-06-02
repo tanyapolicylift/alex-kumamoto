@@ -6,6 +6,30 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-02 — `[client-call]` `[docs]` Priority segment use cases from Alex (§12.2)
+
+Added §12.2 to `concepts_working_doc.md` capturing the prioritized Segment/Automation use cases Alex relayed from client asks, plus a renewal-proxy note in `segments.md`. Strong validation: almost every use case lands on design built this week.
+
+### Use cases captured (with what each validates)
+
+**Highest priority:**
+- **Renewal Reminders** (Policy) — canonical `renewing_in_days`, two resolutions: prefer `renewal_date`; fall back to `effective_date + term` (AR proxy). Term is **agency-configurable, not a constant**.
+- **Cancellations** (Policy, Marker-only) — concrete predicate `status = "Cancelled (Pending)" AND substatus = "Non-Payment"`. Confirms status guard + HawkSoft substatus readable on Cancelled.
+- **Welcome Kits** (Account) — **textbook enrollment-policy validation**: Alex independently describes Reach's "all in or entering" blast-the-backlog failure vs AR's "only newly entering" = our newly-entering-only policy. 🆕 **Sold-Date principle**: prefer a date-anchored entry condition over state-transition detection when a reliable date exists (robust, no transition capture, naturally excludes the backlog).
+
+**Medium priority:**
+- **Cross-Sells** (Account) — "Home but no Auto, with bundle carriers" = **complexity-ladder rung 5** (mixed quantifiers + `none` negation + carrier `in`). Concrete proof quantified relational segmentation is required.
+- **Renewal Notices** — distinct from reminders; tricky/untested, left open.
+- **Reputation/NPS** — "just signed" = newly-entering; NPS ≥ 9 → Google Review = survey-response data feeding a 2-stage automation. Confirms engagement / PL-side-data condition category.
+
+### Renewal-proxy note (`segments.md`)
+
+Added a note at the per-AMS SQL example: prefer `renewal_date`, fall back to `effective_date + term`; the `+300` is illustrative, the term is **agency-configurable** (agencies represent renewal differently; not every book is a clean 1-yr term). The `+300` looks low for a 1-yr term — flagged to confirm the real default with Alex rather than silently changing it.
+
+Net new vs. confirmation: mostly confirms canonical fields, enrollment policy, and quantified relational Segments. New = the Sold-Date-over-state-transition guideline, the agency-configurable renewal term, and the concrete tier-1 predicates (cancellation, cross-sell, NPS≥9) that seed the Segment library.
+
+---
+
 ## 2026-06-02 — `[brainstorm]` `[docs]` Enrollment state & drift over time added to `automations.md`
 
 Added an "Enrollment state & drift over time" section to `automations.md` (after Exit conditions), answering Martin's question: what happens when the Segment matching changes *after* an Automation has enrolled someone — e.g. an account + 2 matching policies were pulled into a template and then one policy stops matching.

@@ -632,6 +632,25 @@ Pulled from `client_feedback.md` plus live onboarding signal (§12). These are s
 
 - **PolicyLift gap candidly acknowledged in client conversation.** Alex was open with Kim that the configuration tooling isn't ready: "our tooling for you to go and investigate the back office pipeline yourself today is not where it needs to be... we want to build the version of this that will get you your own ability to go and investigate yourself over the next, you know, two to eight to ten weeks." Kim was OK with this and explicitly chose PolicyLift because the team is "young people that want to get into an industry... going to be driven to success." Trust based on honesty, not feature parity.
 
+### 12.2 Priority segment use cases (Alex, 2026-06-02)
+
+Alex relayed the concrete Segment / Automation use cases clients have asked for, prioritized. Captured as client signal; each maps onto design we've already built (cross-refs inline) — strong validation that the primitives + canonical-field + enrollment-policy model fit real asks. The concrete predicates seed the tier-1 Segment library and the canonical-field catalog.
+
+**Highest priority**
+
+- **Renewal Reminders** — *Policy*-anchored. Two resolutions of the same canonical field `policy.renewing_in_days`: (1) **X days before Renewal Date** — direct, where the AMS carries a reliable renewal date (the PL way); (2) **(360 − X) days since Effective Date** — AR's proxy, assuming a ~1-yr term because Effective Date is more universal/consistent. Rule: *prefer `renewal_date`; fall back to `effective_date + term` where the renewal date is unreliable.* **The term is agency-configurable, not a universal constant** — agencies represent renewal differently and not every book is a clean 1-year term, so the offset lives in per-agency (/ per-AMS) config. (The `+300` in the `segments.md` SQL example is illustrative and looks low for a 1-yr term — confirm the real default with Alex.) See [`segments.md`](segments.md) canonical fields + renewal-proxy note.
+- **Cancellations** — *Policy*-anchored. Predicate: `status = "Cancelled (Pending)" AND substatus = "Non-Payment"` (HawkSoft) → a missed payment. Marker-only top priority. Confirms the status-guard concept and that HawkSoft substatus *is* readable on Cancelled status (consistent with N1).
+- **Welcome Kits** — *Account*-anchored. Naïve target: "Account Status becomes Active." **The textbook enrollment-policy case.** Alex's framing maps 1:1 onto our [enrollment policy](automations.md): Reach targets "all in *or* entering" → blasts the existing active book (the failure mode); AR targets "only those who enter *after* the campaign is turned on" → **newly-entering only**. Welcome Kit default = newly-entering only.
+  - 🆕 **Sold-Date principle.** Better HawkSoft targeting is **Sold Date** (a date field), not status-becomes-Active (a state transition). General guideline: *prefer a date-anchored entry condition over state-transition detection when a reliable date exists* — it's robust, needs no transition-event capture, and "sold within last N days" naturally excludes the pre-existing backlog (approximating newly-entering semantics even under continuous enrollment).
+
+**Medium priority**
+
+- **Cross-Sells** — *Account*-anchored. "Has X policy but not Y" (classically **Home but no Auto**), optionally constrained to the carriers the agency bundles with. Predicate: `any` policy where `type = Home` (and `carrier ∈ {bundle set}`) **AND** `none` policy where `type = Auto`. This is **[complexity-ladder](segments.md) rung 5** — multiple child collections, mixed quantifiers, the "no policy of type X" = `none` negation we flagged — plus carrier-set `in`. Concrete proof that quantified relational segmentation is required (the thing Levitate can't express and AR does densely).
+- **Renewal Notices** — distinct from Renewal Reminders (formal / compliance-style notice *at* renewal). Alex: tricky, possibly effective-date-based, "never really tested we could measure this." Left open, no committed predicate.
+- **Reputation / NPS** — two parts: "customer just signed" = same newly-entering / Sold-Date pattern as Welcome Kits; **NPS → Google Review** = a Segment over **survey-response data** (`NPS score ≥ 9`) feeding a 2-stage Automation (collect NPS → branch on score → request Google review). Confirms the engagement / PL-side-data [condition category](segments.md) and the need for NPS responses as a queryable field.
+
+**Net:** validates canonical fields + per-AMS resolution (renewal, cancellation, sold-date), enrollment policy (Welcome Kit = newly-entering), and quantified relational Segments (cross-sell = rung 5). New: the **Sold-Date-over-state-transition** guideline, the **agency-configurable renewal term**, and the concrete tier-1 predicates above.
+
 ---
 
 ## 13. Reference

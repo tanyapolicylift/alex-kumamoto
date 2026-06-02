@@ -334,6 +334,8 @@ WHERE a.agency_id = :agency_id
 
 Inline `CASE a.ams_type` branching keeps complexity in the Segment query rather than spreading it across schema views or app-layer logic. Honest and ugly; gets replaced by the canonical-field catalog when that ships.
 
+> **Note on the renewal proxy.** Two ways to resolve "days until renewal" (Alex, 2026-06-02 — see working-doc §12.2): **prefer `renewal_date` directly** where the AMS carries it reliably; **fall back to `effective_date + term`** where it doesn't (AR's approach — Effective Date is more universal and consistent). The `+ INTERVAL '300 days'` above is **illustrative, not a constant** — the term is **agency-configurable** (and may be per-AMS): agencies represent renewal differently and not every book is a clean 1-year term, so the offset lives in config, not hardcoded. AR assumes a ~360-day (1-yr) term; if using the effective-date proxy, the term should reflect the agency's actual policy terms.
+
 ### PoC: execution operations
 
 Three operations matter:
