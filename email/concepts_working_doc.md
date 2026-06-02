@@ -662,6 +662,7 @@ Alex relayed the concrete Segment / Automation use cases clients have asked for,
 - [`broadcasts.md`](broadcasts.md) — companion doc, the Broadcast primitive in full detail (non-technical → implementation details)
 - [`automations.md`](automations.md) — companion doc, the Automation primitive (short / starter version; implementation details deferred)
 - [`dynamic-content.md`](dynamic-content.md) — cross-cutting companion doc: rendering related data (filtered child collections) into a message — the "list of renewing policies" problem
+- [`segment_library_poc.md`](segment_library_poc.md) — the concrete tier-1 PoC Segments (from §12.2 use cases) + the canonical-field seed they require; per-AMS resolutions provisional
 - [`changelog.md`](changelog.md) — running narrative log of brainstorm decisions, doc restructures, research, client signal
 - [`research_segment_builder_ux.md`](research_segment_builder_ux.md) — segment builder UX patterns across ~15 products (2026-05-26)
 - [`client_feedback.md`](client_feedback.md) — feedback from 5 named clients

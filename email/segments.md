@@ -4,7 +4,7 @@
 
 **Created:** 2026-05-27
 
-**Related:** [`concepts_working_doc.md`](concepts_working_doc.md) · [`research_segment_builder_ux.md`](research_segment_builder_ux.md) · [`changelog.md`](changelog.md)
+**Related:** [`concepts_working_doc.md`](concepts_working_doc.md) · [`segment_library_poc.md`](segment_library_poc.md) (concrete tier-1 Segments + canonical-field seed) · [`research_segment_builder_ux.md`](research_segment_builder_ux.md) · [`changelog.md`](changelog.md)
 
 ---
 

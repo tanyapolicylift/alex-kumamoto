@@ -6,6 +6,24 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-02 — `[brainstorm]` `[docs]` Tier-1 PoC Segment library + canonical-field seed
+
+Created [`segment_library_poc.md`](segment_library_poc.md) — the concrete tier-1 (PL-authored) Segments we ship at PoC, derived from the §12.2 use cases, plus the canonical-field seed they require. This turns the segmentation *model* (built across this week's brainstorm) into actual segment definitions, and is the long-flagged "canonical-field catalog seed" (working-doc §8.3 #2 / §8.5). Chosen as the next segmentation move because it ships the PoC deliverable *and* validates the whole model against real predicates.
+
+### Structure
+
+- **Part 1 — canonical-field seed:** the recurring fields (policy status/substatus/type/carrier/effective_date/renewal_date/renewing_in_days/sold_date/days_since_sold, account.status, contact.nps_score) with type, operators, guards, and provisional per-AMS resolution notes.
+- **Part 2 — the five Segments:** S1 Policies renewing in N days (per-policy enrollment, prefer renewal_date / fall back effective+term), S2 Pending cancellation non-payment (HawkSoft status+substatus; Marker's first), S3 Newly sold accounts (Sold-Date principle; newly-entering enrollment), S4 Cross-sell Home-without-Auto (rung-5 quantifiers: any(Home)+none(Auto), same-row carrier, vacuous-truth guarded), S5 NPS promoters (PL-side data, 2-stage automation). Renewal Notices left unspecced (untested).
+- **Part 3 — cross-cutting decisions these force closed:** per-anchor display schemas (was open Q4), default fanout per anchor (was open Q5: Account→primary, Policy→named insured, Contact→self), and the three semantic defaults flagged after the complexity ladder — same-row scoping default = same row; count default = existence (any); vacuous truth guarded by an existence requirement.
+
+### Caveat baked in
+
+Per-AMS field paths are a **provisional seed**, NOT verified against the live CXP schema (which Martin notes may be stale) — confirm against actual `ams_data` / sync code before implementing. HawkSoft specced concretely (Marker is the PoC agency); other AMSes marked TBD. 7 open items, chiefly: per-AMS resolutions beyond HawkSoft, the renewal-term default (confirm with Alex), LOB-mapping mechanism, NPS data dependency.
+
+Wired into working-doc §13 reference list + `segments.md` Related header.
+
+---
+
 ## 2026-06-02 — `[client-call]` `[docs]` Priority segment use cases from Alex (§12.2)
 
 Added §12.2 to `concepts_working_doc.md` capturing the prioritized Segment/Automation use cases Alex relayed from client asks, plus a renewal-proxy note in `segments.md`. Strong validation: almost every use case lands on design built this week.
