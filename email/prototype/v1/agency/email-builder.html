@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Email Builder — PolicyLift</title>
+<script>try{if(localStorage.getItem('proto-toggle-theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Inter:opsz,wght@14..32,100..900&display=swap">
+<link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="/assets/fonts.css">
+<style>
+  body{visibility:hidden}
+  /* Prototype-only: contenteditable + render styling. Page-scoped, no invented utilities. */
+  [data-eb-editor]:focus { outline: none; }
+  [data-eb-editor] [data-token] { user-select: all; cursor: default; }
+  [data-eb-editor="subject"] { display:flex; flex-wrap:wrap; align-items:center; gap:.25rem .35rem; }
+  [data-eb-editor="body"] > * { margin: 0 0 .75rem 0; }
+  [data-eb-editor="body"] > *:last-child { margin-bottom: 0; }
+  [data-eb-editor="body"] [data-token="policyList"] { display:block; }
+  /* The rendered email is locked to explicit colors so its Light/Dark behavior is
+     independent of the global proto theme (which the Settings drawer controls). */
+  [data-eb-render-theme="light"] { background:#ffffff; color:#1f2937; }
+  [data-eb-render-theme="light"] .eb-r-inbox    { background:#f6f8fa; }
+  [data-eb-render-theme="light"] .eb-r-divider  { border-color:#e5e7eb; }
+  [data-eb-render-theme="light"] .eb-r-muted    { color:#6b7280; }
+  [data-eb-render-theme="light"] .eb-r-table th,
+  [data-eb-render-theme="light"] .eb-r-table td { border-color:#e5e7eb; }
+  [data-eb-render-theme="dark"]  { background:#0d1117; color:#e6edf3; }
+  [data-eb-render-theme="dark"]  .eb-r-inbox    { background:#161b22; }
+  [data-eb-render-theme="dark"]  .eb-r-divider  { border-color:#30363d; }
+  [data-eb-render-theme="dark"]  .eb-r-muted    { color:#8b949e; }
+  [data-eb-render-theme="dark"]  .eb-r-table th,
+  [data-eb-render-theme="dark"]  .eb-r-table td { border-color:#30363d; }
+  [data-eb-render-theme="dark"]  a.eb-r-link    { color:#9bf297; }
+  /* preview frame width transition */
+  [data-eb-preview-frame] { transition: max-width .2s ease; }
+</style>
+<script src="/assets/agency-chrome.js" defer></script>
+</head>
+<body class="inter_fe8b9d92-module__LINzvG__variable geist_91de93b2-module__aTViIa__variable antialiased" data-page-active="templates">
+
+<!-- Back link -->
+<a href="#" class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left size-4" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>Templates</a>
+
+<!-- Title row -->
+<header class="mb-6 flex flex-col md:flex-row md:items-start justify-between gap-4">
+<div class="min-w-0">
+<h1 class="text-2xl font-bold">Renewal reminder — 30 days</h1>
+<p class="text-muted-foreground mt-1">Edit the template on the left. The preview on the right shows how it renders for each customer.</p>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2">Discard</button>
+<button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Template</button>
+</div>
+</header>
+
+<!-- 2-panel: editor + preview -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+<!-- LEFT: Editor -->
+<section class="rounded-lg border bg-card text-card-foreground">
+<div class="border-b px-5 py-3 flex items-center gap-2">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil size-4 text-muted-foreground" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+<h2 class="text-sm font-medium">Edit</h2>
+</div>
+<div class="p-5 space-y-5">
+
+<!-- Template name -->
+<div class="space-y-1.5">
+<label class="text-sm font-medium" for="eb-template-name">Template name</label>
+<input id="eb-template-name" data-slot="input" class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] w-full" value="Renewal reminder — 30 days">
+</div>
+
+<!-- Subject -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between gap-2">
+<label class="text-sm font-medium">Subject</label>
+<div class="relative" data-eb-dropdown>
+<button type="button" data-eb-dropdown-trigger class="inline-flex items-center gap-1 whitespace-nowrap rounded-md text-xs font-medium border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-7 px-2.5">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 text-muted-foreground" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+Insert field
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 text-muted-foreground" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+</button>
+<div data-eb-dropdown-menu data-target="subject" class="hidden absolute right-0 mt-1 w-64 rounded-md border bg-white text-foreground dark:bg-zinc-950 dark:text-zinc-100 shadow-md z-50 p-1 max-h-80 overflow-y-auto"></div>
+</div>
+</div>
+<div data-eb-editor="subject" contenteditable="true" class="border-input rounded-md border bg-transparent shadow-xs min-h-9 px-3 py-2 text-sm transition-[color,box-shadow] dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]" spellcheck="false"><span data-token="contact.firstName" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">First name</span><span>, your renewal is coming up</span></div>
+<p data-eb-subject-warning class="text-xs text-amber-700 mt-1 hidden items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>Required: include first name + HawkSoft ID.</p>
+</div>
+
+<!-- Body -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between gap-2">
+<label class="text-sm font-medium">Body</label>
+<div class="flex items-center gap-2">
+<div class="relative" data-eb-dropdown>
+<button type="button" data-eb-dropdown-trigger class="inline-flex items-center gap-1 whitespace-nowrap rounded-md text-xs font-medium border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-7 px-2.5">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 text-muted-foreground" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+Insert field
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 text-muted-foreground" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+</button>
+<div data-eb-dropdown-menu data-target="body" class="hidden absolute right-0 mt-1 w-64 rounded-md border bg-white text-foreground dark:bg-zinc-950 dark:text-zinc-100 shadow-md z-50 p-1 max-h-80 overflow-y-auto"></div>
+</div>
+<button type="button" data-eb-insert-policylist class="inline-flex items-center gap-1 whitespace-nowrap rounded-md text-xs font-medium border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-7 px-2.5">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 text-muted-foreground" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+Insert policy list
+</button>
+</div>
+</div>
+<div data-eb-editor="body" contenteditable="true" spellcheck="false" class="border-input rounded-md border bg-transparent shadow-xs p-4 text-sm leading-relaxed transition-[color,box-shadow] dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] overflow-y-auto" style="min-height:24rem;max-height:34rem;">
+<p>Hi <span data-token="contact.firstName" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">First name</span>,</p>
+<p>Just a quick note that your <span data-token="policy.policyType" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">Policy type</span> policy with us is set to renew on <span data-token="policy.renewalDate" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">Renewal date</span>.</p>
+<p>Here's what's renewing on your account:</p>
+<div data-token="policyList" contenteditable="false" class="group relative block border-2 border-dashed border-primary/40 bg-primary/5 text-primary text-xs font-medium uppercase tracking-wide px-3 py-2 pr-9 rounded-md select-none"><span class="inline-flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>Policy list — expands per recipient</span><button type="button" data-eb-delete-policylist class="absolute top-1.5 right-1.5 size-5 rounded flex items-center justify-center text-primary hover:bg-primary/15 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" aria-label="Remove policy list"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
+<p>If anything's changed — a new car, a remodel, or you'd just like a fresh comparison — reply to this email and I'll take a look.</p>
+<p>For reference, your customer ID on file is <span data-token="policy.hawksoftId" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">HawkSoft ID</span>.</p>
+<p>Thanks for trusting <span data-token="agency.name" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">Agency name</span> with your insurance.</p>
+<p><span data-token="sender.name" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">Sender name</span><br><span data-token="sender.phone" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">Sender phone</span></p>
+</div>
+</div>
+
+</div>
+</section>
+
+<!-- RIGHT: Preview -->
+<section class="rounded-lg border bg-card text-card-foreground overflow-hidden">
+
+<!-- Toolbar -->
+<div class="border-b px-3 py-2 flex items-center justify-between flex-wrap gap-2">
+<!-- left: device + theme toggles -->
+<div class="flex items-center gap-2">
+
+<!-- Device toggle (Desktop / Mobile) — built on the same data-state shape as shadcn tabs -->
+<div data-eb-device-toggle role="tablist" class="bg-base-muted text-muted-foreground inline-flex h-8 w-fit items-center justify-center rounded-md p-[3px] gap-0.5">
+<button type="button" role="tab" data-device="desktop" data-state="active" class="data-[state=active]:bg-background dark:data-[state=active]:text-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] items-center justify-center gap-1 rounded-sm border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] data-[state=active]:shadow-sm">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+Desktop
+</button>
+<button type="button" role="tab" data-device="mobile" data-state="inactive" class="data-[state=active]:bg-background dark:data-[state=active]:text-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] items-center justify-center gap-1 rounded-sm border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] data-[state=active]:shadow-sm">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+Mobile
+</button>
+</div>
+
+<!-- Theme toggle (Light / Dark) — same shape; controls only the preview frame -->
+<div data-eb-theme-toggle role="tablist" class="bg-base-muted text-muted-foreground inline-flex h-8 w-fit items-center justify-center rounded-md p-[3px] gap-0.5">
+<button type="button" role="tab" data-theme="light" data-state="active" class="data-[state=active]:bg-background dark:data-[state=active]:text-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] items-center justify-center gap-1 rounded-sm border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] data-[state=active]:shadow-sm">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+Light
+</button>
+<button type="button" role="tab" data-theme="dark" data-state="inactive" class="data-[state=active]:bg-background dark:data-[state=active]:text-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] items-center justify-center gap-1 rounded-sm border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] data-[state=active]:shadow-sm">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+Dark
+</button>
+</div>
+</div>
+
+<!-- right: preview-as + send test -->
+<div class="flex items-center gap-2">
+<label class="text-xs text-muted-foreground whitespace-nowrap" for="eb-preview-as">Preview as</label>
+<div class="relative">
+<select id="eb-preview-as" data-eb-preview-as class="border-input dark:bg-input/30 rounded-md border bg-transparent shadow-xs h-8 pl-2.5 pr-7 text-xs appearance-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none">
+<option value="sarah">Sarah Mitchell</option>
+<option value="bigtop">Big Top Catering Co.</option>
+<option value="russo">No first name — Russo</option>
+</select>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 absolute right-2 top-1/2 -translate-y-1/2 opacity-60 pointer-events-none" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+</div>
+<button type="button" class="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-xs font-medium border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-8 px-3">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+Send test
+</button>
+</div>
+</div>
+
+<!-- Preview area -->
+<div class="bg-muted/40 overflow-y-auto p-6" style="max-height:46rem;">
+<div data-eb-preview-frame data-eb-render-theme="light" class="mx-auto rounded-md border shadow-sm overflow-hidden" style="max-width:600px;">
+
+<!-- Inbox preview strip -->
+<div class="eb-r-inbox eb-r-divider border-b px-4 py-3 flex items-start gap-3">
+<div data-eb-inbox-avatar class="size-10 rounded-full flex items-center justify-center font-medium text-sm shrink-0" style="background:rgba(18,183,109,.12);color:#0a7a48;">M</div>
+<div class="min-w-0 flex-1">
+<div class="flex items-center justify-between gap-2 text-xs">
+<span data-eb-inbox-sender class="font-medium truncate">Marcus Davis · Bayview Insurance</span>
+<span class="eb-r-muted shrink-0">10:42 AM</span>
+</div>
+<div data-eb-inbox-subject class="text-sm font-medium truncate mt-0.5">—</div>
+<div data-eb-inbox-preview class="text-xs eb-r-muted truncate">—</div>
+</div>
+</div>
+
+<!-- Brand header bar -->
+<div data-eb-render-agency-name class="px-6 py-4 text-sm font-medium" style="background:#12B76D;color:#ffffff;">Bayview Insurance</div>
+
+<!-- Body -->
+<div data-eb-render-body class="px-6 py-6 text-sm leading-relaxed"></div>
+
+<!-- Footer -->
+<div class="eb-r-divider eb-r-muted border-t px-6 py-4 text-xs leading-relaxed">
+<div data-eb-render-footer-agency>Bayview Insurance · 1247 Harbor Dr, Suite 200, San Diego, CA 92101</div>
+<div class="mt-1"><a href="#" class="eb-r-link underline" style="color:inherit;">Unsubscribe</a> · <a href="#" class="eb-r-link underline" style="color:inherit;">View in browser</a></div>
+</div>
+
+</div>
+</div>
+
+</section>
+
+</div>
+
+<script>
+(function(){
+  // ───────── Sample data ─────────
+  const recipients = {
+    sarah: {
+      label: 'Sarah Mitchell',
+      contact: { firstName: 'Sarah', lastName: 'Mitchell', email: 'sarah.mitchell@example.com' },
+      account: { name: 'Sarah Mitchell' },
+      policy:  { policyType: 'Auto', renewalDate: 'Jun 14, 2026', hawksoftId: 'HS-100482' },
+      sender:  { name: 'Marcus Davis', phone: '(555) 123-4567' },
+      agency:  { name: 'Bayview Insurance', phone: '(555) 100-2200', address: '1247 Harbor Dr, Suite 200, San Diego, CA 92101' },
+      policies: [
+        { type: 'Auto', renewalDate: 'Jun 14, 2026' },
+        { type: 'Home', renewalDate: 'Jun 20, 2026' },
+      ],
+    },
+    bigtop: {
+      label: 'Big Top Catering Co.',
+      contact: { firstName: 'David', lastName: 'Chen', email: 'david@bigtopcatering.com' },
+      account: { name: 'Big Top Catering Co.' },
+      policy:  { policyType: 'Commercial Auto', renewalDate: 'Jul 2, 2026', hawksoftId: 'HS-393104' },
+      sender:  { name: 'Sarah Liu', phone: '(555) 234-5678' },
+      agency:  { name: 'Bayview Insurance', phone: '(555) 100-2200', address: '1247 Harbor Dr, Suite 200, San Diego, CA 92101' },
+      policies: [
+        { type: 'Commercial Auto', renewalDate: 'Jul 2, 2026' },
+      ],
+    },
+    russo: {
+      label: 'No first name — Russo',
+      contact: { firstName: '', lastName: 'Russo', email: 'a.russo@example.com' },
+      account: { name: 'Anthony Russo' },
+      policy:  { policyType: 'Auto', renewalDate: 'Jul 1, 2026', hawksoftId: 'HS-391877' },
+      sender:  { name: 'Marcus Davis', phone: '(555) 123-4567' },
+      agency:  { name: 'Bayview Insurance', phone: '(555) 100-2200', address: '1247 Harbor Dr, Suite 200, San Diego, CA 92101' },
+      policies: [
+        { type: 'Auto', renewalDate: 'Jul 1, 2026' },
+      ],
+    },
+  };
+
+  // ───────── Merge-field catalog ─────────
+  const fields = [
+    { group: 'Contact', items: [
+      { token: 'contact.firstName',   label: 'First name' },
+      { token: 'contact.lastName',    label: 'Last name' },
+      { token: 'contact.email',       label: 'Email' },
+    ]},
+    { group: 'Account', items: [
+      { token: 'account.name',        label: 'Account name' },
+    ]},
+    { group: 'Policy', items: [
+      { token: 'policy.policyType',   label: 'Policy type' },
+      { token: 'policy.renewalDate',  label: 'Renewal date' },
+      { token: 'policy.hawksoftId',   label: 'HawkSoft ID' },
+    ]},
+    { group: 'Sender', items: [
+      { token: 'sender.name',         label: 'Sender name' },
+      { token: 'sender.phone',        label: 'Sender phone' },
+    ]},
+    { group: 'Agency', items: [
+      { token: 'agency.name',         label: 'Agency name' },
+      { token: 'agency.phone',        label: 'Agency phone' },
+    ]},
+  ];
+  const FALLBACKS = { 'contact.firstName': 'there' };
+
+  function labelOf(token){ for (const g of fields) for (const i of g.items) if (i.token === token) return i.label; return token; }
+  function valueFor(rec, token){
+    const [ns, key] = token.split('.');
+    const v = rec && rec[ns] && rec[ns][key];
+    if (v === undefined || v === null || v === '') return FALLBACKS[token] || '';
+    return v;
+  }
+
+  // ───────── Editor: chip + policy-list block factories ─────────
+  const CHIP_CLASS = 'inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap';
+  function chip(token){
+    const s = document.createElement('span');
+    s.setAttribute('data-token', token);
+    s.setAttribute('contenteditable', 'false');
+    s.className = CHIP_CLASS;
+    s.textContent = labelOf(token);
+    return s;
+  }
+  function policyListBlock(){
+    const d = document.createElement('div');
+    d.setAttribute('data-token', 'policyList');
+    d.setAttribute('contenteditable', 'false');
+    d.className = 'group relative block border-2 border-dashed border-primary/40 bg-primary/5 text-primary text-xs font-medium uppercase tracking-wide px-3 py-2 pr-9 rounded-md select-none';
+    d.innerHTML = '<span class="inline-flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>Policy list — expands per recipient</span><button type="button" data-eb-delete-policylist class="absolute top-1.5 right-1.5 size-5 rounded flex items-center justify-center text-primary hover:bg-primary/15 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" aria-label="Remove policy list"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>';
+    return d;
+  }
+
+  // ───────── Dropdown menus ─────────
+  const fieldIcons = {
+    'contact.firstName':  '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    'contact.lastName':   '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    'contact.email':      '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+    'account.name':       '<rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+    'policy.policyType':  '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+    'policy.renewalDate': '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+    'policy.hawksoftId':  '<line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/>',
+    'sender.name':        '<path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/><circle cx="12" cy="12" r="10"/>',
+    'sender.phone':       '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
+    'agency.name':        '<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/>',
+    'agency.phone':       '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  };
+  function fieldIconSvg(token){
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 shrink-0 text-muted-foreground mt-0.5" aria-hidden="true">${fieldIcons[token]||''}</svg>`;
+  }
+
+  function buildMenu(menuEl){
+    let html = '';
+    fields.forEach((g) => {
+      for (const i of g.items) {
+        html += `<button type="button" data-insert-token="${i.token}" class="flex w-full items-start gap-3 rounded-md px-2 py-2 hover:bg-accent text-left outline-none">${fieldIconSvg(i.token)}<span class="flex flex-col min-w-0"><span class="text-sm font-semibold leading-tight text-foreground">${i.label}</span><span class="text-[10px] font-mono text-muted-foreground leading-tight mt-0.5">${i.token}</span></span></button>`;
+      }
+    });
+    menuEl.innerHTML = html;
+  }
+  document.querySelectorAll('[data-eb-dropdown-menu]').forEach(buildMenu);
+
+  document.querySelectorAll('[data-eb-dropdown]').forEach(wrap => {
+    const trigger = wrap.querySelector('[data-eb-dropdown-trigger]');
+    const menu = wrap.querySelector('[data-eb-dropdown-menu]');
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('[data-eb-dropdown-menu]').forEach(m => { if (m !== menu) m.classList.add('hidden'); });
+      menu.classList.toggle('hidden');
+    });
+    menu.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-insert-token]');
+      if (!btn) return;
+      e.stopPropagation();
+      const token = btn.getAttribute('data-insert-token');
+      const target = menu.getAttribute('data-target');
+      const editor = document.querySelector(`[data-eb-editor="${target}"]`);
+      insertNodeIntoEditor(editor, chip(token));
+      menu.classList.add('hidden');
+    });
+  });
+  document.addEventListener('click', () => {
+    document.querySelectorAll('[data-eb-dropdown-menu]').forEach(m => m.classList.add('hidden'));
+  });
+
+  // ───────── Insertion helper ─────────
+  function insertNodeIntoEditor(editor, node){
+    editor.focus();
+    const sel = window.getSelection();
+    let range;
+    if (sel && sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
+      range = sel.getRangeAt(0);
+      range.deleteContents();
+    } else {
+      range = document.createRange();
+      range.selectNodeContents(editor);
+      range.collapse(false);
+    }
+    range.insertNode(node);
+    range.setStartAfter(node);
+    range.setEndAfter(node);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    editor.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  document.querySelector('[data-eb-insert-policylist]').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const editor = document.querySelector('[data-eb-editor="body"]');
+    insertNodeIntoEditor(editor, policyListBlock());
+  });
+
+  // Delete policy-list block via its hover-X button
+  document.querySelector('[data-eb-editor="body"]').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-eb-delete-policylist]');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const block = btn.closest('[data-token="policyList"]');
+    if (block) {
+      const editor = block.parentElement;
+      block.remove();
+      editor.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
+
+  // ───────── Render ─────────
+  function renderInline(node, rec){
+    if (node.nodeType === 3) return document.createTextNode(node.textContent);
+    if (node.nodeType !== 1) return null;
+    const token = node.getAttribute && node.getAttribute('data-token');
+    if (token === 'policyList') return renderPolicyTable(rec);
+    if (token) return document.createTextNode(valueFor(rec, token));
+    // Drop nodes that are visually empty placeholders
+    const clone = document.createElement(node.tagName);
+    // Carry simple inline semantics (no class copy — we want clean rendered email)
+    if (node.tagName === 'A' && node.getAttribute('href')) clone.setAttribute('href', node.getAttribute('href'));
+    for (const child of node.childNodes) {
+      const r = renderInline(child, rec);
+      if (r) clone.appendChild(r);
+    }
+    // Apply preview-friendly defaults
+    if (clone.tagName === 'P') { clone.style.margin = '0 0 .85rem 0'; }
+    return clone;
+  }
+
+  function renderPolicyTable(rec){
+    const table = document.createElement('table');
+    table.className = 'eb-r-table';
+    table.style.borderCollapse = 'collapse';
+    table.style.width = '100%';
+    table.style.margin = '0 0 .85rem 0';
+    table.style.fontSize = '13px';
+    const thead = document.createElement('thead');
+    const tr = document.createElement('tr');
+    const th1 = document.createElement('th'); th1.textContent = 'Policy';
+    const th2 = document.createElement('th'); th2.textContent = 'Renews';
+    [th1, th2].forEach(th => { th.style.textAlign='left'; th.style.padding='8px 10px'; th.style.borderBottom='1px solid'; th.style.fontWeight='600'; th.style.fontSize='12px'; });
+    th2.style.textAlign = 'right';
+    tr.append(th1, th2);
+    thead.appendChild(tr);
+    table.appendChild(thead);
+    const tbody = document.createElement('tbody');
+    (rec.policies || []).forEach(p => {
+      const r = document.createElement('tr');
+      const c1 = document.createElement('td'); c1.textContent = p.type;
+      const c2 = document.createElement('td'); c2.textContent = p.renewalDate;
+      [c1,c2].forEach(c => { c.style.padding='8px 10px'; c.style.borderBottom='1px solid'; });
+      c2.style.textAlign='right';
+      r.append(c1, c2);
+      tbody.appendChild(r);
+    });
+    table.appendChild(tbody);
+    return table;
+  }
+
+  function renderEditorAsText(editor, rec){
+    let out = '';
+    function walk(node){
+      if (node.nodeType === 3) { out += node.textContent; return; }
+      if (node.nodeType !== 1) return;
+      const t = node.getAttribute && node.getAttribute('data-token');
+      if (t === 'policyList') { out += ' [policy list] '; return; }
+      if (t) { out += valueFor(rec, t); return; }
+      for (const c of node.childNodes) walk(c);
+      if (node.tagName === 'P' || node.tagName === 'DIV' || node.tagName === 'BR') out += ' ';
+    }
+    for (const c of editor.childNodes) walk(c);
+    return out.replace(/\s+/g, ' ').trim();
+  }
+
+  function previewText(editor, rec){
+    const t = renderEditorAsText(editor, rec).replace(/\[policy list\]/g, '');
+    return t.length > 140 ? t.slice(0,140) + '…' : t;
+  }
+
+  function checkSubjectRequired(){
+    const editor = document.querySelector('[data-eb-editor="subject"]');
+    const warning = document.querySelector('[data-eb-subject-warning]');
+    const hasFirstName = !!editor.querySelector('[data-token="contact.firstName"]');
+    const hasHawk      = !!editor.querySelector('[data-token="policy.hawksoftId"]');
+    const ok = hasFirstName && hasHawk;
+    warning.classList.toggle('hidden', ok);
+    warning.classList.toggle('inline-flex', !ok);
+  }
+
+  function rerender(){
+    const subjectEditor = document.querySelector('[data-eb-editor="subject"]');
+    const bodyEditor    = document.querySelector('[data-eb-editor="body"]');
+    const recId         = document.querySelector('[data-eb-preview-as]').value;
+    const rec           = recipients[recId];
+
+    document.querySelector('[data-eb-inbox-sender]').textContent       = `${rec.sender.name} · ${rec.agency.name}`;
+    const av = document.querySelector('[data-eb-inbox-avatar]');
+    av.textContent = (rec.sender.name.charAt(0) || '?').toUpperCase();
+    document.querySelector('[data-eb-render-agency-name]').textContent = rec.agency.name;
+    document.querySelector('[data-eb-render-footer-agency]').textContent = `${rec.agency.name} · ${rec.agency.address}`;
+
+    document.querySelector('[data-eb-inbox-subject]').textContent = renderEditorAsText(subjectEditor, rec) || '(no subject)';
+    document.querySelector('[data-eb-inbox-preview]').textContent = previewText(bodyEditor, rec);
+
+    const host = document.querySelector('[data-eb-render-body]');
+    host.innerHTML = '';
+    for (const c of bodyEditor.childNodes) {
+      const r = renderInline(c, rec);
+      if (r) host.appendChild(r);
+    }
+
+    checkSubjectRequired();
+  }
+
+  // ───────── Input wiring ─────────
+  ['subject','body'].forEach(t => {
+    document.querySelector(`[data-eb-editor="${t}"]`).addEventListener('input', rerender);
+  });
+  document.querySelector('[data-eb-preview-as]').addEventListener('change', rerender);
+
+  // Device toggle
+  document.querySelectorAll('[data-eb-device-toggle] button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const v = btn.getAttribute('data-device');
+      btn.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('data-state', b === btn ? 'active' : 'inactive'));
+      const frame = document.querySelector('[data-eb-preview-frame]');
+      frame.style.maxWidth = (v === 'mobile') ? '360px' : '600px';
+    });
+  });
+
+  // Theme toggle (preview only)
+  document.querySelectorAll('[data-eb-theme-toggle] button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const v = btn.getAttribute('data-theme');
+      btn.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('data-state', b === btn ? 'active' : 'inactive'));
+      document.querySelector('[data-eb-preview-frame]').setAttribute('data-eb-render-theme', v);
+    });
+  });
+
+  // Initial render (after DOM is ready in the page body, before chrome injects)
+  rerender();
+})();
+</script>
+
+</body>
+</html>
