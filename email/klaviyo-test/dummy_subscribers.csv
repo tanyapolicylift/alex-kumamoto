@@ -1,0 +1,151 @@
+email,first_name,last_name,city,region,zip,account_status,total_premium,policy_count,policy_lobs,carriers,has_auto,has_home,auto_carrier,home_carrier,earliest_renewal_date,earliest_renewal_lob,earliest_renewal_carrier,flagged_status,flagged_substatus,last_sold_date,nps_score,last_nps_date
+kenneth.davis+klaviyotest001@example.com,Kenneth,Davis,Austin,TX,78701,active,6110,3,"[""Auto"", ""Home"", ""Renters""]","[""Foremost"", ""Nationwide"", ""Travelers""]",true,true,Travelers,Foremost,2026-06-11,Auto,Travelers,,,2022-05-29,,
+joseph.lewis+klaviyotest002@example.com,Joseph,Lewis,Kansas City,MO,64106,active,2329,1,"[""Auto""]","[""Safeco""]",true,false,Safeco,,2026-10-22,Auto,Safeco,Cancelled (Pending),Non-Payment,2024-05-30,,
+john.campbell+klaviyotest003@example.com,John,Campbell,Charlotte,NC,28202,active,2300,1,"[""Home""]","[""State Auto""]",false,true,,State Auto,2027-01-05,Home,State Auto,,,2026-05-31,,
+jennifer.anderson+klaviyotest004@example.com,Jennifer,Anderson,Dallas,TX,75201,active,1658,1,"[""Auto""]","[""Safeco""]",true,false,Safeco,,2026-08-09,Auto,Safeco,,,2023-10-01,10,2025-12-21
+brian.scott+klaviyotest005@example.com,Brian,Scott,Phoenix,AZ,85004,active,3431,2,"[""Auto"", ""Renters""]","[""Erie"", ""Mercury""]",true,false,Erie,,2026-07-03,Auto,Erie,,,2022-09-26,,
+thomas.rodriguez+klaviyotest006@example.com,Thomas,Rodriguez,Phoenix,AZ,85004,active,2095,1,"[""Auto""]","[""Mercury""]",true,false,Mercury,,2026-09-12,Auto,Mercury,Cancelled (Pending),Non-Payment,2026-05-24,9,2026-01-01
+robert.harris+klaviyotest007@example.com,Robert,Harris,Columbus,OH,43215,active,7341,3,"[""Auto"", ""Home"", ""Boat""]","[""Allstate"", ""Nationwide"", ""Progressive""]",true,true,Allstate,Nationwide,2026-06-17,Auto,Allstate,,,2024-11-11,,
+edward.lopez+klaviyotest008@example.com,Edward,Lopez,Nashville,TN,37203,prospect,3179,1,"[""Home""]","[""Foremost""]",false,true,,Foremost,,,,,,2025-06-08,,
+deborah.king+klaviyotest009@example.com,Deborah,King,Austin,TX,78701,active,2727,2,"[""Auto"", ""Home""]","[""Geico"", ""Safeco""]",true,true,Geico,Safeco,2026-08-13,Auto,Geico,,,2023-05-10,,
+david.nelson+klaviyotest010@example.com,David,Nelson,Charlotte,NC,28202,prospect,1333,1,"[""Auto""]","[""Mercury""]",true,false,Mercury,,,,,,,2022-06-22,7,2025-12-13
+carol.white+klaviyotest011@example.com,Carol,White,Charlotte,NC,28202,prospect,4452,2,"[""Auto"", ""Home""]","[""Safeco"", ""Travelers""]",true,true,Travelers,Safeco,,,,,,2026-04-20,9,2026-04-05
+robert.williams+klaviyotest012@example.com,Robert,Williams,Tampa,FL,33602,active,2801,2,"[""Auto"", ""Boat""]","[""Dairyland"", ""Erie""]",true,false,Erie,,2027-01-28,Auto,Erie,Cancelled (Pending),Non-Payment,2024-01-14,,
+george.brown+klaviyotest013@example.com,George,Brown,Dallas,TX,75201,active,1409,1,"[""Auto""]","[""Travelers""]",true,false,Travelers,,2026-09-13,Auto,Travelers,,,2025-12-01,10,2026-01-13
+michael.brown+klaviyotest014@example.com,Michael,Brown,Nashville,TN,37203,lead,0,0,,,false,false,,,,,,,,2025-05-29,9,2026-02-20
+patricia.hernandez+klaviyotest015@example.com,Patricia,Hernandez,Columbus,OH,43215,active,1484,1,"[""Auto""]","[""Dairyland""]",true,false,Dairyland,,2027-04-14,Auto,Dairyland,,,2026-01-05,,
+paul.brown+klaviyotest016@example.com,Paul,Brown,Tampa,FL,33602,active,4635,3,"[""Auto"", ""Home"", ""Umbrella""]","[""Allstate"", ""Travelers""]",true,true,Allstate,Travelers,2026-11-01,Home,Travelers,Cancelled (Pending),Insured Request,2023-01-03,3,2025-12-16
+donna.torres+klaviyotest017@example.com,Donna,Torres,Nashville,TN,37203,active,1388,1,"[""Auto""]","[""Geico""]",true,false,Geico,,2026-06-24,Auto,Geico,,,2025-12-07,9,2026-01-09
+michael.jones+klaviyotest018@example.com,Michael,Jones,Nashville,TN,37203,active,1400,1,"[""Auto""]","[""Travelers""]",true,false,Travelers,,2026-06-30,Auto,Travelers,,,2022-09-03,,
+kevin.scott+klaviyotest019@example.com,Kevin,Scott,Denver,CO,80202,prospect,1136,1,"[""Auto""]","[""Progressive""]",true,false,Progressive,,,,,,,2025-06-20,9,2026-03-07
+susan.baker+klaviyotest020@example.com,Susan,Baker,Denver,CO,80202,active,1089,1,"[""Auto""]","[""Nationwide""]",true,false,Nationwide,,2026-07-26,Auto,Nationwide,,,2024-11-14,8,2026-02-13
+emily.smith+klaviyotest021@example.com,Emily,Smith,Dallas,TX,75201,active,973,1,"[""Auto""]","[""Allstate""]",true,false,Allstate,,2026-09-17,Auto,Allstate,Cancelled (Pending),Non-Payment,2026-02-12,,
+susan.baker+klaviyotest022@example.com,Susan,Baker,Phoenix,AZ,85004,active,2171,1,"[""Auto""]","[""Mercury""]",true,false,Mercury,,2026-11-02,Auto,Mercury,,,2024-01-11,10,2026-03-09
+anthony.nelson+klaviyotest023@example.com,Anthony,Nelson,Phoenix,AZ,85004,active,3027,1,"[""Home""]","[""Nationwide""]",false,true,,Nationwide,2027-02-24,Home,Nationwide,,,2025-01-23,9,2026-02-20
+nancy.moore+klaviyotest024@example.com,Nancy,Moore,Dallas,TX,75201,dead_file,2291,1,"[""Auto""]","[""Mercury""]",true,false,Mercury,,,,,,,2026-03-09,10,2026-04-18
+donna.taylor+klaviyotest025@example.com,Donna,Taylor,Austin,TX,78701,active,1793,1,"[""Auto""]","[""Geico""]",true,false,Geico,,2027-01-17,Auto,Geico,,,2026-05-01,,
+paul.baker+klaviyotest026@example.com,Paul,Baker,Phoenix,AZ,85004,active,2176,1,"[""Auto""]","[""Geico""]",true,false,Geico,,2026-12-04,Auto,Geico,,,2022-06-07,4,2026-02-15
+kevin.harris+klaviyotest027@example.com,Kevin,Harris,Houston,TX,77002,active,1522,1,"[""Auto""]","[""Nationwide""]",true,false,Nationwide,,2027-04-26,Auto,Nationwide,,,2025-02-21,,
+melissa.hernandez+klaviyotest028@example.com,Melissa,Hernandez,Dallas,TX,75201,active,2576,1,"[""Auto""]","[""Travelers""]",true,false,Travelers,,2026-12-09,Auto,Travelers,,,2026-01-30,8,2026-05-15
+sandra.clark+klaviyotest029@example.com,Sandra,Clark,Kansas City,MO,64106,active,1704,1,"[""Home""]","[""Travelers""]",false,true,,Travelers,2026-06-28,Home,Travelers,,,2022-06-09,,
+patricia.scott+klaviyotest030@example.com,Patricia,Scott,Phoenix,AZ,85004,prospect,5376,2,"[""Auto"", ""Home""]","[""Dairyland"", ""Foremost""]",true,true,Dairyland,Foremost,,,,,,2023-11-10,,
+george.allen+klaviyotest031@example.com,George,Allen,Columbus,OH,43215,lead,0,0,,,false,false,,,,,,,,2023-09-05,,
+edward.thomas+klaviyotest032@example.com,Edward,Thomas,Denver,CO,80202,active,2656,2,"[""Auto"", ""Renters""]","[""Erie"", ""Progressive""]",true,false,Progressive,,2027-04-06,Auto,Progressive,Cancelled (Pending),Non-Payment,2022-05-19,8,2026-03-10
+paul.robinson+klaviyotest033@example.com,Paul,Robinson,Columbus,OH,43215,active,5224,2,"[""Home"", ""Boat""]","[""Mercury"", ""State Auto""]",false,true,,State Auto,2026-06-15,Home,State Auto,,,2023-12-28,,
+melissa.wright+klaviyotest034@example.com,Melissa,Wright,Kansas City,MO,64106,prospect,4172,2,"[""Auto"", ""Home""]","[""Dairyland"", ""Nationwide""]",true,true,Dairyland,Nationwide,,,,,,2025-05-31,,
+david.flores+klaviyotest035@example.com,David,Flores,Nashville,TN,37203,active,1071,1,"[""Auto""]","[""Nationwide""]",true,false,Nationwide,,2026-06-18,Auto,Nationwide,Cancelled (Pending),Non-Payment,2024-07-04,10,2026-03-23
+edward.clark+klaviyotest036@example.com,Edward,Clark,Denver,CO,80202,lead,0,0,,,false,false,,,,,,,,2024-05-18,2,2025-12-18
+john.carter+klaviyotest037@example.com,John,Carter,Austin,TX,78701,prospect,4197,2,"[""Auto"", ""Home""]","[""Safeco"", ""Travelers""]",true,true,Safeco,Travelers,,,,,,2025-02-12,,
+thomas.roberts+klaviyotest038@example.com,Thomas,Roberts,Tampa,FL,33602,active,2492,1,"[""Auto""]","[""Travelers""]",true,false,Travelers,,2026-08-28,Auto,Travelers,,,2024-03-27,10,2026-05-14
+donna.hall+klaviyotest039@example.com,Donna,Hall,Phoenix,AZ,85004,active,2530,1,"[""Auto""]","[""Travelers""]",true,false,Travelers,,2026-12-28,Auto,Travelers,,,2026-05-24,10,2026-01-28
+michael.ramirez+klaviyotest040@example.com,Michael,Ramirez,Tampa,FL,33602,active,1260,1,"[""Auto""]","[""Mercury""]",true,false,Mercury,,2026-11-19,Auto,Mercury,,,2023-01-07,10,2026-05-11
+sarah.lewis+klaviyotest041@example.com,Sarah,Lewis,Phoenix,AZ,85004,active,958,1,"[""Auto""]","[""Geico""]",true,false,Geico,,2027-03-10,Auto,Geico,,,2024-10-09,,
+brian.moore+klaviyotest042@example.com,Brian,Moore,Nashville,TN,37203,active,2764,1,"[""Home""]","[""Foremost""]",false,true,,Foremost,2027-03-04,Home,Foremost,,,2026-05-30,9,2026-03-16
+kevin.nguyen+klaviyotest043@example.com,Kevin,Nguyen,Tampa,FL,33602,active,5598,2,"[""Auto"", ""Home""]","[""Allstate"", ""Safeco""]",true,true,Allstate,Safeco,2026-10-30,Auto,Allstate,,,2023-05-03,,
+brian.lopez+klaviyotest044@example.com,Brian,Lopez,Phoenix,AZ,85004,active,2122,1,"[""Auto""]","[""Allstate""]",true,false,Allstate,,2026-06-10,Auto,Allstate,,,2026-04-06,,
+david.moore+klaviyotest045@example.com,David,Moore,Austin,TX,78701,dead_file,2206,1,"[""Auto""]","[""Safeco""]",true,false,Safeco,,,,,,,2026-04-09,,
+donald.walker+klaviyotest046@example.com,Donald,Walker,Charlotte,NC,28202,active,1567,1,"[""Home""]","[""Erie""]",false,true,,Erie,2026-08-10,Home,Erie,,,2024-08-20,6,2026-01-11
+edward.clark+klaviyotest047@example.com,Edward,Clark,Kansas City,MO,64106,active,1822,1,"[""Auto""]","[""Mercury""]",true,false,Mercury,,2027-05-01,Auto,Mercury,,,2022-12-03,,
+michael.carter+klaviyotest048@example.com,Michael,Carter,Phoenix,AZ,85004,active,3437,2,"[""Auto"", ""Home""]","[""Erie"", ""Travelers""]",true,true,Erie,Travelers,2027-05-04,Home,Travelers,,,2022-05-18,10,2026-05-15
+amanda.anderson+klaviyotest049@example.com,Amanda,Anderson,Denver,CO,80202,active,2614,2,"[""Auto"", ""Umbrella""]","[""Erie"", ""Safeco""]",true,false,Erie,,2026-08-09,Auto,Erie,,,2023-02-24,,
+mark.davis+klaviyotest050@example.com,Mark,Davis,Charlotte,NC,28202,active,2005,1,"[""Auto""]","[""Allstate""]",true,false,Allstate,,2026-06-05,Auto,Allstate,,,2026-03-13,10,2026-01-06
+donna.johnson+klaviyotest051@example.com,Donna,Johnson,Denver,CO,80202,active,3768,1,"[""Home""]","[""State Auto""]",false,true,,State Auto,2027-04-29,Home,State Auto,,,2025-10-30,,
+anthony.perez+klaviyotest052@example.com,Anthony,Perez,Tampa,FL,33602,active,3129,1,"[""Home""]","[""Foremost""]",false,true,,Foremost,2027-04-11,Home,Foremost,,,2024-07-11,10,2026-01-22
+james.nelson+klaviyotest053@example.com,James,Nelson,Nashville,TN,37203,active,3116,2,"[""Auto"", ""Home""]","[""Dairyland"", ""Foremost""]",true,true,Dairyland,Foremost,2026-11-28,Home,Foremost,,,2026-03-06,,
+joshua.thomas+klaviyotest054@example.com,Joshua,Thomas,Houston,TX,77002,active,3426,2,"[""Auto"", ""Home""]","[""Erie"", ""Nationwide""]",true,true,Erie,Nationwide,2026-07-03,Home,Nationwide,,,2023-08-20,,
+jessica.robinson+klaviyotest055@example.com,Jessica,Robinson,Nashville,TN,37203,active,1042,1,"[""Auto""]","[""Safeco""]",true,false,Safeco,,2027-02-01,Auto,Safeco,,,2026-04-29,7,2026-01-03
+donna.nelson+klaviyotest056@example.com,Donna,Nelson,Charlotte,NC,28202,lead,0,0,,,false,false,,,,,,,,2023-04-18,10,2026-04-15
+brian.thomas+klaviyotest057@example.com,Brian,Thomas,Kansas City,MO,64106,active,4150,1,"[""Home""]","[""Safeco""]",false,true,,Safeco,2027-01-15,Home,Safeco,,,2022-09-07,,
+ashley.williams+klaviyotest058@example.com,Ashley,Williams,Houston,TX,77002,active,1104,1,"[""Auto""]","[""Dairyland""]",true,false,Dairyland,,2026-09-15,Auto,Dairyland,,,2025-12-02,,
+thomas.perez+klaviyotest059@example.com,Thomas,Perez,Kansas City,MO,64106,active,1678,1,"[""Auto""]","[""Allstate""]",true,false,Allstate,,2027-03-10,Auto,Allstate,,,2022-07-03,,
+joseph.mitchell+klaviyotest060@example.com,Joseph,Mitchell,Dallas,TX,75201,active,1808,1,"[""Auto""]","[""Travelers""]",true,false,Travelers,,2026-07-18,Auto,Travelers,,,2026-05-29,5,2026-01-18
+anthony.torres+klaviyotest061@example.com,Anthony,Torres,Houston,TX,77002,active,1919,1,"[""Auto""]","[""Erie""]",true,false,Erie,,2026-06-18,Auto,Erie,,,2023-09-25,,
+amanda.wright+klaviyotest062@example.com,Amanda,Wright,Houston,TX,77002,active,2208,1,"[""Auto""]","[""Progressive""]",true,false,Progressive,,2027-02-22,Auto,Progressive,,,2023-08-19,8,2026-03-03
+andrew.jackson+klaviyotest063@example.com,Andrew,Jackson,Denver,CO,80202,active,3418,1,"[""Home""]","[""Nationwide""]",false,true,,Nationwide,2026-07-29,Home,Nationwide,,,2025-01-18,,
+daniel.anderson+klaviyotest064@example.com,Daniel,Anderson,Phoenix,AZ,85004,active,3118,2,"[""Auto"", ""Boat""]","[""Nationwide"", ""Safeco""]",true,false,Safeco,,2026-07-21,Auto,Safeco,,,2026-05-30,8,2026-04-12
+david.wright+klaviyotest065@example.com,David,Wright,Tampa,FL,33602,active,2588,1,"[""Auto""]","[""Progressive""]",true,false,Progressive,,2026-12-02,Auto,Progressive,,,2025-12-01,10,2025-12-11
+george.baker+klaviyotest066@example.com,George,Baker,Columbus,OH,43215,dead_file,1157,1,"[""Home""]","[""Erie""]",false,true,,Erie,,,,,,2024-04-10,,
+amanda.taylor+klaviyotest067@example.com,Amanda,Taylor,Kansas City,MO,64106,active,2057,1,"[""Home""]","[""Foremost""]",false,true,,Foremost,2027-04-17,Home,Foremost,,,2025-12-26,,
+sandra.hall+klaviyotest068@example.com,Sandra,Hall,Denver,CO,80202,active,4578,3,"[""Auto"", ""Home"", ""Boat""]","[""Nationwide"", ""Safeco""]",true,true,Nationwide,Safeco,2027-04-06,Home,Safeco,,,2024-01-06,,
+ashley.flores+klaviyotest069@example.com,Ashley,Flores,Columbus,OH,43215,prospect,1808,1,"[""Auto""]","[""Erie""]",true,false,Erie,,,,,,,2024-04-22,9,2026-01-14
+carol.thompson+klaviyotest070@example.com,Carol,Thompson,Austin,TX,78701,active,4225,2,"[""Auto"", ""Home""]","[""Dairyland"", ""Nationwide""]",true,true,Dairyland,Nationwide,2026-07-14,Auto,Dairyland,,,2025-08-20,,
+susan.jones+klaviyotest071@example.com,Susan,Jones,Nashville,TN,37203,active,3352,2,"[""Auto"", ""Boat""]","[""Geico"", ""Nationwide""]",true,false,Geico,,2026-09-16,Auto,Geico,,,2025-09-21,,
+mary.rodriguez+klaviyotest072@example.com,Mary,Rodriguez,Austin,TX,78701,active,1256,1,"[""Auto""]","[""Nationwide""]",true,false,Nationwide,,2026-06-17,Auto,Nationwide,,,2024-04-23,,
+michael.lewis+klaviyotest073@example.com,Michael,Lewis,Nashville,TN,37203,active,1517,1,"[""Auto""]","[""Allstate""]",true,false,Allstate,,2026-08-04,Auto,Allstate,,,2025-09-25,,
+mark.jones+klaviyotest074@example.com,Mark,Jones,Dallas,TX,75201,active,4225,2,"[""Auto"", ""Home""]","[""Allstate"", ""Foremost""]",true,true,Allstate,Foremost,2027-02-21,Home,Foremost,Cancelled (Pending),Underwriting,2022-09-09,,
+emily.campbell+klaviyotest075@example.com,Emily,Campbell,Phoenix,AZ,85004,active,2733,1,"[""Home""]","[""Erie""]",false,true,,Erie,2026-06-17,Home,Erie,,,2025-06-26,,
+donald.jones+klaviyotest076@example.com,Donald,Jones,Dallas,TX,75201,lead,0,0,,,false,false,,,,,,,,2025-08-11,,
+donna.scott+klaviyotest077@example.com,Donna,Scott,Nashville,TN,37203,active,3283,2,"[""Auto"", ""Home""]","[""Foremost"", ""Mercury""]",true,true,Mercury,Foremost,2027-04-25,Auto,Mercury,,,2025-09-25,9,2026-05-04
+edward.moore+klaviyotest078@example.com,Edward,Moore,Kansas City,MO,64106,active,953,1,"[""Auto""]","[""Allstate""]",true,false,Allstate,,2026-11-17,Auto,Allstate,,,2024-08-10,,
+daniel.smith+klaviyotest079@example.com,Daniel,Smith,Houston,TX,77002,lead,0,0,,,false,false,,,,,,,,2022-10-16,,
+jennifer.mitchell+klaviyotest080@example.com,Jennifer,Mitchell,Nashville,TN,37203,active,4805,2,"[""Auto"", ""Home""]","[""Geico"", ""Safeco""]",true,true,Geico,Safeco,2026-08-16,Auto,Geico,,,2026-01-23,,
+sarah.lewis+klaviyotest081@example.com,Sarah,Lewis,Columbus,OH,43215,active,5845,3,"[""Auto"", ""Home"", ""Boat""]","[""Allstate"", ""Dairyland"", ""Nationwide""]",true,true,Allstate,Nationwide,2026-07-27,Auto,Allstate,,,2026-04-19,10,2026-04-28
+edward.taylor+klaviyotest082@example.com,Edward,Taylor,Denver,CO,80202,active,1164,1,"[""Auto""]","[""Safeco""]",true,false,Safeco,,2027-03-17,Auto,Safeco,Cancelled (Pending),Underwriting,2026-06-03,,
+robert.lee+klaviyotest083@example.com,Robert,Lee,Kansas City,MO,64106,active,1135,1,"[""Auto""]","[""Progressive""]",true,false,Progressive,,2026-09-29,Auto,Progressive,,,2025-11-05,4,2026-02-11
+donna.sanchez+klaviyotest084@example.com,Donna,Sanchez,Nashville,TN,37203,active,1582,1,"[""Auto""]","[""Erie""]",true,false,Erie,,2026-06-24,Auto,Erie,,,2024-05-19,10,2025-12-19
+elizabeth.thomas+klaviyotest085@example.com,Elizabeth,Thomas,Dallas,TX,75201,active,1262,1,"[""Auto""]","[""Travelers""]",true,false,Travelers,,2027-02-26,Auto,Travelers,,,2022-09-26,,
+michelle.lee+klaviyotest086@example.com,Michelle,Lee,Tampa,FL,33602,active,3441,2,"[""Auto"", ""Home""]","[""Progressive"", ""Safeco""]",true,true,Progressive,Safeco,2026-06-18,Home,Safeco,Cancelled (Pending),Non-Payment,2022-09-22,,
+jennifer.flores+klaviyotest087@example.com,Jennifer,Flores,Kansas City,MO,64106,active,1821,1,"[""Auto""]","[""Nationwide""]",true,false,Nationwide,,2026-10-08,Auto,Nationwide,,,2025-12-29,,
+nancy.rivera+klaviyotest088@example.com,Nancy,Rivera,Dallas,TX,75201,active,5214,2,"[""Auto"", ""Home""]","[""Dairyland"", ""Erie""]",true,true,Dairyland,Erie,2026-11-25,Home,Erie,,,2022-12-27,9,2026-03-09
+robert.perez+klaviyotest089@example.com,Robert,Perez,Dallas,TX,75201,active,4552,2,"[""Auto"", ""Home""]","[""Safeco""]",true,true,Safeco,Safeco,2026-12-09,Home,Safeco,Cancelled (Pending),Underwriting,2026-05-26,10,2026-05-01
+kevin.hall+klaviyotest090@example.com,Kevin,Hall,Nashville,TN,37203,active,2585,1,"[""Home""]","[""Nationwide""]",false,true,,Nationwide,2026-12-25,Home,Nationwide,,,2025-06-21,10,2026-05-08
+steven.roberts+klaviyotest091@example.com,Steven,Roberts,Nashville,TN,37203,lead,0,0,,,false,false,,,,,,,,2022-11-16,8,2026-04-22
+barbara.hall+klaviyotest092@example.com,Barbara,Hall,Kansas City,MO,64106,lead,0,0,,,false,false,,,,,,,,2022-07-19,,
+mark.flores+klaviyotest093@example.com,Mark,Flores,Denver,CO,80202,active,2367,1,"[""Home""]","[""Travelers""]",false,true,,Travelers,2026-10-11,Home,Travelers,,,2023-11-14,,
+charles.roberts+klaviyotest094@example.com,Charles,Roberts,Columbus,OH,43215,active,4742,3,"[""Auto"", ""Home"", ""Renters""]","[""Erie"", ""Geico"", ""State Auto""]",true,true,Erie,State Auto,2027-03-25,Auto,Erie,,,2024-10-23,9,2026-02-11
+jennifer.anderson+klaviyotest095@example.com,Jennifer,Anderson,Charlotte,NC,28202,prospect,3156,1,"[""Home""]","[""Erie""]",false,true,,Erie,,,,,,2025-11-18,0,2026-05-08
+dorothy.adams+klaviyotest096@example.com,Dorothy,Adams,Tampa,FL,33602,active,5173,2,"[""Auto"", ""Home""]","[""Dairyland"", ""Foremost""]",true,true,Dairyland,Foremost,2026-08-13,Auto,Dairyland,,,2023-04-07,,
+joshua.king+klaviyotest097@example.com,Joshua,King,Columbus,OH,43215,active,5476,2,"[""Auto"", ""Home""]","[""Nationwide"", ""Travelers""]",true,true,Nationwide,Travelers,2026-08-29,Home,Travelers,,,2026-05-26,,
+dorothy.martinez+klaviyotest098@example.com,Dorothy,Martinez,Denver,CO,80202,active,7474,3,"[""Auto"", ""Home"", ""Renters""]","[""Mercury"", ""Travelers""]",true,true,Mercury,Travelers,2027-03-20,Auto,Mercury,,,2022-10-11,8,2026-05-29
+daniel.jones+klaviyotest099@example.com,Daniel,Jones,Tampa,FL,33602,active,4111,1,"[""Home""]","[""State Auto""]",false,true,,State Auto,2026-06-15,Home,State Auto,,,2022-07-02,,
+brian.walker+klaviyotest100@example.com,Brian,Walker,Houston,TX,77002,lead,0,0,,,false,false,,,,,,,,2024-09-11,10,2026-05-23
+christopher.martin+klaviyotest101@example.com,Christopher,Martin,Nashville,TN,37203,active,4185,1,"[""Home""]","[""Nationwide""]",false,true,,Nationwide,2026-07-28,Home,Nationwide,,,2023-11-22,,
+melissa.lewis+klaviyotest102@example.com,Melissa,Lewis,Columbus,OH,43215,active,2532,1,"[""Auto""]","[""Geico""]",true,false,Geico,,2027-02-06,Auto,Geico,,,2025-04-30,,
+christopher.miller+klaviyotest103@example.com,Christopher,Miller,Dallas,TX,75201,active,5230,2,"[""Auto"", ""Home""]","[""Mercury"", ""Travelers""]",true,true,Mercury,Travelers,2026-07-01,Home,Travelers,,,2022-10-03,,
+patricia.jones+klaviyotest104@example.com,Patricia,Jones,Columbus,OH,43215,active,1192,1,"[""Auto""]","[""Nationwide""]",true,false,Nationwide,,2027-02-13,Auto,Nationwide,Cancelled (Pending),Non-Payment,2024-04-23,9,2025-12-30
+elizabeth.baker+klaviyotest105@example.com,Elizabeth,Baker,Charlotte,NC,28202,prospect,1984,1,"[""Auto""]","[""Safeco""]",true,false,Safeco,,,,,,,2024-10-11,4,2026-04-16
+ashley.king+klaviyotest106@example.com,Ashley,King,Columbus,OH,43215,prospect,1339,1,"[""Auto""]","[""Dairyland""]",true,false,Dairyland,,,,,,,2023-08-03,4,2026-05-15
+mark.lopez+klaviyotest107@example.com,Mark,Lopez,Charlotte,NC,28202,dead_file,0,0,,,false,false,,,,,,,,2022-08-06,2,2026-01-15
+charles.martin+klaviyotest108@example.com,Charles,Martin,Houston,TX,77002,active,1941,1,"[""Auto""]","[""Geico""]",true,false,Geico,,2026-09-13,Auto,Geico,,,2026-05-26,,
+sandra.scott+klaviyotest109@example.com,Sandra,Scott,Houston,TX,77002,active,4518,2,"[""Auto"", ""Home""]","[""Dairyland"", ""State Auto""]",true,true,Dairyland,State Auto,2026-06-14,Auto,Dairyland,,,2024-05-29,10,2026-01-12
+kenneth.nguyen+klaviyotest110@example.com,Kenneth,Nguyen,Houston,TX,77002,active,3687,2,"[""Auto"", ""Home""]","[""Nationwide""]",true,true,Nationwide,Nationwide,2026-10-27,Home,Nationwide,,,2024-09-30,,
+thomas.gonzalez+klaviyotest111@example.com,Thomas,Gonzalez,Nashville,TN,37203,active,1929,1,"[""Auto""]","[""Travelers""]",true,false,Travelers,,2027-04-27,Auto,Travelers,,,2022-12-12,10,2026-05-23
+mary.garcia+klaviyotest112@example.com,Mary,Garcia,Austin,TX,78701,prospect,3443,1,"[""Home""]","[""Travelers""]",false,true,,Travelers,,,,,,2023-07-20,,
+paul.jackson+klaviyotest113@example.com,Paul,Jackson,Denver,CO,80202,active,3028,2,"[""Auto"", ""Umbrella""]","[""Progressive"", ""Safeco""]",true,false,Progressive,,2027-02-26,Auto,Progressive,,,2024-07-20,,
+daniel.sanchez+klaviyotest114@example.com,Daniel,Sanchez,Houston,TX,77002,active,3345,2,"[""Auto"", ""Home""]","[""Erie""]",true,true,Erie,Erie,2026-06-05,Home,Erie,,,2023-12-30,10,2026-04-23
+christopher.torres+klaviyotest115@example.com,Christopher,Torres,Tampa,FL,33602,active,1921,1,"[""Auto""]","[""Dairyland""]",true,false,Dairyland,,2026-08-19,Auto,Dairyland,,,2025-02-18,,
+patricia.brown+klaviyotest116@example.com,Patricia,Brown,Denver,CO,80202,active,1485,1,"[""Auto""]","[""Dairyland""]",true,false,Dairyland,,2027-02-09,Auto,Dairyland,,,2024-01-30,8,2026-01-08
+emily.gonzalez+klaviyotest117@example.com,Emily,Gonzalez,Tampa,FL,33602,active,6242,2,"[""Auto"", ""Home""]","[""Allstate"", ""Safeco""]",true,true,Allstate,Safeco,2026-06-07,Home,Safeco,,,2023-03-19,,
+edward.martinez+klaviyotest118@example.com,Edward,Martinez,Phoenix,AZ,85004,active,4825,2,"[""Auto"", ""Home""]","[""Nationwide"", ""Travelers""]",true,true,Nationwide,Travelers,2026-09-18,Auto,Nationwide,,,2025-06-06,9,2026-03-18
+donna.perez+klaviyotest119@example.com,Donna,Perez,Nashville,TN,37203,lead,0,0,,,false,false,,,,,,,,2026-03-31,9,2026-02-16
+donna.martin+klaviyotest120@example.com,Donna,Martin,Austin,TX,78701,active,3750,2,"[""Auto"", ""Renters""]","[""Erie"", ""Safeco""]",true,false,Erie,,2027-05-17,Auto,Erie,,,2026-03-01,,
+brian.davis+klaviyotest121@example.com,Brian,Davis,Phoenix,AZ,85004,active,5531,2,"[""Auto"", ""Home""]","[""Erie""]",true,true,Erie,Erie,2026-08-04,Auto,Erie,,,2022-08-17,,
+matthew.lee+klaviyotest122@example.com,Matthew,Lee,Houston,TX,77002,active,2149,1,"[""Auto""]","[""Progressive""]",true,false,Progressive,,2026-11-23,Auto,Progressive,,,2024-09-02,,
+dorothy.wilson+klaviyotest123@example.com,Dorothy,Wilson,Charlotte,NC,28202,active,2566,2,"[""Auto"", ""Boat""]","[""Allstate"", ""Progressive""]",true,false,Progressive,,2027-01-22,Auto,Progressive,,,2024-09-17,10,2026-05-13
+daniel.lewis+klaviyotest124@example.com,Daniel,Lewis,Denver,CO,80202,active,2051,1,"[""Auto""]","[""Progressive""]",true,false,Progressive,,2026-06-23,Auto,Progressive,,,2023-05-13,6,2026-05-08
+anthony.perez+klaviyotest125@example.com,Anthony,Perez,Charlotte,NC,28202,active,1746,1,"[""Home""]","[""State Auto""]",false,true,,State Auto,2027-03-04,Home,State Auto,,,2024-09-23,9,2026-05-11
+carol.torres+klaviyotest126@example.com,Carol,Torres,Phoenix,AZ,85004,active,1755,1,"[""Auto""]","[""Safeco""]",true,false,Safeco,,2026-07-22,Auto,Safeco,,,2024-09-19,,
+james.martin+klaviyotest127@example.com,James,Martin,Kansas City,MO,64106,active,3726,1,"[""Home""]","[""Erie""]",false,true,,Erie,2026-09-10,Home,Erie,,,2024-06-26,8,2026-03-29
+dorothy.lopez+klaviyotest128@example.com,Dorothy,Lopez,Austin,TX,78701,active,1259,1,"[""Auto""]","[""Erie""]",true,false,Erie,,2027-01-27,Auto,Erie,,,2026-05-24,10,2026-01-31
+christopher.thomas+klaviyotest129@example.com,Christopher,Thomas,Austin,TX,78701,active,1518,1,"[""Auto""]","[""Geico""]",true,false,Geico,,2026-11-14,Auto,Geico,,,2026-06-02,,
+william.sanchez+klaviyotest130@example.com,William,Sanchez,Nashville,TN,37203,prospect,0,0,,,false,false,,,,,,,,2022-10-04,,
+charles.white+klaviyotest131@example.com,Charles,White,Kansas City,MO,64106,active,4162,1,"[""Home""]","[""Erie""]",false,true,,Erie,2027-04-11,Home,Erie,,,2025-02-11,,
+amanda.carter+klaviyotest132@example.com,Amanda,Carter,Kansas City,MO,64106,lead,0,0,,,false,false,,,,,,,,2025-11-26,,
+linda.brown+klaviyotest133@example.com,Linda,Brown,Nashville,TN,37203,prospect,1571,1,"[""Auto""]","[""Safeco""]",true,false,Safeco,,,,,,,2022-07-11,9,2026-05-10
+steven.lewis+klaviyotest134@example.com,Steven,Lewis,Austin,TX,78701,active,5701,2,"[""Auto"", ""Home""]","[""Nationwide"", ""State Auto""]",true,true,Nationwide,State Auto,2027-01-22,Home,State Auto,,,2023-02-05,8,2025-12-05
+robert.wright+klaviyotest135@example.com,Robert,Wright,Austin,TX,78701,prospect,1487,1,"[""Auto""]","[""Nationwide""]",true,false,Nationwide,,,,,,,2022-09-29,,
+carol.clark+klaviyotest136@example.com,Carol,Clark,Tampa,FL,33602,dead_file,2241,2,"[""Auto"", ""Boat""]","[""Allstate"", ""Mercury""]",true,false,Mercury,,,,,,,2024-05-22,10,2026-02-22
+kimberly.rodriguez+klaviyotest137@example.com,Kimberly,Rodriguez,Phoenix,AZ,85004,lead,0,0,,,false,false,,,,,,,,2023-04-15,8,2026-04-05
+jessica.robinson+klaviyotest138@example.com,Jessica,Robinson,Tampa,FL,33602,active,965,1,"[""Auto""]","[""Travelers""]",true,false,Travelers,,2026-07-12,Auto,Travelers,,,2026-06-03,9,2026-05-21
+jessica.mitchell+klaviyotest139@example.com,Jessica,Mitchell,Austin,TX,78701,active,4215,2,"[""Auto"", ""Home""]","[""Nationwide"", ""Travelers""]",true,true,Nationwide,Travelers,2027-04-24,Home,Travelers,,,2024-07-17,10,2025-12-15
+kimberly.anderson+klaviyotest140@example.com,Kimberly,Anderson,Columbus,OH,43215,active,2182,1,"[""Auto""]","[""Safeco""]",true,false,Safeco,,2026-07-28,Auto,Safeco,,,2023-05-26,8,2026-04-25
+karen.harris+klaviyotest141@example.com,Karen,Harris,Houston,TX,77002,active,3800,2,"[""Auto"", ""Renters""]","[""Nationwide"", ""Progressive""]",true,false,Progressive,,2027-02-02,Auto,Progressive,,,2024-06-27,,
+mark.white+klaviyotest142@example.com,Mark,White,Dallas,TX,75201,active,3859,1,"[""Home""]","[""Erie""]",false,true,,Erie,2026-06-06,Home,Erie,,,2022-07-29,,
+donald.wilson+klaviyotest143@example.com,Donald,Wilson,Tampa,FL,33602,active,4855,2,"[""Home"", ""Renters""]","[""Erie"", ""Travelers""]",false,true,,Travelers,2026-11-03,Home,Travelers,,,2023-05-08,,
+karen.taylor+klaviyotest144@example.com,Karen,Taylor,Tampa,FL,33602,active,3934,2,"[""Auto"", ""Home""]","[""Dairyland"", ""Safeco""]",true,true,Dairyland,Safeco,2026-07-01,Auto,Dairyland,,,2026-05-26,,
+donna.campbell+klaviyotest145@example.com,Donna,Campbell,Columbus,OH,43215,active,5808,2,"[""Auto"", ""Home""]","[""Erie""]",true,true,Erie,Erie,2027-03-11,Home,Erie,,,2024-05-13,10,2026-01-28
+barbara.wright+klaviyotest146@example.com,Barbara,Wright,Austin,TX,78701,active,1298,1,"[""Home""]","[""Foremost""]",false,true,,Foremost,2027-05-22,Home,Foremost,Cancelled (Pending),Non-Payment,2023-10-14,9,2025-12-14
+michelle.walker+klaviyotest147@example.com,Michelle,Walker,Charlotte,NC,28202,active,4604,2,"[""Auto"", ""Home""]","[""Nationwide"", ""State Auto""]",true,true,Nationwide,State Auto,2027-03-18,Home,State Auto,,,2025-09-27,,
+kimberly.martinez+klaviyotest148@example.com,Kimberly,Martinez,Phoenix,AZ,85004,active,2528,1,"[""Auto""]","[""Progressive""]",true,false,Progressive,,2027-01-27,Auto,Progressive,,,2025-01-27,10,2026-05-13
+carol.adams+klaviyotest149@example.com,Carol,Adams,Austin,TX,78701,active,3527,2,"[""Auto"", ""Umbrella""]","[""Nationwide"", ""Travelers""]",true,false,Nationwide,,2026-12-20,Auto,Nationwide,,,2025-01-19,10,2026-01-08
+donald.moore+klaviyotest150@example.com,Donald,Moore,Austin,TX,78701,prospect,3408,1,"[""Home""]","[""State Auto""]",false,true,,State Auto,,,,,,2024-07-29,6,2026-04-27
