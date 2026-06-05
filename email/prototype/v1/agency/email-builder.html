@@ -36,6 +36,11 @@
   [data-eb-render-theme="dark"]  a.eb-r-link    { color:#9bf297; }
   /* preview frame width transition */
   [data-eb-preview-frame] { transition: max-width .2s ease; }
+  /* Body-editor rich-text defaults (mirrored in rendered preview via inline styles) */
+  [data-eb-editor="body"] h2 { font-size: 1.125rem; font-weight: 600; margin: .25rem 0 .5rem; }
+  [data-eb-editor="body"] ul { list-style: disc; padding-left: 1.25rem; }
+  [data-eb-editor="body"] ol { list-style: decimal; padding-left: 1.25rem; }
+  [data-eb-editor="body"] a  { color: #12b76d; text-decoration: underline; }
 </style>
 <script src="/assets/agency-chrome.js" defer></script>
 </head>
@@ -59,13 +64,8 @@
 <!-- 2-panel: editor + preview -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-<!-- LEFT: Editor -->
-<section class="rounded-lg border bg-card text-card-foreground">
-<div class="border-b px-5 py-3 flex items-center gap-2">
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil size-4 text-muted-foreground" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
-<h2 class="text-sm font-medium">Edit</h2>
-</div>
-<div class="p-5 space-y-5">
+<!-- LEFT: Editor (no container — bare fields) -->
+<section class="space-y-5">
 
 <!-- Template name -->
 <div class="space-y-1.5">
@@ -109,7 +109,22 @@ Insert policy list
 </button>
 </div>
 </div>
-<div data-eb-editor="body" contenteditable="true" spellcheck="false" class="border-input rounded-md border bg-transparent shadow-xs p-4 text-sm leading-relaxed transition-[color,box-shadow] dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] overflow-y-auto" style="min-height:24rem;max-height:34rem;">
+<div class="border-input rounded-md border bg-transparent shadow-xs dark:bg-input/30 overflow-hidden focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px] transition-[color,box-shadow]">
+<div data-eb-wysiwyg class="border-b border-input px-1.5 py-1 flex items-center gap-0.5 flex-wrap">
+<button type="button" data-cmd="bold" title="Bold (⌘B)" class="inline-flex items-center justify-center size-7 rounded text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/></svg></button>
+<button type="button" data-cmd="italic" title="Italic (⌘I)" class="inline-flex items-center justify-center size-7 rounded text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg></button>
+<button type="button" data-cmd="underline" title="Underline (⌘U)" class="inline-flex items-center justify-center size-7 rounded text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" x2="20" y1="20" y2="20"/></svg></button>
+<span aria-hidden="true" class="w-px h-5 bg-border mx-1"></span>
+<button type="button" data-cmd="formatBlock" data-val="h2" title="Heading" class="inline-flex items-center justify-center h-7 px-2 rounded text-xs font-semibold text-muted-foreground hover:bg-accent hover:text-foreground transition-colors">H2</button>
+<button type="button" data-cmd="formatBlock" data-val="p" title="Paragraph" class="inline-flex items-center justify-center size-7 rounded text-muted-foreground hover:bg-accent hover:text-foreground transition-colors text-sm" aria-label="Paragraph">¶</button>
+<span aria-hidden="true" class="w-px h-5 bg-border mx-1"></span>
+<button type="button" data-cmd="insertUnorderedList" title="Bullet list" class="inline-flex items-center justify-center size-7 rounded text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg></button>
+<button type="button" data-cmd="insertOrderedList" title="Numbered list" class="inline-flex items-center justify-center size-7 rounded text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><line x1="10" x2="21" y1="6" y2="6"/><line x1="10" x2="21" y1="12" y2="12"/><line x1="10" x2="21" y1="18" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+<span aria-hidden="true" class="w-px h-5 bg-border mx-1"></span>
+<button type="button" data-cmd="createLink" title="Insert link" class="inline-flex items-center justify-center size-7 rounded text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+<button type="button" data-cmd="unlink" title="Remove link" class="inline-flex items-center justify-center size-7 rounded text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="m18.84 12.25 1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="m5.17 11.75-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" x2="16" y1="2" y2="2"/><line x1="2" x2="5" y1="22" y2="22"/><line x1="3" x2="3" y1="15" y2="22"/></svg></button>
+</div>
+<div data-eb-editor="body" contenteditable="true" spellcheck="false" class="p-4 text-sm leading-relaxed outline-none overflow-y-auto" style="min-height:22rem;max-height:30rem;">
 <p>Hi <span data-token="contact.firstName" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">First name</span>,</p>
 <p>Just a quick note that your <span data-token="policy.policyType" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">Policy type</span> policy with us is set to renew on <span data-token="policy.renewalDate" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">Renewal date</span>.</p>
 <p>Here's what's renewing on your account:</p>
@@ -120,8 +135,8 @@ Insert policy list
 <p><span data-token="sender.name" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">Sender name</span><br><span data-token="sender.phone" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">Sender phone</span></p>
 </div>
 </div>
-
 </div>
+
 </section>
 
 <!-- RIGHT: Preview -->
@@ -383,6 +398,27 @@ Send test
     insertNodeIntoEditor(editor, policyListBlock());
   });
 
+  // WYSIWYG toolbar (execCommand — fine for prototype)
+  document.querySelector('[data-eb-wysiwyg]').addEventListener('mousedown', (e) => {
+    // Prevent the toolbar click from blurring the editor & losing the selection
+    if (e.target.closest('button')) e.preventDefault();
+  });
+  document.querySelector('[data-eb-wysiwyg]').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-cmd]');
+    if (!btn) return;
+    const cmd = btn.getAttribute('data-cmd');
+    let val = btn.getAttribute('data-val') || null;
+    const editor = document.querySelector('[data-eb-editor="body"]');
+    editor.focus();
+    if (cmd === 'createLink') {
+      const url = window.prompt('Link URL', 'https://');
+      if (!url) return;
+      val = url;
+    }
+    document.execCommand(cmd, false, val);
+    editor.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+
   // Delete policy-list block via its hover-X button
   document.querySelector('[data-eb-editor="body"]').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-eb-delete-policylist]');
@@ -413,7 +449,11 @@ Send test
       if (r) clone.appendChild(r);
     }
     // Apply preview-friendly defaults
-    if (clone.tagName === 'P') { clone.style.margin = '0 0 .85rem 0'; }
+    if (clone.tagName === 'P')  { clone.style.margin = '0 0 .85rem 0'; }
+    if (clone.tagName === 'H2') { clone.style.cssText = 'font-size:1.125rem;font-weight:600;margin:.25rem 0 .5rem;'; }
+    if (clone.tagName === 'UL') { clone.style.cssText = 'list-style:disc;padding-left:1.25rem;margin:0 0 .85rem;'; }
+    if (clone.tagName === 'OL') { clone.style.cssText = 'list-style:decimal;padding-left:1.25rem;margin:0 0 .85rem;'; }
+    if (clone.tagName === 'A')  { clone.style.cssText = 'color:#12b76d;text-decoration:underline;'; }
     return clone;
   }
 
