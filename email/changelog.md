@@ -6,6 +6,20 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-05 — `[docs]` `[brainstorm]` Created `vision.md` — the readable front door
+
+Created [`vision.md`](vision.md) — a high-level, non-technical vision spec modeled on Fairs' `specs/registrations/crm-vision.md`. The problem it solves: `concepts_working_doc.md` has accreted into a *working* doc (concept-status map, active-thread scaffolding, client-signal logs, decision history) — the email equivalent of Fairs' `design-session-notes.md`, **not** its `crm-vision.md`. There was no clean artifact a non-technical reader (teammate, client, exec skimming) could pick up cold. `vision.md` is that front door: plain prose, no schema/status, each concept ending in a `Detail — … in [doc]` pointer, closing with a concepts-at-a-glance table.
+
+Structure (mirrors crm-vision.md): Summary → **the four primitives** (Segment / Template / Broadcast / Automation, each a few sentences + pointer) → **how Segments and Automations fit together** → **cross-cutting capabilities** (fields by source, dynamic content, recipient/sender resolution, verification, consent/writeback/reporting) → **data foundation** (two-tier AMS) → **delivery model** (concierge tier-1, Managed/Regular, three tiers) → concepts table.
+
+Folded in the conceptual output of the 2026-06-03 Alex/Yurii/Tanya call (`fathom.video/calls/696082388`):
+- **The Segment↔Automation boundary** (Martin's flagged #1 question) stated as the design spine: *Segment = durable "what kind of record is this" (slow-changing, reusable, agent's AMS vocabulary); Automation = temporal/program logic (timing, sender, refining filters layered on top).* Separate entities, but the Automation always shows the **net resulting audience** — and the filter-on-top is what avoids fifty near-identical Segments. Enrollment = newly-entering by construction.
+- **Raw-AMS-first sharpening:** agents are AMS-field experts and marketing-abstraction novices → lean on raw `ams.*` fields they already trust; `calc.*` isn't just deferred, it's a standing harder sell.
+
+Per Martin: this is option (a) — `vision.md` becomes the front door; `concepts_working_doc.md` stays the working doc **untouched for now**, to be eliminated later once its durable content has migrated to the vision + companion docs. The fuller capture of the 2026-06-03 call (working-doc §12 client-signal entry, decisions-register updates) is still pending.
+
+---
+
 ## 2026-06-03 — `[docs]` Consolidated decisions & open-questions register for team review
 
 Created [`decisions_and_open_questions.md`](decisions_and_open_questions.md) — a single review artifact pulling every decided/leaning/open item out of the scattered docs (companion-doc open-questions sections, the §7 cluster status flags, §11 commitments, prototype blueprint) into one place, grouped by area with status (✅/🔄/🔲/⏭️), current leans, dependencies, and back-pointers. Explicitly **not** a source of truth — each home doc stays authoritative. Opens with a "decide-these-first" shortlist (tagging strategy, verification UX, re-eval cadence, coverage data, matched-set ownership, sender resolver). For Martin to walk through with Alex / Raghav / Mike.
