@@ -69,14 +69,16 @@
 
 <!-- Template name -->
 <div class="space-y-1.5">
-<label class="text-sm font-medium" for="eb-template-name">Template name</label>
-<input id="eb-template-name" data-slot="input" class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 min-w-0 rounded-md border bg-white px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] w-full" value="Renewal reminder — 30 days">
+<div class="flex items-center h-7">
+<label class="text-base font-semibold" for="eb-template-name">Template name</label>
+</div>
+<input id="eb-template-name" data-slot="input" class="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-gray-300 dark:border-input flex h-9 min-w-0 rounded-md border bg-white px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] w-full" value="Renewal reminder — 30 days">
 </div>
 
 <!-- Subject -->
 <div class="space-y-1.5">
-<div class="flex items-center justify-between gap-2">
-<label class="text-sm font-medium">Subject</label>
+<div class="flex items-center justify-between gap-2 h-7">
+<label class="text-base font-semibold">Subject</label>
 <div class="relative" data-eb-dropdown>
 <button type="button" data-eb-dropdown-trigger class="inline-flex items-center gap-1 whitespace-nowrap rounded-md text-xs font-medium border bg-white shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-7 px-2.5">
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 text-muted-foreground" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
@@ -86,14 +88,14 @@ Insert field
 <div data-eb-dropdown-menu data-target="subject" class="hidden absolute right-0 mt-1 w-64 rounded-md border bg-white text-foreground dark:bg-zinc-950 dark:text-zinc-100 shadow-md z-50 p-1 max-h-80 overflow-y-auto"></div>
 </div>
 </div>
-<div data-eb-editor="subject" contenteditable="true" class="border-input rounded-md border bg-white shadow-xs min-h-9 px-3 py-2 text-sm transition-[color,box-shadow] dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]" spellcheck="false"><span data-token="contact.firstName" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">First name</span><span>, your renewal is coming up</span></div>
+<div data-eb-editor="subject" contenteditable="true" class="border-gray-300 dark:border-input rounded-md border bg-white shadow-xs min-h-9 px-3 py-2 text-sm transition-[color,box-shadow] dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]" spellcheck="false"><span data-token="contact.firstName" contenteditable="false" class="inline-flex items-center rounded-md bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 text-xs font-medium select-none whitespace-nowrap">First name</span><span>, your renewal is coming up</span></div>
 <p data-eb-subject-warning class="text-xs text-amber-700 mt-1 hidden items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 shrink-0" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>Required: include first name + HawkSoft ID.</p>
 </div>
 
 <!-- Body -->
 <div class="space-y-1.5">
-<div class="flex items-center justify-between gap-2">
-<label class="text-sm font-medium">Body</label>
+<div class="flex items-center justify-between gap-2 h-7">
+<label class="text-base font-semibold">Body</label>
 <div class="flex items-center gap-2">
 <div class="relative" data-eb-dropdown>
 <button type="button" data-eb-dropdown-trigger class="inline-flex items-center gap-1 whitespace-nowrap rounded-md text-xs font-medium border bg-white shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-7 px-2.5">
@@ -109,8 +111,8 @@ Insert policy list
 </button>
 </div>
 </div>
-<div class="border-input rounded-md border bg-white shadow-xs dark:bg-input/30 overflow-hidden focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px] transition-[color,box-shadow]">
-<div data-eb-wysiwyg class="border-b border-input px-1.5 py-1 flex items-center gap-0.5 flex-wrap">
+<div class="border-gray-300 dark:border-input rounded-md border bg-white shadow-xs dark:bg-input/30 overflow-hidden focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px] transition-[color,box-shadow]">
+<div data-eb-wysiwyg class="border-b border-gray-200 dark:border-input px-1.5 py-1 flex items-center gap-0.5 flex-wrap">
 <button type="button" data-cmd="bold" title="Bold (⌘B)" class="inline-flex items-center justify-center size-7 rounded text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/></svg></button>
 <button type="button" data-cmd="italic" title="Italic (⌘I)" class="inline-flex items-center justify-center size-7 rounded text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg></button>
 <button type="button" data-cmd="underline" title="Underline (⌘U)" class="inline-flex items-center justify-center size-7 rounded text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4" aria-hidden="true"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" x2="20" y1="20" y2="20"/></svg></button>
