@@ -103,7 +103,7 @@ Three runtime concerns that sit under everything: a **consent layer** (marketing
 
 Underneath everything sits a **two-tier view of AMS data**. Tier one is a clean **CXP abstraction layer** — accounts, contacts, and policies in the same shape regardless of which AMS the agency runs — used for the UI and everyday convenience. Tier two is the **raw AMS payload preserved alongside it**, every native field in its original structure. The Segment engine queries the raw tier primarily, because that's where the fidelity for real segmentation lives, and mixes it with PolicyLift-side data.
 
-Today there's only one AMS in play (HawkSoft), so there's nothing to normalize *across* yet — which is exactly why raw-AMS-first works and the unified `calc.*` layer can wait until a second AMS forces it.
+Each agency is tied to a single AMS, so within an agency there's nothing to normalize *across* — which is why raw-AMS-first works and the unified `calc.*` layer can wait until we want one Segment definition to span agencies on *different* AMSes.
 
 *Detail — the two-tier strategy and what's in CXP today vs. missing — in [`concepts_working_doc.md` §3–§4](concepts_working_doc.md).*
 

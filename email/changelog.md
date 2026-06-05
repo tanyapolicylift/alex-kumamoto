@@ -6,6 +6,16 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-05 — `[docs]` `[brainstorm]` `segments.md` — trim Fields by source, drop Segment metadata, fix AMS framing
+
+Follow-on simplifications from Martin's read-through:
+
+- **Fields by source collapsed** to the bare model: `ams.*` / `pl.*` (tags can live on either side, or both) + `calc.*` later. Cut the standalone "PolicyLift-side data" section (it just restated `pl.*`), the "policy in force" subsection (it's just a `status = active` condition — no auto-include planned), and the "no canonical layer" prose (compressed to a clause).
+- **Fixed the AMS framing** (it was wrong): not "one AMS today" — the platform syncs many, but **each agency is tied to a single AMS**, so within an agency there's nothing to normalize *across*; different agencies build against different AMSes. Corrected in `segments.md`, `vision.md`, and the `concepts_working_doc.md` §4.3 banner.
+- **Dropped the "Segment metadata" section** — overcomplex for a segment property. "Suggested sender" is a sender-resolution concern (the prospect-list-from-its-producer case is now a note under "Where Segments fit"); "owner" is a one-line aside in "What a Segment is."
+
+---
+
 ## 2026-06-05 — `[docs]` `[brainstorm]` `segments.md` — conceptual-first restructure + authorship reframe + de-phasing
 
 A big pass on `segments.md` to make it read top-to-bottom at a conceptual altitude (Martin works at that level, not deep-technical).

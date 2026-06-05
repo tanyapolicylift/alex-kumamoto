@@ -25,6 +25,8 @@ A Segment has four parts that matter to the people using it:
 - **The criteria** that define who's in. This can be anything from AMS data ("renewal date in the next 30 days," "carrier = Nationwide," "premium > $5,000") to PolicyLift-side annotations ("has the 'inspection pending' tag," "hasn't unsubscribed").
 - **A current count and sample of who matches right now.** The count tells you how big the Segment is. The sample lets you eyeball who's actually in it — names, key fields, anything that helps spot a mistake before you hit send.
 
+(Beyond these, a Segment carries only light library bookkeeping — an owner, a last-modified time — not part of what it matches.)
+
 Crucially, a Segment is a *question*, not a list. We come back to this below — but the short version is that a Segment doesn't store names. It stores the criteria, and we run them whenever someone asks "who matches right now?" The answer changes as data changes.
 
 ---
@@ -163,71 +165,18 @@ This is also *why* a Segment can stay simple and reusable: the parts that vary p
 
 ## Fields by source — `ams.`, `pl.`, and (later) `calc.`
 
-A Segment's predicate references fields, and the simplest useful model names them by **source**:
+A Segment's criteria reference fields, named by **where they come from**:
 
-- **`ams.*`** — data that originates in the AMS: `ams.policy.status`, `ams.policy.renewal_date`, `ams.policy.substatus`. This is a *source* label, not a storage one — whether PolicyLift keeps a field in a normalized CXP column or reads it from raw `ams_data` JSONB is invisible *under* the `ams.` name; the author doesn't care.
-- **`pl.*`** — data that originates in PolicyLift: `pl.conversation.type`, tags, NPS responses, consent/suppression, custom fields, lifecycle markers.
+- **`ams.*`** — data from the AMS: `ams.policy.status`, `ams.policy.renewal_date`, `ams.policy.substatus`, and the AMS's own tags. (A *source* label, not storage — whether it's a normalized CXP column or read from raw `ams_data` JSONB is invisible under the `ams.` name.)
+- **`pl.*`** — data from PolicyLift: PolicyLift tags, NPS responses, consent/suppression, conversations, custom fields. An agency can tag in its AMS (`ams.*`), tag in PolicyLift (`pl.*`, if we build that), or use both.
 
-So "accounts with an active policy and no chats" is `count(ams.policy where status = 'active') > 0 AND count(pl.conversation where type = 'chat') = 0`.
+Both sources sit in the *same* predicate — *"renewing in 30 days [ams] AND has the 'Inspection Pending' tag [pl] AND not unsubscribed [pl]"* — and the engine joins them without the author thinking about which is which. So "accounts with an active policy and no chats" is `count(ams.policy where status='active') > 0 AND count(pl.conversation where type='chat') = 0`.
 
-### Today: no canonical / mapping layer
+We reference these fields **directly — there's no canonical / normalization layer in between.** Each agency is tied to a single AMS, so within an agency every `ams.*` field comes from one place: there's nothing to map *across*, and the agency recognizes its own AMS's field names. Different agencies build against different AMSes (HawkSoft for one, NASA for another); a normalization layer would only earn its keep if we wanted one shared Segment definition to span agencies on *different* AMSes, or to give self-serve clients a friendlier vocabulary — neither is on the table yet. Computed concepts (days-until-renewal) are just written inline. This is also the *right* posture, not only the simplest: agents trust `status` / `substatus` because that's exactly what they use in their AMS, and distrust a transformed "PolicyLift version" — so raw fields stay first-class, each agency's Segments tuned to how it actually uses its AMS. *(Alex, [`concepts_working_doc.md` §12.3](concepts_working_doc.md).)*
 
-Right now we're onboarding one agency on one AMS (Marker / HawkSoft), and PolicyLift authors the Segments. With **one** AMS there is nothing to map *across*, and with **PL-only** authoring nobody needs a friendly vocabulary that hides field names — so we **don't build a normalization layer**. Segments reference `ams.*` / `pl.*` fields directly, and each `ams.*` field resolves to one concrete HawkSoft location (a CXP column or a JSONB path). Computed concepts are written **inline** in the SQL — e.g. `ams.policy.renewal_date BETWEEN now() AND now() + 30d`, or `ams.policy.effective_date + <term>` where a reliable renewal date is missing. Clunky but honest — and PL writes it, not clients.
+### Later: `calc.*` — named computed fields (deferred)
 
-This is close to what Agency Revolution does: its Advanced Segment exposes raw per-AMS fields directly (an "AMS/BMS section… [that] varies from system to system"), normalizing only selectively (policy-type, renewal proxy).
-
-**Why raw-first is the right posture, not merely the simplest (Alex, 2026-06-03).** Agents are experts in their AMS fields and novices in marketing abstractions. They trust `status` + `substatus` because that's *exactly what they use in HawkSoft* — and they distrust a transformed "PolicyLift version" of the same field, because the moment you normalize it the assumptions change and the Segment stops feeling like theirs. So the realistic shape is **raw AMS fields exposed directly, with a different Segment set authored per AMS — and possibly per customer**, mirroring how each agency actually uses its fields. (It's also why Levitate sidesteps the whole problem with tags-only.) See [`concepts_working_doc.md` §12.3](concepts_working_doc.md).
-
-### Later: `calc.*` — the unified / computed layer (deferred)
-
-When a computed concept is reused enough to deserve a name, or is exposed to tier-2 self-serve clients who can't write raw expressions, promote it to a **`calc.*` field** — a *named expression* over `ams.` / `pl.` inputs (e.g. `calc.policy.days_until_renewal`). The prefix flags "computed, possibly approximate / AMS-dependent." A `calc.` field is exactly what earlier drafts called a *canonical field*: it carries a definition, a type, the AMSes it works on, and — **only when a second AMS needs that same field** — a per-AMS resolution inside its definition. (Some are reference-data-backed, e.g. "at or below state minimum" against a state-minimums table.) So the model complicates only where forced:
-
-1. **`ams.` / `pl.` raw, math inline** ← now (one AMS, PL authors)
-2. **name a `calc.` field** ← when reused, or exposed to tier-2
-3. **per-AMS resolution inside a `calc.` field** ← only when a 2nd AMS needs that field
-
-The "seven AMSes store renewal date seven different ways" problem is real — but it's a *multi-AMS* problem we don't have yet. And even when it arrives, `calc.*` is a **hard sell** (see the trust note above): expect raw fields to stay the default and `calc.*` to be the exception for genuinely reused/multi-AMS concepts, not a friendly front layered over everything. The deeper design (catalog, versioning, agency extensions) lives in [`concepts_working_doc.md > §4.3`](concepts_working_doc.md), deferred until that step actually arrives.
-
-### A note on the "policy in force" filter
-
-Some canonical fields only make sense paired with another condition. The main case is date-based fields and policy status: when a policy is canceled in HawkSoft, the renewal/expiration date becomes unreliable (stale value or gone), but other date fields stick around. A naive "renewal in 30 days" segment that doesn't *also* filter `status = active` will start emailing canceled policies — bad.
-
-The fix is **just another condition** — include `status = active` in the predicate. It's not a special construct: while PL hand-writes the SQL, it's one more line in the `WHERE` clause. We deliberately don't model "guards" as a separate concept (it would only ever compile to a plain `AND`).
-
-*Deferred, tier-2 only:* once non-experts author segments, a canonical field could quietly **auto-include** this companion condition so a self-serve author who picks "days until renewal" doesn't forget it and footgun. That's an invisible convenience of the field in the future catalog — not a user-facing concept, and nothing to build now.
-
-Surfaced by Marker Insurance during their 2026-05-27 onboarding (`concepts_working_doc.md` §12.1).
-
----
-
-## PolicyLift-side data in Segments
-
-Not all the data a Segment queries comes from the AMS. Some lives on PolicyLift's side: tags applied by the client, custom fields they've set up, do-not-market flags, consent and suppression state, lifecycle markers.
-
-These need to be queryable in the same Segment expression as canonical AMS fields. Concretely: a Segment can say *"Auto policies renewing in 30 days [from the AMS] AND has the 'Inspection Pending' tag [from PolicyLift] AND has not unsubscribed [from PolicyLift suppression]"* and the Segment engine joins both data sources at query time without the client having to know which is which.
-
-This matters more than originally planned. The first sketch of the email product assumed clients would tag in their AMS and PolicyLift would just read those tags — but during Marker's onboarding it became clear that HawkSoft's substatus (which is the tagging-like field available via API) is only editable on a few statuses (Cancellation / Non-Renewed / Moved / Rejected) and NOT on the New Business / Rewrite statuses where Marker needed it for inspection tracking. So AMS-only tagging is structurally blocked for a big chunk of real use cases, and PolicyLift-side tags end up doing more of the work than the original framing suggested.
-
-Tag design itself — categories, colors, AND/OR logic, system tags vs custom tags — lives in [`concepts_working_doc.md > §7 N1`](concepts_working_doc.md) and will get its own companion doc when it matures. For Segment design, the relevant point is just that PL-side data and AMS data both feed the same Segment query.
-
----
-
-## Segment metadata — sender hints and ownership
-
-A Segment can carry metadata beyond its predicate. The current motivating case is **prospect lists with producer assignment** (Marker §12.1):
-
-- An agency uploads a prospect list — say J-Lo's 200-name list for the contractor outreach campaign
-- The list gets tagged in HawkSoft as J-Lo's
-- That tag becomes a Segment ("J-Lo's contractor prospects")
-- All emails from that Segment should be sent from J-Lo, not from a house mailbox or some other producer
-
-The producer assignment isn't part of *who matches the Segment* — it's a property *of the Segment*. So Segments carry an optional metadata block:
-
-- **Suggested sender** — for use by the sender-resolver chain when a Broadcast or Automation uses this Segment (covered in the Broadcast/Automation docs)
-- **Owner** — which user/producer "owns" the Segment, for permissions and visibility
-- **Tags** on the Segment itself (different from tags on contacts) — for organizing the library
-
-Metadata is opt-in. Most Segments don't need it; the prospect-list-with-producer case is the canonical reason it exists.
+When a computed concept gets reused enough to deserve a name, or a client builder needs it without writing raw expressions, it becomes a **`calc.*` field** — a named expression over `ams.` / `pl.` inputs (e.g. `calc.policy.days_until_renewal`). This is the old "canonical field": a definition + type, and — only once a *second* AMS needs the same field — a per-AMS resolution inside it. It stays a **hard sell even then** (agents distrust transformed fields), so expect raw to remain the default and `calc.*` the exception, not a layer over everything. Deeper design in [`concepts_working_doc.md` §4.3](concepts_working_doc.md).
 
 ---
 
@@ -245,7 +194,7 @@ A Segment doesn't know how it'll be used. The same Segment can power five differ
 A few specific non-overlaps worth being explicit about:
 
 - **Segments don't know about recipients.** Recipients are *people who'll receive an email*. Segments may anchor on accounts or policies; turning those into actual contact-method targets is the job of the Broadcast or Automation (covered as "Recipient resolution" / fanout in their docs).
-- **Segments don't know about senders.** A Segment may carry a *suggested* sender via metadata, but the actual From identity per message is resolved by the Broadcast or Automation at send time.
+- **Segments don't know about senders.** The From identity per message is resolved by the Broadcast or Automation at send time (e.g. a prospect list's emails going from its assigned producer is a sender-resolution choice made there, not stored on the Segment).
 - **Segments don't know about timing.** When something happens (now / scheduled / triggered) is the Broadcast's or Automation's concern.
 - **Segments don't carry "campaign state."** Per-person enrollment in an Automation is the Automation's state, not the Segment's.
 
@@ -277,9 +226,9 @@ Rungs 0–1 are "filtering a table." Rung 2 and up are "asking a question about 
 
 **Rung 5 — multiple child collections, mixed quantifiers, negation.** "Accounts with an auto policy (`any`) **AND** no open claims (`none`) **AND** all policies in force (`all`)." Each child collection gets its own independent quantifier. Negation interacts with the quantifier in a way people get wrong: "no policy of type X" (`none` over `type = X`) is **not** the same as "a policy that is not type X" (`any` over `type ≠ X`). Same words, opposite meaning.
 
-**Rung 6 — computed fields.** Swap a raw column for a derived concept: "days until renewal `<= 30`". Not a stored field — computed from `ams.policy.renewal_date` (or `effective_date + term`); written inline now, a named `calc.*` field later (see [Fields by source](#fields-by-source--ams-pl-and-later-calc) above). You'll usually pair it with a plain `ams.policy.status = active` condition (canceled policies have stale dates — see the "policy in force" note above). The complexity here isn't structural; it's that the value is computed, not stored.
+**Rung 6 — computed fields.** Swap a raw column for a derived concept: "days until renewal `<= 30`". Not a stored field — computed from `ams.policy.renewal_date` (or `effective_date + term`); written inline now, a named `calc.*` field later (see [Fields by source](#fields-by-source--ams-pl-and-later-calc) above). You'll usually pair it with a plain `ams.policy.status = active` condition (canceled policies have stale dates, so a renewal segment that doesn't filter on status will email canceled policies). The complexity here isn't structural; it's that the value is computed, not stored.
 
-**Rung 7 — cross-source (AMS + PolicyLift-side data in one expression).** "…renewing in 30 days [AMS] **AND** has 'Inspection Pending' tag [PL] **AND** not unsubscribed [PL suppression]." The engine joins two data sources in one predicate; the client never has to know which fact came from where. (See [PolicyLift-side data in Segments](#policylift-side-data-in-segments) above.)
+**Rung 7 — cross-source (AMS + PolicyLift-side data in one expression).** "…renewing in 30 days [AMS] **AND** has 'Inspection Pending' tag [PL] **AND** not unsubscribed [PL suppression]." The engine joins two data sources in one predicate; the client never has to know which fact came from where. (See [Fields by source](#fields-by-source--ams-pl-and-later-calc) above.)
 
 **Rung 8 — composition (a different *level* entirely).** This is tier 3. You're no longer building one predicate tree — you're combining whole *answers* with set operators: `(Auto below state min) ∩ (in California) − (contacted this month)`. It sits *above* the ladder because each operand is itself a Segment that internally can be anywhere from rung 0 to rung 7. (See [Combining Segments](#combining-segments--composition) above.)
 
