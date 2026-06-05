@@ -2,7 +2,8 @@
 
 **Status:** Live brainstorming notes. Captures framing settled, concepts queued, decisions made, open threads. Eventually breaks into per-concept vision docs (style: Fairs.com `specs/kiosk/kiosk.md` + `specs/registrations/crm-vision.md`).
 **Created:** 2026-05-26
-**Updated:** 2026-05-27 (v5 — restructured around four primitives)
+**Updated:** 2026-06-05 (added §5.8 Segment↔Automation boundary + §12.3 call signal)
+**Front door:** [`vision.md`](vision.md) — the readable, non-technical overview; start there. This doc is the working/brainstorm record underneath it (slated for eventual retirement once its durable content has migrated to the vision + companion docs).
 **Companion docs:** [`segments.md`](segments.md) · [`templates.md`](templates.md) · [`broadcasts.md`](broadcasts.md) · [`automations.md`](automations.md) · [`dynamic-content.md`](dynamic-content.md)
 **Related:** [`research_segment_builder_ux.md`](research_segment_builder_ux.md) · [`client_feedback.md`](client_feedback.md) · [`data_object_map.md`](data_object_map.md) · [`research_feature_list.md`](research_feature_list.md) · [`email_automation_system_requirements.md`](email_automation_system_requirements.md) · [`changelog.md`](changelog.md)
 
@@ -102,6 +103,8 @@ These advance independently. Convenience-goal improvements (richer Carrier entit
 ### 4.3 Canonical field vocabulary — the unifying layer
 
 > **Reframed 2026-06-02 — deferred (Martin).** This whole layer is now **post-PoC**. At PoC we reference fields by *source* — `ams.*` (from the AMS) and `pl.*` (from PolicyLift) — directly, with computed concepts written inline; with one AMS and PL-only authoring there's nothing to unify. The "canonical field" described below is renamed `calc.*` (a named expression over `ams.`/`pl.` inputs) and introduced only when a concept is reused, exposed to tier-2, or needed across a 2nd AMS. See [`segments.md` → Fields by source](segments.md) for the staged model. The content below is the *eventual* `calc.*` design.
+>
+> **Sharpened 2026-06-03 (§12.3).** `calc.*` is not just deferred — it's a **standing hard sell.** Agents are experts in their raw AMS fields and distrust any transformed "PolicyLift version," so the realistic posture is **raw-AMS-first, with per-AMS (possibly per-customer) Segment sets** rather than a single normalized catalog. Build `calc.*` only where genuinely forced.
 
 (Working name; we may rename.) The conceptual layer the client sees in the Segment builder. The user picks "Policy age > 365 days," not `ams_data->>'policy_inception_dt' < now() - 365` — because under the hood, "policy age" resolves differently across the 6+ AMSes.
 
@@ -258,6 +261,16 @@ The four screens clients touch at PoC:
 
 Plus a pre-send recipient verification step at both Broadcast and Automation launch.
 
+### 5.8 Segment ↔ Automation — what goes where (the boundary)
+
+**Added 2026-06-03** from the Alex/Yurii call (§12.3) — Martin's flagged **#1 design question**. Different tools split conditions between the segment and the automation differently (AR puts some rules on each; Klaviyo leans filters onto the trigger). The principle we're settling on:
+
+> **The Segment holds the durable "what kind of record is this" — slow-changing, reusable, expressed in the agent's native AMS vocabulary. The Automation holds the temporal/program logic — timing, sender, and refining filters layered on top.**
+
+So a renewal program = a *simple, reusable* Segment ("active auto policies") + an Automation supplying the window ("30 days before `renewal_date`") and the send resolution — Alex's "super-simple segment, all the rule-setting on the trigger." Rule of thumb for an ambiguous condition: *if you'd reuse this exact audience for a different message, it's a Segment; if it only makes sense for this one program, it's an Automation filter.* This also lines up with the field-trust insight (§12.3): the durable structural predicate is exactly the part agents express in raw AMS fields; the temporal/marketing logic is PolicyLift's domain.
+
+**Co-location decision.** Keep Segment and Automation as **separate entities** — you don't author a Segment from inside an Automation (overkill, per Martin) — **but the Automation must show the net resulting audience** after its layered profile filters (the shared pre-send verification surface, BR4/AU12). Reach's failing was forcing the two apart with *no* shared view, yielding ~50 one-to-one segment/automation pairs you can't see together; we keep them distinct but surface the result together. The **filter-on-top** is what prevents fifty near-identical Segments (Yurii: we essentially never reuse one Segment across many Automations, so don't over-invest in reuse machinery — invest in the layered-filter + net-audience view). Enrollment behavior on top of this is §5.6 (trigger-driven, newly-entering).
+
 ---
 
 ## 6. Brainstorm style we're following
@@ -286,7 +299,7 @@ Reorganized 2026-05-27 around the four primitives (§5). Old clusters (Segmenter
 | F3 | Two-tier AMS data strategy | ✅ | CXP abstraction layer + raw AMS preserved alongside. See §4.1–4.2. |
 | F4 | Canonical field vocabulary | 🔄 | Shape sketched via state-min walkthrough; catalog hybrid. **Constraint:** date-derived canonical fields need status-guard companion (e.g., `policy.status = active`) per Marker §12.1. AR uses effective_date+300d as renewal proxy; PL currently uses renewal_date — needs reconciliation. See §4.3 + §8.2. |
 | F5 | Data layer for segmentation | 🔄 | Active thread §8. Segment engine queries raw AMS jsonb + PL-side annotations + (sometimes) abstraction layer. Index/perf TBD. |
-| F6 | Three-tier Segment authorship | ✅ | PL-built named (PoC), client-built simple (later), composition layered on top. **PoC delivery is concierge service-request workflow** (Marker §12.1). |
+| F6 | Segment authorship spectrum | ✅ | PolicyLift writes them first (engineers → lightweight internal ops builder), client-facing builder later once we see which fields agencies reach for. Combining saved Segments is a possible further step — even mature tools (Klaviyo/AR/Lev) do it as a membership condition / send-time multi-select, not a dedicated feature (see `segments.md`). Delivery is concierge / out-of-band (Marker §12.1). |
 | F7 | Four primitives + vocabulary | ✅ 🆕 | Segment / Template / Broadcast / Automation as the four self-contained concepts. Audience deprecated as primary; Trigger / Fanout / Sender as properties not peers. See §5. |
 
 ### Segment cluster (SE) — the query layer
@@ -299,7 +312,7 @@ Reorganized 2026-05-27 around the four primitives (§5). Old clusters (Segmenter
 | SE4 | Field discovery / mapping UI | 🔲 | "Where does this field come from in my AMS?" Trust-critical surface. |
 | SE5 | Mixing PL-side annotations | 🔲 | Tags + custom fields + consent state queryable alongside canonical AMS fields. |
 | SE6 | Composition (intersect / union / except) | 🔲 | Tier-3 mechanic. UI representation TBD. Language pick early: "except" vs "minus" vs "suppression." |
-| SE7 | PL-built Segment library | 🔲 | Tier-1 surface. Curation, versioning, per-agency exposure model TBD. **Anti-pattern to avoid** (Marker §12.1): AR buries triggers — surface segment criteria + counts at the library header. |
+| SE7 | PL-built Segment library | 🔲 | Tier-1 surface. Curation, versioning, exposure model TBD. **Per-AMS / per-customer, not one global catalog** (Alex, §12.3): raw-AMS-first authoring means a different Segment set per AMS, possibly per-customer. **Anti-pattern to avoid** (Marker §12.1): AR buries triggers — surface segment criteria + counts at the library header. |
 | SE8 | Segment metadata (ownership, sender routing) | 🔲 | Segment can carry metadata beyond predicate: producer assignment for sender resolution (T5-style chain), owner, etc. Prospect-list pattern (Marker §12.1). |
 
 ### Template cluster (TE) — the content layer
@@ -341,7 +354,7 @@ The biggest cluster — this is where complexity lives.
 | AU8 | Default sender resolver | 🔲 | Per-Automation chain. Resolution: segment metadata (S8) → policy producer → account CSR/AR → house team. Per-Step override possible. See §9. |
 | AU9 | Recipient resolution (fanout) | 🔲 | Same options as BR2. Per-Automation, possibly per-Step override. |
 | AU10 | Exit conditions | 🔲 | Rules that pull a person mid-sequence: unsubscribe, status changes, segment criteria no longer met, manual exit, custom predicate. Stop-on-reply at Step level. |
-| AU11 | Re-enrollment rules | 🔲 | Can a person re-enter after exiting? When? (Never / after N days / once per trigger event / always.) |
+| AU11 | Re-enrollment rules | 🔲 | Can a person re-enter after exiting? When? (Never / after N days / once per trigger event / always.) **Eng-flagged must-answer (Yurii, §12.3):** a pure query Segment can't express leave→re-enter — the per-(subject, automation) enrollment record carries the state (last entered, cooldown, re-entry policy). |
 | AU12 | Pre-launch recipient verification | 🔲 | Reviewable list of who'd be enrolled at launch. Same surface as BR4. |
 | AU13 | Approval mode | 🔲 | Per-Step or per-Automation. YOLO vs Outbox-approval. |
 | AU14 | Calendar-driven sub-pattern | 🔲 | Holiday calendar — pre-configured per-date templates with on/off toggles per occasion. Marker §12.1, AR pattern. |
@@ -653,6 +666,27 @@ Alex relayed the concrete Segment / Automation use cases clients have asked for,
 - **Reputation / NPS** — two parts: "customer just signed" = same newly-entering / Sold-Date pattern as Welcome Kits; **NPS → Google Review** = a Segment over **survey-response data** (`NPS score ≥ 9`) feeding a 2-stage Automation (collect NPS → branch on score → request Google review). Confirms the engagement / PL-side-data [condition category](segments.md) and the need for NPS responses as a queryable field.
 
 **Net:** validates canonical fields + per-AMS resolution (renewal, cancellation, sold-date), enrollment policy (Welcome Kit = newly-entering), and quantified relational Segments (cross-sell = rung 5). New: the **Sold-Date-over-state-transition** guideline, the **agency-configurable renewal term**, and the concrete tier-1 predicates above.
+
+### 12.3 Email 2.0 deep-dive — Alex / Yurii / Tanya — 2026-06-03
+
+Internal product + eng sync (the segmentation/automation half; the first ~30 min covered Fenris data-prefill, a separate workstream). Source: `fathom.video/calls/696082388`. Client-grounded throughout (Alex relaying real agency behavior). Key signals:
+
+- **Segment↔Automation boundary = the central question** (→ §5.8). Resolved toward: durable predicate on the Segment, temporal/program logic + layered profile filters on the Automation; **separate entities, but the Automation shows the net audience.** Co-location over Reach's forced separation (which yields ~50 one-to-one segment/automation pairs you can't view together).
+
+- **Raw-AMS-first — sharper than "defer `calc.*`".** Alex: agents are **experts in AMS fields, novices in marketing abstractions** — they trust `status` + `substatus` ("exactly what I use in HawkSoft") and distrust any transformed "PolicyLift version." Prediction: we expose **every raw AMS field** and end up authoring **a different Segment set per AMS — possibly per-customer** (agency-specific field usage), maybe with per-customer customizations. So `calc.*` transformed fields are a *standing hard sell*, not merely deferred. (This is why Levitate did tagging-only — it sidesteps the whole abstraction problem.) Reshapes **SE7**: the PL-built library is per-AMS / per-customer, not one global catalog. `pl.*` fields (call counts, NPS) still belong on Segments.
+
+- **Multi-anchor confirmed needed.** AR has 4 entity anchors; most tools (Reach, Levitate) have contacts only. If a Segment anchors on policies, "who do we email?" lives on the Automation/Broadcast. Alex wants both shapes first-class: **one email per policy**, OR a **per-customer aggregate** with a merge field listing the matching policies ("policies expiring today"). = our multi-anchor + [dynamic-content](dynamic-content.md) Path A/B, restated almost verbatim. Validates.
+
+- **Enrollment / backfill confirmed.** Klaviyo's default (new entrants only) + an explicit backfill checkbox = our trigger-driven + one-time-backfill model (§5.6). Directly solves Alex's live Reach pain (a Welcome email targeting "is active customer" blasts the whole book). ClientCircle framing corroborates: Automations for ongoing daily events; whole-segment sends = a Broadcast.
+
+- **Refresh + re-entry (eng, Yurii).** Proposes a **per-agency nightly cron** checking who should enter each Segment, re-resolved at the automation/broadcast step. The **hard part he flagged: re-entry** — a pure query approach can't express leave→re-enter. Resolution (already latent in our model): the Segment stays a stateless query; the **per-(subject, automation) enrollment record carries the state** (last entered, cooldown, re-entry policy). Promotes "pin re-entry semantics" (**AU11**) from background to must-answer.
+
+- **Builder scope at PoC.** Both agree: **barely expose the builder** — PL writes queries on the backend, Managed Segments are read-only-but-viewable; agencies won't author from scratch. AND/OR is a phase-2 concern (Reach effectively only does AND). Don't over-invest in builder UI; the underlying concepts (anchoring, the §5.8 boundary) are the real complexity. Validates the prototype's Library/Detail-first, builder-deferred stance.
+
+**Action items (process):**
+- Alex + Martin each independently **map 1–2 end-to-end use cases** (sender · segment · trigger logic · automation · **entry + re-entry**), then compare. The agreed next deliverable — extends [`segment_library_poc.md`](segment_library_poc.md) onto the automation side.
+- Yurii: **audit raw AMS schemas** per AMS (how each references policy / contacts) — *after* the use cases.
+- Friday: longer email deep-dive (Martin + Yurii + Alex).
 
 ---
 

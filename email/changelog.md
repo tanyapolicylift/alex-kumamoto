@@ -6,6 +6,16 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-05 — `[brainstorm]` `[docs]` Captured the 06-03 Alex/Yurii call into the working doc
+
+Folded the conceptual output of the 2026-06-03 Email 2.0 deep-dive (`fathom.video/calls/696082388`) into `concepts_working_doc.md`:
+
+- **§5.8 (new) — the Segment↔Automation boundary** (Martin's flagged #1 question): *Segment = durable "what kind of record is this," reusable, agent's AMS vocabulary; Automation = temporal/program logic (timing, sender, layered filters).* Separate entities, but the Automation shows the net audience; filter-on-top avoids segment sprawl.
+- **§12.3 (new) — full call signal**: the boundary, raw-AMS-first (agents are AMS-field experts → `calc.*` is a standing hard sell, expect per-AMS/per-customer Segment sets), multi-anchor + per-entity-vs-aggregate fanout, enrollment/backfill confirmation, nightly-cron + re-entry (eng-flagged), builder-barely-exposed scope, and the action items (each maps end-to-end use cases; audit raw AMS schemas).
+- **Sharpenings**: §4.3 banner (`calc.*` a hard sell, not just deferred), SE7 (library is per-AMS/per-customer), AU11 (re-entry a must-answer), **F6 retitled "Segment authorship spectrum"** (engineers → ops builder → client builder; composition as a possible later step, not a dedicated feature). Header now points to `vision.md` as the front door.
+
+---
+
 ## 2026-06-05 — `[docs]` `[brainstorm]` Created `vision.md` — the readable front door
 
 Created [`vision.md`](vision.md) — a high-level, non-technical vision spec modeled on Fairs' `specs/registrations/crm-vision.md`. The problem it solves: `concepts_working_doc.md` has accreted into a *working* doc (concept-status map, active-thread scaffolding, client-signal logs, decision history) — the email equivalent of Fairs' `design-session-notes.md`, **not** its `crm-vision.md`. There was no clean artifact a non-technical reader (teammate, client, exec skimming) could pick up cold. `vision.md` is that front door: plain prose, no schema/status, each concept ending in a `Detail — … in [doc]` pointer, closing with a concepts-at-a-glance table.
