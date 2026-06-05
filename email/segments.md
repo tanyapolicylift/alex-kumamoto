@@ -1,10 +1,10 @@
 # Segments
 
-**Status:** Companion doc to [`concepts_working_doc.md`](concepts_working_doc.md). Permanent home for the Segment primitive — what it is, how clients use it, how the three authorship tiers work, how it composes with other Segments, and how it's implemented under the hood. Non-technical readers can stop at "Implementation details"; everything before that is plain-language.
+**Status:** Companion detail doc for the **Segment** primitive — the deep dive beneath [`vision.md`](vision.md). What a Segment is, how clients use it, how the three authorship tiers work, how it composes, where the Segment↔Automation line sits, and the conceptual model underneath. Plain-language throughout — there's no deep-technical section here; engineers derive the build from these concepts.
 
-**Created:** 2026-05-27
+**Created:** 2026-05-27 · **Updated:** 2026-06-05 (Segment↔Automation boundary; raw-AMS-first sharpening)
 
-**Related:** [`concepts_working_doc.md`](concepts_working_doc.md) · [`segment_library_poc.md`](segment_library_poc.md) (concrete tier-1 Segments + the `ams.`/`pl.` fields they read) · [`research_segment_builder_ux.md`](research_segment_builder_ux.md) · [`changelog.md`](changelog.md)
+**Related:** [`vision.md`](vision.md) (the front door) · [`concepts_working_doc.md`](concepts_working_doc.md) · [`segment_library_poc.md`](segment_library_poc.md) (concrete tier-1 Segments + the `ams.`/`pl.` fields they read) · [`research_segment_builder_ux.md`](research_segment_builder_ux.md) · [`changelog.md`](changelog.md)
 
 ---
 
@@ -47,78 +47,30 @@ The anchor is part of the Segment, set when it's first created, and doesn't chan
 
 ---
 
-## How Segments come into being — three tiers
+## How Segments get authored
 
-There are three ways a Segment gets created. They build on each other.
+A Segment can be authored at a few levels of self-serve. The more self-serve the tool, the simpler it is — and the more guardrails it needs, because a wrong Segment sends a wrong campaign to real customers. So authoring starts on PolicyLift's side and opens up outward as we learn.
 
-### Tier 1 — PolicyLift creates them
+### PolicyLift writes them (tier 1)
 
-PolicyLift's team writes Segments on the client's behalf. The client picks from a list of pre-built Segments curated for their agency and AMS. The complexity of insurance segmentation — the AMS-specific data shapes, the "policy in force" filters, the canonical-field resolution — lives entirely on PolicyLift's side. The client doesn't see it.
+The complexity of insurance segmentation — AMS-specific data shapes, "policy in force" filters — stays on PolicyLift's side, out of the client's view. There's a progression in *how* PolicyLift authors:
 
-This is the only tier we ship at PoC, and the only one we need to onboard real customers. Why: insurance segmentation is hard and AMSes vary wildly. The first time a client gets to author a Segment from scratch is also the first time they get to author it *wrong* — and a wrong Segment sends a wrong campaign to real customers. Starting with PL-authored Segments lets us onboard fast and learn what clients actually need before exposing them to authoring.
+- **Engineers write the query directly.** The simplest and most powerful — it handles every case, including the hard relational ones. This is how the first real Segments get made.
+- **Ops use a rudimentary builder.** A lighter internal tool so the ops/CS team can create and tweak Segments without pulling in an engineer. At its simplest that "builder" is little more than a box to enter a query; it can grow into a real field-picker over time.
 
-When a client needs a Segment that doesn't exist yet, they arrange it with the PolicyLift ops team **directly, out of band** (clients are already in regular contact with ops); PolicyLift creates it as a **Managed** Segment, shares a preview or a Loom, and the client confirms. This concierge model is operational at PoC, not a fallback — and there's deliberately **no in-product request flow** in the first cut.
+Either way the result is a **Managed** Segment — read-only to the client. When a client needs one that doesn't exist yet, they arrange it with ops directly, out of band (they're already in regular contact); PolicyLift builds it, shares a preview or a Loom, and the client confirms. There's deliberately no in-product "request a segment" flow.
 
-### Tier 2 — clients build their own simple Segments
+### Clients build their own (tier 2)
 
-Once we know which fields clients reach for most often, we'll ship a rule-based builder. The client picks a field, picks an operator, picks a value; combines multiple rules with And/Or; sees the matching count live; saves it under a name. This is the shape every modern marketing tool ships, and it covers maybe 80% of what clients want to do day-to-day.
+Further along, a client-facing builder: pick a field, an operator, a value; combine a few rules with And/Or; watch the count update live; save it under a name — the shape every marketing tool ships, producing a **Regular** (client-editable) Segment. This is also where a client can author a Segment *wrong*, so it opens up once we've learned which fields and rungs clients actually reach for.
 
-Tier 2 is post-PoC. It depends on a few things that aren't ready yet — most importantly the canonical field catalog (covered below) — and we want client signal before we lock in which fields and operators matter.
+### Combining Segments (tier 3 — uncertain)
 
-### Tier 3 — combining Segments
-
-Even with PL-built Segments only, clients need to combine them. "Send to (PL-built: Auto-below-state-min) AND (in California) AND NOT (already contacted this month)" — three Segments stacked into one final audience. This is tier 3 — composition — and it's what makes tier 1 scale.
-
-Without tier 3, PolicyLift would have to write a new Segment every time an agency wanted a slightly different cut. With tier 3, PolicyLift writes one "Auto below state minimum" Segment, and twenty different agencies can layer their own filters on top.
-
-Tier 3 ships with PoC. Combining Segments is straightforward to build and immediately useful.
+A natural-sounding follow-on is stacking saved Segments — "Auto-below-state-min AND in California AND NOT contacted this month." Worth a reality check before committing to it: even mature tools don't ship a first-class "merge these saved Segments into a new one." Klaviyo has no combine-segments object — you either reference another segment as a *condition* inside the builder ("is in / not in segment X"), or, at send time, target several segments at once (a deduped union); AR and Levitate are similar (rule conditions, tag include/exclude). So if we do this, it's likely the same way — a membership condition and/or a campaign-level "send to these few" — rather than a separate composition feature. Whether we need any of it early is an open question. (Mechanics, if we do build it, are under [Combining Segments — composition](#combining-segments--composition) below.)
 
 ---
 
-## The complexity ladder — flat predicates to quantified relations
-
-The three tiers above are about *who* authors a Segment. This section is about *what the criteria can express* — and that's a separate axis. Criteria range from trivial ("accounts where status = active") to genuinely demanding ("accounts with at least 2 auto policies under $1,000 each"), and understanding the rungs between them is the single most important concept in the whole Segment design. It's the gap that Reach's too-simple Segment shape couldn't cross, and it's why we anchor Segments on an entity in the first place.
-
-The governing rule is simple: **complexity is driven by the relationship between a criterion and the anchor.** A criterion that lives *on the anchor itself* is flat and easy. A criterion that lives on a *different, related* entity forces a question that flat filtering never has to answer. Here's the ladder, with anchor = **Account** held constant so the escalation is visible.
-
-**Rung 0 — single predicate on the anchor.** `status = active`. One entity, one field, one operator.
-
-**Rung 1 — several predicates on the anchor, AND/OR combined.** `status = active AND state = CA`. Still all fields *of the account*. Flat. This is where most marketing tools max out.
-
-**Rung 2 — a predicate on a *related* entity (the leap).** "Accounts that have an auto policy." The anchor is Account, but `type = auto` is a fact about **Policy**, a child collection. Crossing that boundary forces a question that didn't exist below: an account has *many* policies — how many have to match? That's the **quantifier**, with three settings (`any` / `all` / `none`):
-
-- **any** — has at least one auto policy
-- **all** — *every* policy is auto
-- **none** — has no auto policy
-
-Rungs 0–1 are "filtering a table." Rung 2 and up are "asking a question about a related set." This is the conceptual cliff.
-
-**Rung 3 — multiple conditions on the child, and the same-row trap.** "Accounts that have a policy of type auto **with premium < $1,000**." Two conditions now live on the policy, and a subtle, bug-prone question appears: *do both conditions have to hold on the **same** policy, or can they be satisfied by **different** policies?* "Same policy" = the account has one auto policy that is also cheap. "Any policy" = the account has *some* auto policy *and* *some* cheap policy — possibly two different ones. These return different account sets, and getting it wrong silently sends the wrong campaign. This is the *"Same policy as above? Or any matching policy?"* micro-prompt in the tier-2 builder sketch (see Implementation details). It is the #1 footgun in relational segmentation.
-
-**Rung 4 — counting.** "Accounts with **at least 2** auto policies under $1,000." This upgrades the quantifier from *existence* (`any` = "at least 1") to a *threshold count* (≥ 2, exactly 1, between 2 and 5…). Most marketing tools can't do this at all. Rungs 3 + 4 stacked — "at least X policies of type Y with premium < Z, same policy" — is a genuinely demanding query.
-
-**Rung 5 — multiple child collections, mixed quantifiers, negation.** "Accounts with an auto policy (`any`) **AND** no open claims (`none`) **AND** all policies in force (`all`)." Each child collection gets its own independent quantifier. Negation interacts with the quantifier in a way people get wrong: "no policy of type X" (`none` over `type = X`) is **not** the same as "a policy that is not type X" (`any` over `type ≠ X`). Same words, opposite meaning.
-
-**Rung 6 — computed fields.** Swap a raw column for a derived concept: "days until renewal `<= 30`". Not a stored field — computed from `ams.policy.renewal_date` (or `effective_date + term`); written inline at PoC, a named `calc.*` field later (see [Fields by source](#fields-by-source--ams-pl-and-later-calc) below). You'll usually pair it with a plain `ams.policy.status = active` condition (canceled policies have stale dates — see the "policy in force" note below). The complexity here isn't structural; it's that the value is computed, not stored.
-
-**Rung 7 — cross-source (AMS + PolicyLift-side data in one expression).** "…renewing in 30 days [AMS] **AND** has 'Inspection Pending' tag [PL] **AND** not unsubscribed [PL suppression]." The engine joins two data sources in one predicate; the client never has to know which fact came from where. (See [PolicyLift-side data in Segments](#policylift-side-data-in-segments) below.)
-
-**Rung 8 — composition (a different *level* entirely).** This is tier 3. You're no longer building one predicate tree — you're combining whole *answers* with set operators: `(Auto below state min) ∩ (in California) − (contacted this month)`. It sits *above* the ladder because each operand is itself a Segment that internally can be anywhere from rung 0 to rung 7. (See [Combining Segments](#combining-segments--composition) below.)
-
-### The insight that ties it together — anchor choice moves the complexity
-
-The same real-world intent can land on different rungs depending on the anchor, because **the anchor decides which predicates are flat and which require a quantifier:**
-
-- Anchor = **Account**: "has ≥ X auto policies under $Z" is a *quantified, counted* predicate over a child collection — rungs 3–4. Hard.
-- Anchor = **Policy**: "type = auto AND premium < Z" is a *flat* predicate on the anchor itself — rung 1. Easy. And the same-row question vanishes, because each row *is* one policy.
-
-Same intent, wildly different query complexity — and a different result *shape* (accounts vs policies). This is why the anchor is a first-class, immutable property of a Segment, and why **cross-anchor lifting** ("which accounts have ≥ 1 matching policy?" — see Implementation details) is the bridge between the two views. Choosing the anchor *is* choosing where the complexity lands.
-
-### Why this maps onto the tiers
-
-At **PoC, none of this is exposed to clients** — PolicyLift hand-writes the SQL, including the quantifiers, same-row joins, and counts, so every rung is reachable on day one *for PL authors*. The ladder only becomes a *UI* problem at tier 2, and rungs 2–5 are brutal to expose safely (the same-row trap and the negation/quantifier interaction are where untrained users send the wrong campaign). That difficulty is the concrete reason tier 2 is deferred until we have client signal on which rungs they actually reach for.
-
-One orthogonal note: **operators are gated by field type** (number → `gt`/`lte`/`between`; enum → `eq`/`in`; date → `before`/`within N days`). That constrains the leaves of any predicate but adds no structural depth — it's a separate axis from the ladder.
+**A second axis runs underneath authorship: *what the criteria can express*** — from flat filters to quantified relations over related records. That's the deepest conceptual material in this doc, so it lives at the end of the conceptual tier rather than here. See [The complexity ladder](#the-complexity-ladder--flat-predicates-to-quantified-relations).
 
 ---
 
@@ -130,7 +82,7 @@ Each row identifies a Segment, marks it **Managed** or **Regular**, and shows it
 
 The detail view shows the full description, the current count with a refresh button, a sample preview (covered next), and a "Use in Broadcast" / "Use in Automation" CTA. **Managed** Segments are read-only here (a "Managed by PolicyLift" note, no edit) — their logic is maintained by PolicyLift; **Regular** Segments show an **Edit** action that opens the builder.
 
-When a client needs a Managed Segment created or changed, they arrange it with the PolicyLift ops team **directly, out of band** — there is no in-product request flow (clients are already in regular contact with ops). An in-product "request a segment" surface may come later, but it's deliberately not in the first cut.
+When a client needs a Managed Segment created or changed, they arrange it with the PolicyLift ops team **directly, out of band** — there is no in-product request flow (clients are already in regular contact with ops). An in-product "request a segment" surface may come later, but it's deliberately left out for now.
 
 ---
 
@@ -154,7 +106,9 @@ Industry-standard: every marketing automation tool worth using has both count + 
 
 ## Combining Segments — composition
 
-Most real campaigns don't target a single Segment. They target a combination. "Customers with state-minimum auto in California who haven't opted out" is three filters stacked.
+> **A candidate capability, not a committed one.** As noted under [How Segments get authored](#how-segments-get-authored) above, even mature tools don't ship a "merge saved Segments" object — they express this as a membership condition or a send-time multi-select. The mechanics below are how a first-class version *would* work if we decide we need one.
+
+Real campaigns often target a combination rather than a single Segment. "Customers with state-minimum auto in California who haven't opted out" is three filters stacked.
 
 There are three ways Segments combine:
 
@@ -164,7 +118,7 @@ There are three ways Segments combine:
 
 In the UI, this looks like a recipe — start from a Segment, add another with a chosen operator, see the running count update at each step, add more if needed. Each step is visible; the order doesn't change the result mathematically but it can change the running count display.
 
-All Segments in a composition must share the same anchor type. You can't combine a Policy-anchored Segment with an Account-anchored Segment directly (the answers are different shapes — there's no obvious way to say whether "Account X" intersects with "Policy 42"). Later we'll support automatic "lifting" — a Policy-anchored Segment can be lifted into an Account-anchored one by asking "which accounts have at least one matching policy?" — but that's post-PoC.
+All Segments in a composition must share the same anchor type. You can't combine a Policy-anchored Segment with an Account-anchored Segment directly (the answers are different shapes — there's no obvious way to say whether "Account X" intersects with "Policy 42"). Later we'll support automatic "lifting" — a Policy-anchored Segment can be lifted into an Account-anchored one by asking "which accounts have at least one matching policy?" — but that's a later capability.
 
 A naming note: we're using **include / intersect / except** as the operator names. "Suppression" overlaps with the consent layer (a suppressed contact is one who's unsubscribed or bounced), and "minus" is too math-y. "Except" reads cleanly in English and matches SQL's `EXCEPT` operator under the hood.
 
@@ -190,6 +144,23 @@ Treating Segments as questions instead of lists keeps the data model simple and 
 
 ---
 
+## What lives on the Segment vs. the Automation
+
+Segments and Automations are tightly related, and the line between them is the spine of the design (`concepts_working_doc.md` §5.8). The split:
+
+> **The Segment holds the durable "what kind of record is this" — slow-changing, reusable, written in the agent's own AMS vocabulary. The Automation holds the temporal and program logic — when to send, who it's from, and any refining filters layered on top.**
+
+A renewal program is a *simple, reusable* Segment ("active auto policies") plus an Automation that supplies the timing ("30 days before the renewal date") and the send resolution — **not** a bespoke "renewing in exactly 30 days" Segment that churns daily. Rule of thumb: *if you'd reuse this exact audience for a different message, it's a Segment; if it only makes sense for one program, it's a filter on the Automation.*
+
+Two consequences:
+
+- **Separate entities, shared result.** You don't author a Segment from inside an Automation — but the Automation always shows the **net resulting audience** after its layered filters, so the agency never has to guess who a program will reach. Reach's mistake was forcing the two apart with no shared view (and producing ~50 one-to-one segment/automation pairs); we keep them distinct but surface the result together.
+- **Filter-on-top avoids segment sprawl.** Because the Automation can narrow a broad Segment with its own profile filters, agencies don't need fifty near-identical Segments that differ by a single condition.
+
+This is also *why* a Segment can stay simple and reusable: the parts that vary per campaign — timing, sender, last-minute exclusions — deliberately live on the Automation, not baked into the Segment.
+
+---
+
 ## Fields by source — `ams.`, `pl.`, and (later) `calc.`
 
 A Segment's predicate references fields, and the simplest useful model names them by **source**:
@@ -199,29 +170,31 @@ A Segment's predicate references fields, and the simplest useful model names the
 
 So "accounts with an active policy and no chats" is `count(ams.policy where status = 'active') > 0 AND count(pl.conversation where type = 'chat') = 0`.
 
-### At PoC: no canonical / mapping layer
+### Today: no canonical / mapping layer
 
-PoC onboards one agency on one AMS (Marker / HawkSoft) and only PolicyLift authors Segments (tier-1 SQL). With **one** AMS there is nothing to map *across*, and with **PL-only** authoring nobody needs a friendly vocabulary that hides field names — so we **don't build a normalization layer**. Segments reference `ams.*` / `pl.*` fields directly, and each `ams.*` field resolves to one concrete HawkSoft location (a CXP column or a JSONB path). Computed concepts are written **inline** in the SQL — e.g. `ams.policy.renewal_date BETWEEN now() AND now() + 30d`, or `ams.policy.effective_date + <term>` where a reliable renewal date is missing. Clunky but honest — and PL writes it, not clients.
+Right now we're onboarding one agency on one AMS (Marker / HawkSoft), and PolicyLift authors the Segments. With **one** AMS there is nothing to map *across*, and with **PL-only** authoring nobody needs a friendly vocabulary that hides field names — so we **don't build a normalization layer**. Segments reference `ams.*` / `pl.*` fields directly, and each `ams.*` field resolves to one concrete HawkSoft location (a CXP column or a JSONB path). Computed concepts are written **inline** in the SQL — e.g. `ams.policy.renewal_date BETWEEN now() AND now() + 30d`, or `ams.policy.effective_date + <term>` where a reliable renewal date is missing. Clunky but honest — and PL writes it, not clients.
 
 This is close to what Agency Revolution does: its Advanced Segment exposes raw per-AMS fields directly (an "AMS/BMS section… [that] varies from system to system"), normalizing only selectively (policy-type, renewal proxy).
+
+**Why raw-first is the right posture, not merely the simplest (Alex, 2026-06-03).** Agents are experts in their AMS fields and novices in marketing abstractions. They trust `status` + `substatus` because that's *exactly what they use in HawkSoft* — and they distrust a transformed "PolicyLift version" of the same field, because the moment you normalize it the assumptions change and the Segment stops feeling like theirs. So the realistic shape is **raw AMS fields exposed directly, with a different Segment set authored per AMS — and possibly per customer**, mirroring how each agency actually uses its fields. (It's also why Levitate sidesteps the whole problem with tags-only.) See [`concepts_working_doc.md` §12.3](concepts_working_doc.md).
 
 ### Later: `calc.*` — the unified / computed layer (deferred)
 
 When a computed concept is reused enough to deserve a name, or is exposed to tier-2 self-serve clients who can't write raw expressions, promote it to a **`calc.*` field** — a *named expression* over `ams.` / `pl.` inputs (e.g. `calc.policy.days_until_renewal`). The prefix flags "computed, possibly approximate / AMS-dependent." A `calc.` field is exactly what earlier drafts called a *canonical field*: it carries a definition, a type, the AMSes it works on, and — **only when a second AMS needs that same field** — a per-AMS resolution inside its definition. (Some are reference-data-backed, e.g. "at or below state minimum" against a state-minimums table.) So the model complicates only where forced:
 
-1. **`ams.` / `pl.` raw, math inline** ← PoC (one AMS, PL authors)
+1. **`ams.` / `pl.` raw, math inline** ← now (one AMS, PL authors)
 2. **name a `calc.` field** ← when reused, or exposed to tier-2
 3. **per-AMS resolution inside a `calc.` field** ← only when a 2nd AMS needs that field
 
-The "seven AMSes store renewal date seven different ways" problem is real — but it's a *step-2/3, multi-AMS* problem, not a PoC one. The deeper design (catalog, versioning, agency extensions) lives in [`concepts_working_doc.md > §4.3`](concepts_working_doc.md), deferred until that step actually arrives.
+The "seven AMSes store renewal date seven different ways" problem is real — but it's a *multi-AMS* problem we don't have yet. And even when it arrives, `calc.*` is a **hard sell** (see the trust note above): expect raw fields to stay the default and `calc.*` to be the exception for genuinely reused/multi-AMS concepts, not a friendly front layered over everything. The deeper design (catalog, versioning, agency extensions) lives in [`concepts_working_doc.md > §4.3`](concepts_working_doc.md), deferred until that step actually arrives.
 
 ### A note on the "policy in force" filter
 
 Some canonical fields only make sense paired with another condition. The main case is date-based fields and policy status: when a policy is canceled in HawkSoft, the renewal/expiration date becomes unreliable (stale value or gone), but other date fields stick around. A naive "renewal in 30 days" segment that doesn't *also* filter `status = active` will start emailing canceled policies — bad.
 
-The fix is **just another condition** — include `status = active` in the predicate. It's not a special construct: at PoC, PL hand-writes the SQL, so it's one more line in the `WHERE` clause. We deliberately don't model "guards" as a separate concept (it would only ever compile to a plain `AND`).
+The fix is **just another condition** — include `status = active` in the predicate. It's not a special construct: while PL hand-writes the SQL, it's one more line in the `WHERE` clause. We deliberately don't model "guards" as a separate concept (it would only ever compile to a plain `AND`).
 
-*Deferred, tier-2 only:* once non-experts author segments, a canonical field could quietly **auto-include** this companion condition so a self-serve author who picks "days until renewal" doesn't forget it and footgun. That's an invisible convenience of the field in the future catalog — not a user-facing concept, and nothing to build at PoC.
+*Deferred, tier-2 only:* once non-experts author segments, a canonical field could quietly **auto-include** this companion condition so a self-serve author who picks "days until renewal" doesn't forget it and footgun. That's an invisible convenience of the field in the future catalog — not a user-facing concept, and nothing to build now.
 
 Surfaced by Marker Insurance during their 2026-05-27 onboarding (`concepts_working_doc.md` §12.1).
 
@@ -280,243 +253,123 @@ These non-overlaps are the entire reason the four primitives are clean.
 
 ---
 
-## Implementation details
+## The complexity ladder — flat predicates to quantified relations
 
-The technical side of how Segments work in the system. Non-technical readers can stop here; everything below is for engineering reference. The implementation evolves substantially between PoC and beyond — PoC keeps it intentionally simple, the post-PoC version supports client authoring.
+This is the deepest conceptual section — the full *why segmentation is genuinely hard* dive. The sections above are the orientation; read them first. The three tiers were about *who* authors a Segment; this is about *what the criteria can express*, a separate axis. Criteria range from trivial ("accounts where status = active") to genuinely demanding ("accounts with at least 2 auto policies under $1,000 each"), and understanding the rungs between them is the single most important concept in the whole Segment design. It's the gap that Reach's too-simple Segment shape couldn't cross, and it's why we anchor Segments on an entity in the first place.
 
-### PoC: schema
+The governing rule is simple: **complexity is driven by the relationship between a criterion and the anchor.** A criterion that lives *on the anchor itself* is flat and easy. A criterion that lives on a *different, related* entity forces a question that flat filtering never has to answer. Here's the ladder, with anchor = **Account** held constant so the escalation is visible.
 
-Each saved Segment is a row in a `segments` table:
+**Rung 0 — single predicate on the anchor.** `status = active`. One entity, one field, one operator.
 
-```
-segments
-├── id                  uuid
-├── name                text                  -- "Auto policies below state minimum"
-├── description         text                  -- shown in library + tooltip
-├── category            text                  -- "Renewal" / "Cross-sell" / "Lifecycle"
-├── anchor_entity       text                  -- 'account' | 'policy' | 'contact' | 'claim' | 'quote'
-├── agency_id           uuid (nullable)       -- null = global, available to all agencies
-├── ams_scope           text[]                -- e.g. ['hawksoft','ezlynx']; null = all
-├── query_sql           text                  -- the SQL; must return single column `id` of anchor type
-├── metadata            jsonb                 -- suggested sender, ownership, hints
-├── is_active           boolean
-├── last_run_at         timestamptz
-├── last_count          int
-├── last_run_duration_ms int
-├── last_error          text
-├── created_by / created_at / updated_by / updated_at
-```
+**Rung 1 — several predicates on the anchor, AND/OR combined.** `status = active AND state = CA`. Still all fields *of the account*. Flat. This is where most marketing tools max out.
 
-`query_sql` receives `:agency_id` as a bound parameter and must return `id` of the anchor entity as a single column.
+**Rung 2 — a predicate on a *related* entity (the leap).** "Accounts that have an auto policy." The anchor is Account, but `type = auto` is a fact about **Policy**, a child collection. Crossing that boundary forces a question that didn't exist below: an account has *many* policies — how many have to match? That's the **quantifier**, with three settings (`any` / `all` / `none`):
 
-### PoC: per-AMS branching in SQL
+- **any** — has at least one auto policy
+- **all** — *every* policy is auto
+- **none** — has no auto policy
 
-PL writes per-AMS branching inline. Example for the "Auto policies renewing in next 30 days" Segment:
+Rungs 0–1 are "filtering a table." Rung 2 and up are "asking a question about a related set." This is the conceptual cliff.
 
-```sql
-SELECT DISTINCT p.id
-FROM policies p
-JOIN accounts a ON p.account_id = a.id
-JOIN policy_types pt ON p.policy_type_id = pt.id
-WHERE a.agency_id = :agency_id
-  AND pt.type = 'personal_auto'
-  AND p.status = 'active'                    -- "policy in force" filter (just a condition)
-  AND CASE a.ams_type
-    WHEN 'hawksoft' THEN p.effective_date + INTERVAL '300 days'
-                          BETWEEN now() AND now() + INTERVAL '30 days'
-    WHEN 'ezlynx'   THEN p.renewal_date
-                          BETWEEN now() AND now() + INTERVAL '30 days'
-    -- ... per AMS
-  END;
-```
+**Rung 3 — multiple conditions on the child, and the same-row trap.** "Accounts that have a policy of type auto **with premium < $1,000**." Two conditions now live on the policy, and a subtle, bug-prone question appears: *do both conditions have to hold on the **same** policy, or can they be satisfied by **different** policies?* "Same policy" = the account has one auto policy that is also cheap. "Any policy" = the account has *some* auto policy *and* *some* cheap policy — possibly two different ones. These return different account sets, and getting it wrong silently sends the wrong campaign. This is the same-row scoping question the eventual builder has to surface explicitly (the *"Same policy as above? Or any matching policy?"* prompt — see [Category-first conditions](#category-first-conditions-the-eventual-builder) below). It is the #1 footgun in relational segmentation.
 
-Inline `CASE a.ams_type` branching keeps complexity in the Segment query rather than spreading it across schema views or app-layer logic. Honest and ugly; gets replaced by the canonical-field catalog when that ships.
+**Rung 4 — counting.** "Accounts with **at least 2** auto policies under $1,000." This upgrades the quantifier from *existence* (`any` = "at least 1") to a *threshold count* (≥ 2, exactly 1, between 2 and 5…). Most marketing tools can't do this at all. Rungs 3 + 4 stacked — "at least X policies of type Y with premium < Z, same policy" — is a genuinely demanding query.
 
-> **Note on the renewal proxy.** Two ways to resolve "days until renewal" (Alex, 2026-06-02 — see working-doc §12.2): **prefer `renewal_date` directly** where the AMS carries it reliably; **fall back to `effective_date + term`** where it doesn't (AR's approach — Effective Date is more universal and consistent). The `+ INTERVAL '300 days'` above is **illustrative, not a constant** — the term is **agency-configurable** (and may be per-AMS): agencies represent renewal differently and not every book is a clean 1-year term, so the offset lives in config, not hardcoded. AR assumes a ~360-day (1-yr) term; if using the effective-date proxy, the term should reflect the agency's actual policy terms.
+**Rung 5 — multiple child collections, mixed quantifiers, negation.** "Accounts with an auto policy (`any`) **AND** no open claims (`none`) **AND** all policies in force (`all`)." Each child collection gets its own independent quantifier. Negation interacts with the quantifier in a way people get wrong: "no policy of type X" (`none` over `type = X`) is **not** the same as "a policy that is not type X" (`any` over `type ≠ X`). Same words, opposite meaning.
 
-### PoC: execution operations
+**Rung 6 — computed fields.** Swap a raw column for a derived concept: "days until renewal `<= 30`". Not a stored field — computed from `ams.policy.renewal_date` (or `effective_date + term`); written inline now, a named `calc.*` field later (see [Fields by source](#fields-by-source--ams-pl-and-later-calc) above). You'll usually pair it with a plain `ams.policy.status = active` condition (canceled policies have stale dates — see the "policy in force" note above). The complexity here isn't structural; it's that the value is computed, not stored.
 
-Three operations matter:
+**Rung 7 — cross-source (AMS + PolicyLift-side data in one expression).** "…renewing in 30 days [AMS] **AND** has 'Inspection Pending' tag [PL] **AND** not unsubscribed [PL suppression]." The engine joins two data sources in one predicate; the client never has to know which fact came from where. (See [PolicyLift-side data in Segments](#policylift-side-data-in-segments) above.)
 
-- **Count** — `SELECT COUNT(*) FROM (query_sql) sub` cached in `last_count`. Refreshed nightly via a background job and on-demand from the segment detail UI.
-- **Sample preview** — `SELECT id FROM (query_sql) sub ORDER BY id LIMIT 50`, joined back to a per-anchor display view (see below). On-demand only.
-- **Resolve for send** — full result set materialized at Broadcast send or Automation evaluation time. This is the canonical "who's in the Segment right now" answer.
+**Rung 8 — composition (a different *level* entirely).** This is tier 3. You're no longer building one predicate tree — you're combining whole *answers* with set operators: `(Auto below state min) ∩ (in California) − (contacted this month)`. It sits *above* the ladder because each operand is itself a Segment that internally can be anywhere from rung 0 to rung 7. (See [Combining Segments](#combining-segments--composition) above.)
 
-No persistent membership cache at PoC. Every operation runs the query. If query cost becomes a problem at scale, add a `segment_membership_cache` table keyed by `(segment_id, anchor_id)` with `computed_at`.
+### The insight that ties it together — anchor choice moves the complexity
 
-### PoC: per-anchor display views
+The same real-world intent can land on different rungs depending on the anchor, because **the anchor decides which predicates are flat and which require a quantifier:**
 
-Sample preview and audience verification both need to show records in a human-readable form. Each anchor type has a "display view" that maps IDs to columns:
+- Anchor = **Account**: "has ≥ X auto policies under $Z" is a *quantified, counted* predicate over a child collection — rungs 3–4. Hard.
+- Anchor = **Policy**: "type = auto AND premium < Z" is a *flat* predicate on the anchor itself — rung 1. Easy. And the same-row question vanishes, because each row *is* one policy.
 
-- Account anchor → name, primary contact, status, total_premium
-- Policy anchor → policy_number, type display, carrier, effective_date, renewal_date, account name
-- Contact anchor → name, email, role, account name
-- Claim anchor → (post-PoC)
-- Quote anchor → (post-PoC)
+Same intent, wildly different query complexity — and a different result *shape* (accounts vs policies). This is why the anchor is a first-class, immutable property of a Segment, and why **cross-anchor lifting** ("which accounts have ≥ 1 matching policy?" — see [What comes later](#what-comes-later) below) is the bridge between the two views. Choosing the anchor *is* choosing where the complexity lands.
 
-These views are also consumed by the audience-verification UI at Broadcast send and Automation activation, so the display is consistent across surfaces.
+### Why this maps onto the tiers
 
-### PoC: composition at the Campaign level
+**Initially, none of this is exposed to clients** — PolicyLift hand-writes the criteria, including the quantifiers, same-row joins, and counts, so every rung is reachable from the start *for PL authors*. The ladder only becomes a *UI* problem once clients author their own, and rungs 2–5 are brutal to expose safely (the same-row trap and the negation/quantifier interaction are where untrained users send the wrong campaign). That difficulty is the concrete reason the client builder is held back until we have signal on which rungs they actually reach for.
 
-Composition is **on the Campaign**, not stored as a separate Segment entity at PoC. A Broadcast or Automation holds a recipe:
+One orthogonal note: **operators are gated by field type** (number → `gt`/`lte`/`between`; enum → `eq`/`in`; date → `before`/`within N days`). That constrains the leaves of any predicate but adds no structural depth — it's a separate axis from the ladder.
 
-```
-campaign.segment_recipe = [
-  { segment_id: "auto-below-state-min",  op: "include" },
-  { segment_id: "in-california",         op: "intersect" },
-  { segment_id: "has-unsubscribed",      op: "except" }
-]
-```
+---
 
-Executed at send time with Postgres set operators:
+## How Segments work — the conceptual model
 
-```sql
-(SELECT id FROM (segment_1_sql) s1)
-INTERSECT
-(SELECT id FROM (segment_2_sql) s2)
-EXCEPT
-(SELECT id FROM (segment_3_sql) s3);
-```
+This is still "how a Segment works," but at the level of *ideas*, not implementation. The actual build is the engineers' — they'll derive it from these concepts against platform realities these docs don't capture. What's worth pinning down here is the mental model.
 
-All Segments in a recipe must share `anchor_entity`. Mixing anchor types is rejected at recipe creation with a clear error.
+### A Segment is re-asked, never stored
 
-### Beyond PoC: predicate AST replaces opaque SQL
+There are three things you do with a Segment, and all of them **re-run the question** against current data:
 
-Each Segment stores a serialized predicate (JSON), not raw SQL. A compiler turns the AST into SQL at execution time.
+- **Count** — how many match right now. Cached and refreshed in the background (and on demand), so the library shows a number without recomputing on every glance.
+- **Sample** — a handful of matching records to eyeball (the trust surface from "count and sample preview" above).
+- **Resolve at send** — the full "who's in it right now" answer, computed fresh the moment a Broadcast sends or an Automation evaluates.
 
-```json
-{
-  "anchor": "account",
-  "predicate": {
-    "type": "group",
-    "op": "and",
-    "rules": [
-      { "type": "rule", "field": "account.total_premium", "op": "gt", "value": 5000 },
-      {
-        "type": "quantifier",
-        "scope": "any",
-        "collection": "policies",
-        "predicate": {
-          "type": "group",
-          "op": "and",
-          "rules": [
-            { "field": "policy.status",           "op": "eq",  "value": "active" },
-            { "field": "policy.renewing_in_days", "op": "lte", "value": 30 }
-          ]
-        }
-      }
-    ]
-  }
-}
-```
+The important part is what's *absent*: there's no frozen membership list sitting somewhere. Every use re-asks. This is what makes "a Segment is a question, not a list" literally true — and why a send always reflects current data, never a stale snapshot. (At large scale you'd cache membership for speed, but that's an optimization, not a change to the model.)
 
-Format:
+### Display is consistent across surfaces
 
-- `anchor` at the top — every Segment has one anchor entity
-- `type: "group"` — boolean composition. **Pinned to CNF: a top-level AND of OR-groups, exactly one level of nesting** (see below). Not a freely-nested AND/OR tree.
-- `type: "quantifier"` — explicit existence / universal predicates over child collections. `scope` is `any | all | none`. This is the cleaner version of AR's "set of sets" UI pattern.
-- `type: "rule"` — leaf predicates with `field` referencing a canonical field ID or raw AMS path.
+Each anchor type has a standard set of columns it shows — an Account as name / primary contact / status / premium, a Policy as number / type / carrier / dates / account, and so on. The same display is reused everywhere records appear: the sample preview, the segment detail page, and the pre-send recipient verification. One definition per anchor, so the agency sees the same shape of information wherever a Segment surfaces.
 
-PoC SQL Segments can migrate to AST form via a synthetic "raw SQL rule" type if backward compatibility is needed during the transition.
+### From hand-written to buildable
 
-#### Boolean shape: CNF within a Segment, union across Segments
+Initially, PolicyLift authors each Segment's criteria directly — including the AMS-specific bits and the "policy in force" conditions — and Managed Segments are read-only to the client. The conceptual trajectory is to move those criteria from *PL-hand-written* to a *structured, editable* form a client builder can render: the same criteria, but expressed as something a UI can show, validate, and re-count live as you edit. That shift is what unlocks client self-serve authoring; nothing about *what* a Segment means changes.
 
-A single Segment's predicate is **pinned to CNF — a top-level AND of OR-groups, with exactly one level of nesting** (`AND( OR(...), OR(...), ... )`). This is *not* a freely-nestable AND/OR tree. The decision follows both the research doc's "cap visible nesting at 2 levels" guidance and Klaviyo's segment builder, which pins to the same shape: groups are joined by a hardwired AND, and OR lives only *inside* a group (OR binds tighter, auto-parenthesized between ANDs — so flipping an inner OR to AND ejects the condition to the top level). Verified against Klaviyo's docs, 2026-06-01 (see `changelog.md`).
+### The boolean shape — stack gates, push unions to composition
 
-Why this isn't a loss of expressive power, only of shape:
+Inside one Segment, conditions combine as **a stack of required gates, each gate allowing alternatives** — "is a customer AND engaged (opened OR clicked) AND in (CA OR NY)." One level of grouping, no deeper nesting. This matches how agencies actually reason about who a campaign is for, and it's the shape Klaviyo's builder settled on too.
 
-- **CNF is the natural form for *narrowing one audience*** — keep adding required gates with AND, each gate allowing alternatives with OR ("engaged (opened OR clicked) AND is a customer AND in (CA OR NY)"). This is how agencies actually reason about who a campaign is for.
-- **DNF — a *union of distinct personas*, `(A AND B) OR (C AND D)` — is deliberately *not* expressed in the predicate.** It's a [composition](#combining-segments--composition): build each AND-group as its own Segment and `union` them via tier-3. Klaviyo's own escape hatch for this case is "make separate segments"; our composition layer is the first-class version. Every boolean formula *has* a CNF, so nothing is strictly inexpressible inside one Segment — but DNF-shaped intent expands combinatorially when forced into CNF, which is exactly the signal that it belongs in composition instead.
-- **Relational complexity stays out of the boolean layer.** Counting and existence ("≥ 2 auto policies under $1k") live in the `quantifier` node / leaf condition (the Mixpanel-sentence, "placed order ≥ 2 times" pattern), not in the AND/OR structure — so the group tree never has to nest to express a relational fact. The boolean layer and the [complexity ladder](#the-complexity-ladder--flat-predicates-to-quantified-relations)'s relational axis are kept orthogonal.
+What you deliberately *don't* build inside one Segment is a **union of distinct personas** — "(young + urban) OR (older + rural)." That's [composition](#combining-segments--composition): build each persona as its own Segment and union them. Everything stays expressible; persona-unions just belong one level up, where they read clearly, instead of being crammed into a single tangled condition.
 
-### Beyond PoC: condition categories (category-first builder)
+(Counting and "related records" questions — "at least 2 auto policies under $1k" — don't add nesting either; they live inside a single condition via the quantifier, keeping the relational axis of the [complexity ladder](#the-complexity-ladder--flat-predicates-to-quantified-relations) separate from the boolean one.)
 
-A leaf condition is **not** a uniform `(field, operator, value)` triple. Different *kinds* of condition have fundamentally different grammars — a behavioral/engagement condition needs frequency + recency, a consent condition has fixed semantics and no free operators, a related-record condition needs a quantifier. The clean way to model this — validated by Klaviyo's segment builder (verified 2026-06-01) and Adobe's Attributes/Events/Audiences tabs — is to make the **condition category the first, explicit choice**, and have it select the sub-builder (and the AST node type) underneath. This supersedes the tier-2 sketch's "pick a field, then we infer whether it's a quantifier" approach: pick the *category* first, and the field picker, operators, and value editor follow from it.
+### Category-first conditions (the eventual builder)
 
-Klaviyo's seven categories anchor on Person and query "kinds of facts about a person." Ours anchor on Account / Policy / Contact / … and query facts about the anchor *and its related insurance records*, so the category set differs:
+When a client builder does arrive, the cleanest model — borrowed from Klaviyo and Adobe — is to make the **kind of condition the first choice**, because different kinds behave differently. The candidate categories for us:
 
-| PL condition category | Klaviyo analog | Builder shape | AST node | PoC? |
-|---|---|---|---|---|
-| **Properties about the [anchor]** | Properties about someone | canonical/raw field → type-driven operator → value editor | `rule` | ✅ core |
-| **Related insurance records (quantified)** | What someone has done | child entity (policy/claim/quote) → `any`/`all`/`none` + count → nested predicate (+ same-row scoping prompt) | `quantifier` | ✅ the differentiator |
-| **Email/SMS engagement** | What someone has done (events) | message event (opened/clicked/bounced/replied) → frequency + recency | `quantifier` over sends | ⏳ needs send history |
-| **Consent / marketing eligibility** | Can/cannot receive marketing | channel → consent state (fixed semantics, no free operators) | specialized `rule` | ✅ critical (exclude unsubscribed) |
-| **In / not in another Segment** | In or not in a list | pick a Segment → in / not-in | composition / `rule` | ✅ (≈ tier-3) |
-| **Tags / PL-side annotations** | (folded into properties) | tag / custom field → has / doesn't-have | PL-side `rule` | ✅ (Marker inspection tag) |
-| **Location** | Proximity / EU GDPR | state (a property) / radius from zip | `rule` / geo | state ✅ (as property); proximity ❌ |
-| **Predictive** | Predictive analytics | ML metrics | — | ❌ (no near-term plan) |
+- **Properties about the anchor** — a field on the account / policy / contact itself.
+- **Related insurance records** — "has a policy / claim / quote where …" — the quantified category, and our real differentiator (the complexity ladder surfaced as a first-class choice).
+- **Engagement** — opened / clicked / replied to past sends.
+- **Consent / eligibility** — can we still market to them (the "exclude unsubscribed" everyone needs).
+- **Tags / PL-side annotations** — the inspection-pending kind of marker.
+- **In / not in another Segment** — membership, ≈ composition inline.
 
-Three categories — consent, segment-membership, tags — confirm that those aren't generic field predicates but distinct condition kinds with their own semantics. And the "Related records" category *is* the [complexity-ladder](#the-complexity-ladder--flat-predicates-to-quantified-relations) quantifier surfaced as a first-class category — Klaviyo's "What someone has done" (frequency + recency over an event collection) is the same machinery, which reinforces keeping the quantifier in the category/leaf and the boolean layer flat (CNF, above).
+Picking the category first sets up the right sub-builder — a field + operator, or a quantifier, or a fixed consent toggle — instead of pretending every condition is the same shape. Two PolicyLift wrinkles: the available categories and fields **depend on the anchor** (an Account's "related records" are its policies; a Policy's are its claims), and **engagement / consent live on contacts** — so on an Account- or Policy-anchored Segment, "hasn't unsubscribed" quietly becomes "no contact who's unsubscribed," which needs a sensible default rather than making the user spell out the quantifier.
 
-Two wrinkles Klaviyo's single-anchor model doesn't have:
+### What comes later
 
-- **Categories are anchor-dependent.** The available fields ("Properties about the *Policy*" vs "*Account*") and child collections ("Related records" on an Account = policies/claims/quotes; on a Policy = claims + parent account) change with the anchor. The category list and its sub-pickers must be filtered by the Segment's anchor.
-- **Engagement and consent live on *contacts*, but the anchor often isn't a contact.** "Account has a contact who opened the May email" or "…who hasn't unsubscribed" is itself a *quantifier over the account's contacts*. So when anchor ≠ Contact, the engagement and consent categories silently become quantified — and "exclude unsubscribed" on an Account- or Policy-anchored Broadcast is an everyday case, so this needs a sensible default (e.g. "any contact" / "the primary contact") rather than forcing the user to express the quantifier.
+Conceptually, the later capabilities are:
 
-### Beyond PoC: canonical field catalog as first-class
-
-Stored as a table with per-AMS resolution functions:
-
-```
-canonical_fields
-├── id                              -- "policy.renewing_in_days"
-├── display_name                    -- "Days until policy renews"
-├── description
-├── category                        -- "Policy lifecycle"
-├── entity                          -- 'policy'
-├── cardinality                     -- 'single' | 'many'
-├── type                            -- 'number' | 'date' | 'boolean' | 'currency' | 'string' | 'enum'
-├── domain                          -- for enum types, the allowed values
-├── default_condition               -- optional companion condition the field auto-includes (tier-2 convenience, e.g. policy.status = 'active'); just an AND'd predicate, not special
-├── predicates                      -- ['eq', 'lte', 'gte', 'between']
-├── per_ams_resolutions             -- jsonb:
-                                    --   { hawksoft: { kind: 'expr', sql: '...' },
-                                    --     ezlynx:   { kind: 'expr', sql: '...' },
-                                    --     nasa:     { kind: 'unavailable', reason: '...' } }
-├── created_by / created_at / updated_by / updated_at
-```
-
-The compiler combines the predicate AST + the requesting agency's `ams_type` to produce executable SQL by inlining the right resolution per field. AMS-unavailable canonical fields surface in the builder UI as greyed out for that agency.
-
-### Beyond PoC: composition as a stored entity
-
-Saved compositions are promoted to first-class Segments with `type: 'composition'` referencing other Segments + operators. Reusable across multiple Campaigns. Useful when an agency has a stable combination they keep coming back to ("our active commercial book minus high-risk minus opted-out").
-
-### Beyond PoC: other backend work
-
-- **Membership materialization** for large agencies. Background recomputation triggered by AMS sync events and PL-side data changes.
-- **AMS-availability check at save time** — when a Segment is authored, the system reports "this won't fully resolve on EZLynx because canonical field X is unavailable there."
-- **Versioning** — Segments get a `version` field; Campaigns can either pin to a version or auto-follow.
-- **Cross-anchor lifting** — a Policy-anchored Segment can be automatically lifted to Account-anchored when composed with one (via `policies.account_id IN (...)`).
-
-### Beyond PoC: tier-2 builder UI
-
-The client-facing rule composer. Sketch:
-
-- Anchor entity selector at the top (default Account)
-- Group combinator below ("Match **all** of the following" / "Match **any**")
-- "Add rule" opens a **condition-category** picker first (see [condition categories](#beyond-poc-condition-categories-category-first-builder) above) — the chosen category selects the sub-builder. Within a category, a hybrid field picker: categorized panel + search bar on top
-- Once a field is picked, operator dropdown filtered by type, value editor adapts to type
-- For many-cardinality fields (e.g. `policies.*` on an Account-anchored Segment), an explicit micro-prompt: "Where the policy [is / is not / there's no policy where] ..." mapping to `any / none / all`
-- When adding a second rule on the same child collection, ask "Same policy as above? Or any matching policy?" → resolves to single-quantifier-group vs separate-quantifier-groups
-- Live count in the header, debounced
-- Two-number display: "**~287** matches now (last verified count: **283** at 8:42am)" — exact-stale + estimated-fresh
-- Sample preview drawer flips out from the right
-
-Composition UI (tier 3 in the builder world) is a separate authoring mode that combines saved Segments instead of building from rules.
+- **A named field catalog** (`calc.*`) once a computed concept repeats or a second AMS arrives — see [Fields by source](#fields-by-source--ams-pl-and-later-calc).
+- **Saved compositions** — promote a recurring combination ("active commercial book minus high-risk minus opted-out") into its own reusable Segment.
+- **Versioning** — when a Segment's definition changes under an in-flight campaign, the campaign can pin the old version or auto-follow the new one.
+- **Cross-anchor lifting** — use a Policy Segment where an Account one is expected, by asking "which accounts have at least one matching policy?" (the bridge the complexity ladder pointed at).
+- **Availability warnings** — flag at authoring time when a field a Segment relies on isn't carried by a particular AMS.
 
 ---
 
 ## Open questions
 
-1. **Per-AMS branching inline vs. early canonical-field abstraction.** Inline SQL works for PoC. As we add agencies on more AMSes, the copy-paste burden grows. Watch for the threshold where the canonical-field catalog earns its build cost.
-2. **Composition stored vs. on the Campaign.** Campaign-side for PoC simplicity. Promote when clients ask for saved compositions explicitly.
-3. **Cross-anchor composition.** Forbid at PoC (clear error); auto-lift later.
-4. **Per-anchor display schemas.** Used by Segment detail, audience verification, and recipient preview — worth designing once explicitly so consistency holds.
-5. **Default fanout per anchor.** Account → primary contact, Policy → named insured on that policy, Contact → that contact. These are implicit defaults the Broadcast/Automation honors; worth documenting once.
-6. **Canonical field naming.** "Canonical field" is a working name. Customer-facing label might be "data field" or "merge field" or something more familiar.
-7. **Tier-3 operator vocabulary.** Going with "include / intersect / except." If a customer trips on this, revisit (`union` vs `or`, `except` vs `not`, etc.).
-8. **Resolution function location.** Where do per-AMS resolutions live in code/config when the catalog ships? TypeScript? Config table? Expression language? See `concepts_working_doc.md` §8.2 open question #1.
-9. **Segments that span agencies.** Mostly out of scope — segments are agency-scoped — but the global Segment case (PL-built, `agency_id = null`) needs explicit ownership / change-control rules.
-10. **Boolean shape — CNF-pinned vs. general tree.** Leaning **CNF (AND-of-OR-groups, one nesting level) inside a Segment, with DNF / union-of-personas pushed to tier-3 composition** — matching Klaviyo and the research doc's nesting cap. Open: confirm tier-1 PL-authored SQL Segments are never forced into this shape (they aren't — raw SQL is unconstrained), and that the tier-2 builder UI never silently distributes a user's DNF intent into a combinatorial CNF blow-up instead of nudging them to composition. Also: do agencies ever genuinely need DNF *within* one Segment in a way composition handles awkwardly (e.g. reporting wants it as one Segment)?
-11. **Condition categories — the PL category set.** Adopting Klaviyo's category-first model (category selects the sub-builder + AST node). Open: lock the PL category list (the table above is the candidate); decide whether Tags is its own category or folds into Properties; decide the default contact-quantifier for engagement/consent conditions on non-Contact anchors ("any contact" vs "primary contact"); and where "in / not in another Segment" lives — an inline condition category vs. only the tier-3 composition recipe (avoid two ways to do the same thing).
+### Open — needs a call
+
+1. **Per-anchor display schemas.** Used by Segment detail, audience verification, and recipient preview — worth designing once explicitly so consistency holds.
+2. **Default fanout per anchor.** Account → primary contact, Policy → named insured on that policy, Contact → that contact. These are implicit defaults the Broadcast/Automation honors; worth documenting once.
+3. **Canonical field naming.** "Canonical field" is a working name. Customer-facing label might be "data field" or "merge field" or something more familiar.
+4. **PL-built library scope — per-AMS / per-customer, not global.** Segments are agency-scoped; a global PL-built case (`agency_id = null`) was the original idea, but raw-AMS-first authoring (Alex, §12.3) means Managed Segments are realistically authored **per AMS, possibly per customer**, so the "one global catalog" model is unlikely. Open: ownership / change-control for any shared PL-built Segments, and how much per-AMS authoring can be templated vs. hand-written each time.
+5. **Boolean shape — CNF-pinned vs. general tree.** Leaning **CNF (AND-of-OR-groups, one nesting level) inside a Segment, with DNF / union-of-personas pushed to tier-3 composition** — matching Klaviyo and the research doc's nesting cap. Open: confirm tier-1 PL-authored SQL Segments are never forced into this shape (they aren't — raw SQL is unconstrained), and that the tier-2 builder UI never silently distributes a user's DNF intent into a combinatorial CNF blow-up instead of nudging them to composition. Also: do agencies ever genuinely need DNF *within* one Segment in a way composition handles awkwardly (e.g. reporting wants it as one Segment)?
+6. **Condition categories — the PL category set.** Adopting Klaviyo's category-first model (category selects the sub-builder + AST node). Open: lock the PL category list (the table above is the candidate); decide whether Tags is its own category or folds into Properties; decide the default contact-quantifier for engagement/consent conditions on non-Contact anchors ("any contact" vs "primary contact"); and where "in / not in another Segment" lives — an inline condition category vs. only the tier-3 composition recipe (avoid two ways to do the same thing).
+
+### Decided for now — revisit later
+
+7. **Per-AMS branching inline vs. early canonical-field abstraction.** Inline SQL works for now. As we add agencies on more AMSes, the copy-paste burden grows. Watch for the threshold where the canonical-field catalog earns its build cost.
+8. **Composition stored vs. on the Campaign.** Campaign-side for now, for simplicity. Promote when clients ask for saved compositions explicitly.
+9. **Cross-anchor composition.** Forbid initially (clear error); auto-lift later.
+10. **Tier-3 operator vocabulary.** Going with "include / intersect / except." If a customer trips on this, revisit (`union` vs `or`, `except` vs `not`, etc.).
+11. **Resolution function location.** Where do per-AMS resolutions live in code/config when the catalog ships? TypeScript? Config table? Expression language? See `concepts_working_doc.md` §8.2 open question #1.

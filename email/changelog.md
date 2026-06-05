@@ -6,6 +6,17 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-05 — `[docs]` `[brainstorm]` `segments.md` — conceptual-first restructure + authorship reframe + de-phasing
+
+A big pass on `segments.md` to make it read top-to-bottom at a conceptual altitude (Martin works at that level, not deep-technical).
+
+- **Conceptual tier first.** Reordered so orientation leads; moved the **complexity ladder** from 4th to the end of the conceptual tier (it's the deep "why segmentation is hard" dive, not orientation). Added the **Segment↔Automation boundary** section and the raw-AMS-first *trust* rationale in Fields-by-source.
+- **Implementation details → conceptual model.** Replaced the ~174-line technical section (schema, per-AMS SQL, predicate-AST JSON, condition-category table, tier-2 builder sketch) with a much shorter **"How Segments work — the conceptual model"** that keeps every *idea* in plain language (re-asked-not-stored; display consistency; hand-written → buildable; stack-gates-not-CNF; category-first conditions; what comes later). Rationale: too technical for Martin, and engineers will re-derive implementation against platform realities these docs don't capture.
+- **Authorship reframed** ("three tiers" → **how Segments get authored**): the PL side is a spectrum — *engineers write queries → ops use a rudimentary builder (maybe just a query box) → client-facing builder*. **Composition demoted** to uncertain: verified even Klaviyo/AR/Levitate have no first-class "combine saved segments" (only membership-conditions or send-time multi-select).
+- **De-phasing** (per Martin: stop pinning to PoC/MVP; phasing comes later). Softened roadmap-stage labels to generic ("now / today / later / initially") across `segments.md`, kept genuine current-state facts (one AMS today). Reconciled `vision.md` Delivery model and working-doc **F6** to match. Open questions split into *Open — needs a call* vs *Decided for now*.
+
+---
+
 ## 2026-06-05 — `[brainstorm]` `[docs]` Captured the 06-03 Alex/Yurii call into the working doc
 
 Folded the conceptual output of the 2026-06-03 Email 2.0 deep-dive (`fathom.video/calls/696082388`) into `concepts_working_doc.md`:
