@@ -6,6 +6,50 @@ For the brainstorm in progress, see [`concepts_working_doc.md`](concepts_working
 
 ---
 
+## 2026-06-03 — `[docs]` Consolidated decisions & open-questions register for team review
+
+Created [`decisions_and_open_questions.md`](decisions_and_open_questions.md) — a single review artifact pulling every decided/leaning/open item out of the scattered docs (companion-doc open-questions sections, the §7 cluster status flags, §11 commitments, prototype blueprint) into one place, grouped by area with status (✅/🔄/🔲/⏭️), current leans, dependencies, and back-pointers. Explicitly **not** a source of truth — each home doc stays authoritative. Opens with a "decide-these-first" shortlist (tagging strategy, verification UX, re-eval cadence, coverage data, matched-set ownership, sender resolver). For Martin to walk through with Alex / Raghav / Mike.
+
+---
+
+## 2026-06-03 — `[research]` `[brainstorm]` `[docs]` Broadcast=Campaign / Automation=Flow; enrollment collapses to trigger-driven; renewal = date-triggered Automation
+
+Triggered by Martin examining the client's actual AR renewal setup, then walking Klaviyo's Campaign/Flow builders and triggers live — and verifying each behavioral claim against Klaviyo / Customer.io / Braze docs (per the "go to source" lesson). A cluster of model refinements landed, all pushing toward *simpler*. Updated `concepts_working_doc.md` (§5.1/§5.3/§5.4/§5.5/§5.6 + AU2), `automations.md` (new "scheduled vs triggered" section, Entry trigger, Enrollment, Marker scope, What's-settled), and `segment_library_poc.md` (S1 + S3 reframed).
+
+### The findings (verified)
+
+- **AR's renewal model isn't a "renewing in N days" segment.** It's a broad *Active Commercial Customers* segment + a **sequence triggered off `Policy › Expiration Date`** (date field, ± offset, "run annually & reschedule when date changes," once per policy). Timing lives on the sequence, not the segment — the same "anchor/timing on the sequence" pattern we'd found for AR's dynamic content (2026-06-01), now for *time*.
+- **Klaviyo/Customer.io do the same and keep it unified, not split.** A **date property is the flow trigger**; "who" = trigger + **profile filters** *inside the same flow*. So it's not "assemble a segment over here, wire a trigger over there" — one builder. (Addresses Martin's worry about splitting audience/targeting.) This also dodges the §8.4 relative-time-exit churn: a windowed segment churns daily; a date trigger computes timing per-record.
+- **Campaign vs Flow = Broadcast vs Automation.** Klaviyo's two objects map exactly onto our two send primitives. The dividing line is **scheduled (audience picked) vs triggered (per-person, continuous)** — **not** single-vs-series. Klaviyo's "omnichannel campaign" (a *scheduled* multi-message/channel send) is still a **Broadcast**, not an Automation.
+- **No "audience lock / existing+new vs only-new" in Klaviyo flows — by design.** Every trigger is a *transition* ("added to segment for the first time," event, date arriving), so enrollment is **newly-entering by construction**. Verified: existing members **don't** auto-enter when a flow turns on, and manual segment-definition edits don't trigger; the backlog is an explicit one-time **"add past profiles"** backfill — or a Broadcast.
+
+### Decisions (model refinements)
+
+1. **Collapse the three enrollment policies.** "Newly-entering ≡ continuous" (trigger-driven). "At-launch / blast the existing book" is **not** an automation mode — it's a one-time op (backfill or Broadcast). Repeat knob = **re-entry**. The Welcome-Kit "don't blast the backlog" win (§12.2) now falls out for free.
+2. **Add real trigger types + two filter layers** to the Automation: added-to-segment (transition), metric/event, **date property** (offset + recurrence + reschedule-on-change), manual; narrowed by **trigger filters** (event data) + **profile filters** (record state); trigger fixed after save.
+3. **Renewal = date-triggered Automation, not a windowed Segment.** S1 "Policies renewing in N days" reframed: the window is the trigger offset; the predicate survives only as a **Broadcast** audience. Same for S3 (welcome kit → `sold_date` date trigger). Corroborated by Katz/Eclipse ("use expiry dates, not status, for renewals").
+4. **Three-bucket use-case taxonomy** (validated against every §12.2 + `client_feedback.md` ask): date-anchored → date-trigger Automation; state-transition → added-to-segment Automation; one-time-to-current-set → Broadcast. Known deferred tension: JAMCO's "one combined email for same-date home+auto" fights per-policy date triggers (account-bundled roll-up, already post-PoC).
+
+Prototype left as-is for now (the flagship "renewing in 30 days" detail page stands as a valid Broadcast-style windowed-segment example).
+
+---
+
+## 2026-06-03 — `[research]` `[docs]` Live Klaviyo teardown — schemaless types, flattened-quantifier ceiling, segment update cadence
+
+Hands-on session: imported 150 dummy insurance subscribers (`klaviyo-test/` — fixed-seed generator + CSV whose columns map to our S1–S5 predicates) and rebuilt the tier-1 segments inside Klaviyo to find where its builder strains. Every behavioral claim was verified against Klaviyo docs (and cross-checked against Customer.io + Braze), per the "go to source for behavioral claims" lesson from the earlier CNF read. Findings folded into `research_segment_builder_ux.md` (new §5.5, §7.4, §8.4, §13.7 + Sources/Updated header).
+
+### Findings
+
+- **List vs Text is multi-value-per-profile, not enum/picklist (§5.5).** Multi-select set-membership (`is in`) lives on **Text** too; **List** (`includes any of` / `has at least N items`) is for arrays. Rebuilding **S4** ("Home with a bundle carrier, no Auto") proved the **same-row trap survives flattening** — list operators quantify over a policy array that has lost row identity, so you can't say "the *Home* policy's carrier is a bundle carrier." Cleanest proof yet that **anchor-as-first-class-entity does real work** a flatten-to-profile model can't.
+- **Schemaless property typing → query-time cast → silent failure (§7.4).** Klaviyo properties are loosely-typed; type is chosen at import *and* re-cast per condition via a `Type:` dropdown, and a mismatch (e.g. `nps_score` as Date) yields a silent **"Unavailable"** segment, not an error. Concrete argument **for** our typed `ams.*`/`pl.*` catalog (type lives on the field → drives operators → nonsense is unrepresentable).
+- **Membership is eventually consistent; relative-time exits are batched (§8.4).** Klaviyo: ~15 min property propagation, viewed-count lag up to 1h, **relative-time passive exits swept once every 24h**. Cross-checked — **Braze** recomputes membership *at send* ("exact segment membership is always calculated just before the message is sent") + a re-evaluate-at-send toggle; **Customer.io** claims continuous relative-date exit (cadence undocumented). Validates **re-resolve-at-send** + **nightly membership pass** (`automations.md` data-drift / open Q10) as mainstream, not workarounds — load-bearing for our date-windowed S1/S3. UX nudge: label any displayed count "as of …".
+
+### Why it matters
+
+Three independent confirmations that the model is right exactly where it diverges from a generic e-commerce tool: **typed field catalog** (vs schemaless), **multi-anchor with first-class child collections** (vs flatten-to-profile), and **send-time audience resolution** (vs trusting standing membership). The dummy-data harness in `klaviyo-test/` stays for further competitor probing (e.g. an events-based slice to test Klaviyo's "what someone has done" category, which CSV can't reach).
+
+---
+
 ## 2026-06-02 — `[brainstorm]` `[docs]` Lean segment-library columns (mirror Reach); design detail → blueprint, not vision prose
 
 Two related calls (Martin), prompted by comparing real tools (Klaviyo, AR, and especially **Reach** — the tool we're replacing, whose list is Name+desc · Type(Managed) · Users · Last Modified · Edit):

@@ -1,8 +1,9 @@
 # Research — Segment Builder UX Across Products
 
-**Status:** Survey of segment / cohort / filter / rule builder design across ~15 products in marketing automation, analytics, CRM, and adjacent categories. Counterweight to the AR + Lev focus that's been the primary reference so far. Not exhaustive — focused on recurring patterns, pitfalls, and best practices rather than tool-specific feature comparison.
+**Status:** Survey of segment / cohort / filter / rule builder design across ~15 products in marketing automation, analytics, CRM, and adjacent categories. Counterweight to the AR + Lev focus that's been the primary reference so far. Not exhaustive — focused on recurring patterns, pitfalls, and best practices rather than tool-specific feature comparison. **2026-06-03 addendum:** §5.5 / §7.4 / §8.4 / §13.7 capture findings from a *hands-on* Klaviyo teardown (rebuilding our S1–S5 in Klaviyo via the `klaviyo-test/` harness), cross-checked against Customer.io and Braze docs — moving beyond the original doc-survey into live behavior.
 **Created:** 2026-05-26
-**Related:** [`concepts_working_doc.md`](concepts_working_doc.md) · [`research_feature_list.md`](research_feature_list.md) · [`changelog.md`](changelog.md)
+**Updated:** 2026-06-03
+**Related:** [`concepts_working_doc.md`](concepts_working_doc.md) · [`segment_library_poc.md`](segment_library_poc.md) · [`automations.md`](automations.md) · [`research_feature_list.md`](research_feature_list.md) · [`changelog.md`](changelog.md) · `klaviyo-test/`
 
 ---
 
@@ -123,6 +124,17 @@ Adobe Experience Platform does the same via containers — a container scoped to
 - Use prefix language ("Find a policy that is...", "And find a different policy that has...") rather than connecting AND/OR
 - Visual scoping (containers, cards) should clearly group co-scoped rules
 
+### 5.5 The flattened-quantifier ceiling, confirmed live (Klaviyo, 2026-06-03)
+
+Hands-on rebuilding of our S1–S5 in Klaviyo (`klaviyo-test/`) made the §5.1 implicit-"any" limitation concrete. Klaviyo profiles are **flat** — one row per person, no child collections — so a customer's policies must be **pre-flattened** onto the profile. The builder can then approximate a child-collection quantifier two ways, **both lossy**:
+
+- **List property + `includes any of` / `has at least N items`.** A List-typed property (e.g. `carriers = ["Travelers","Safeco"]`) gives a real existence (`includes any of`) and even **count** (`has at least N items`) quantifier over the array — but the array has **lost which policy each value came from**. So `carriers includes any of {bundle set}` AND `policy_lobs includes Home` AND `policy_lobs doesn't include Auto` matches a bundle carrier on **any** policy, not the *Home* one.
+- **Text property + `is in {set}`.** One value per profile (e.g. `home_carrier`), so it preserves "this is the *Home* carrier" — but only because we pre-computed a per-LOB scalar, and it can't count or range over the collection.
+
+Neither expresses our **S4** ("the *Home* policy's carrier is a bundle carrier AND no active Auto") in one shot — the **same-row trap (rung 3)** survives even with list operators, because flattening discards row identity. This is the cleanest available proof that **anchor-as-first-class-entity (our model) does real work** a flatten-to-profile model structurally can't: quantifier and same-row scope can't both hold once the child collection is flattened. (The pre-flattening — `has_auto`, `home_carrier`, `earliest_renewal_date` — is exactly the precompute AR and our engine do *for* the user; every new question needs a new precomputed column.)
+
+Operator reference observed (relevant to §2's atom and §7.4): **Text** → `equals` / `is in` / `is not in` / `contains` / `starts with`; **List** → `includes any of` / `includes all of` / `contains the text` / `is empty` / `has at least N items`. So multi-select set-membership (`is in`) lives on **Text** too — it does **not** require the List type (a common misconception); List is strictly for multi-value-per-profile.
+
 ---
 
 ## 6. Anchor entity selection
@@ -166,6 +178,19 @@ Categorized panel with search at top. The dominant pattern. What we should defau
 - "Recently used" or "Popular" group at the top of the picker for high-frequency fields
 - Search should match field names AND descriptions (so a user searching "renewal" finds both `renewal_date` and `next_renewal` and any field whose description mentions renewals)
 
+### 7.4 Property typing — schemaless, cast at query time (Klaviyo, 2026-06-03)
+
+§7's best practice ("show field type — it affects which operators are available") has a failure mode that Klaviyo demonstrates by *not* enforcing type at the schema layer. Klaviyo custom properties are **schemaless**: a value is loosely-typed JSON, and **type is chosen twice** —
+
+- **At import** (write-time parsing/normalization + the builder's default): Date → real datetime, Number → numeric `9` (not `"9"`), List → parsed array.
+- **At query time**: each condition has a `Type:` dropdown (Text / Number / Date / Boolean / List) that **re-casts** the property for that comparison, and the available operators change with it (Text→`equals`/`is in`; Number→`≥`; Date→`in last N days`; List→`includes any of`). **Nothing forces the query type to match the import type.**
+
+Two **silent** footguns follow:
+1. **Double type specification** with no guaranteed agreement.
+2. **Silent failure on mismatch** — evaluating a numeric `nps_score` as **Date** (operator `after`) yields a segment count of **"Unavailable"**, not an error: the value can't coerce, so the condition matches no one with no warning. A mistyped field buried in a multi-rule segment = quietly-wrong audience.
+
+**Implication for us:** a concrete argument *for* a **typed field catalog** — our `ams.*` / `pl.*` fields carry a type at the source. When the type lives on the field it **drives the operators automatically**, the user never picks a type (let alone twice), and nonsense like "nps after a date" is unrepresentable. The schemaless query-time-cast "convenience" is a net UX liability here; design against it explicitly.
+
 ---
 
 ## 8. Live count and preview
@@ -190,6 +215,23 @@ Sample preview is **load-bearing** for our Audience verification need (Ley Insur
 ### 8.3 Trade-off
 
 Live computation is expensive at scale. Adobe's approach (exact-stale + estimated-fresh) is a good compromise. Some products debounce or require explicit "Refresh count" — acceptable if computation is heavy.
+
+### 8.4 Membership update cadence & freshness (live finding, 2026-06-03)
+
+Beyond the count *display*, the live test surfaced how membership itself stays current — relevant because our library leans heavily on **relative-date** predicates (S1 renewing-in-30-days, S3 sold-in-last-14-days). All dynamic-segment engines are **push-maintained and eventually consistent**; they differ mainly in how they handle the *passive* relative-time exit (no event fires when wall-clock time simply passes) and how they guarantee a correct send.
+
+| Tool | Entry on data change | Relative-time passive exit | Correct-send guarantee |
+|---|---|---|---|
+| **Klaviyo** | Near-real-time (~15 min property propagation; viewed count lags up to 1h) | **Batched once every 24h** (documented) | resolves audience at send |
+| **Customer.io** | Auto enter/exit (data-driven) | Exit *"as soon as"* the date crosses — framed continuous; cadence undocumented | n/a confirmed |
+| **Braze** | Real-time off the event stream | SQL Segment Extensions regenerate daily (midnight ±1h) | **"Exact segment membership is always calculated just before the message is sent"** + opt-in re-evaluate-at-send for delayed sends |
+
+**Why the lag is structural, not just performance.** Maintaining membership is incremental-view-maintenance over a huge, changing profile table: a property/event change can be *pushed* (hence near-real-time entry, bounded by queue throughput), but a predicate that's a function of `now()` can change its answer with **no underlying row change and no event to react to** — so it's catchable only by a periodic scan, which at scale is throttled (Klaviyo's daily sweep).
+
+**Two takeaways validate decisions already made (cross-ref `automations.md` data-drift / open Q10):**
+- **Re-resolve-at-send** — recompute the recipient set at send rather than trusting standing membership. Braze states this as a *core principle*; it's exactly our posture.
+- **Nightly membership pass** — to keep browse counts/exits honest. Klaviyo's 24h relative-time sweep is direct precedent.
+- **UX nudge:** any count shown on a Segment list/detail should be labelled "as of …" — every one of these tools' displayed counts is eventually consistent, and ours will be too. For an insurance book that's mostly date-windowed segments, send-time resolution is the **primary** correctness mechanism, not an optimization.
 
 ---
 
@@ -334,6 +376,14 @@ Two real differences from general-purpose tools:
 - **Multi-anchor segments are required**, not optional. We need Account / Policy / Contact / Claim / Quote anchors. Almost all marketing tools have a single fixed anchor (User/Person). AR is one of the few that doesn't, and is the closest reference.
 - **Heterogeneous source data (per-AMS) is unique to this domain.** None of the surveyed tools have a "canonical field vocabulary over multiple data sources" abstraction — they assume one source of truth (their own DB). This is novel work for us. The closest analog is Segment.com's "computed traits" — pre-computed fields that live above raw event data — but it's not quite the same problem.
 
+### 13.7 Runtime / data-model findings from live testing (2026-06-03)
+
+Three findings from hands-on rebuilding of S1–S5 in Klaviyo (`klaviyo-test/`), cross-checked against Customer.io and Braze — each confirms the model is right exactly where it diverges from a generic e-commerce tool:
+
+- **Typed field catalog beats schemaless properties (§7.4).** Source-typed `ams.*`/`pl.*` fields drive operators automatically and make mistyped conditions unrepresentable; Klaviyo's schemaless query-time type cast produces silent "Unavailable" segments. Design *for* the typed catalog.
+- **Anchor-as-entity is load-bearing (§5.5).** Flattening a policy collection onto the profile (Klaviyo's only option) cannot express same-row + quantifier together (our S4). Keeping Policy a first-class anchor is what makes our relational segments expressible.
+- **Re-resolve-at-send + nightly pass are mainstream, not workarounds (§8.4).** Braze recomputes membership at send; Klaviyo sweeps relative-time exits every 24h. Both match `automations.md` (drift handling, open Q10). For a mostly date-windowed insurance book, send-time resolution is the **primary** correctness mechanism.
+
 ---
 
 ## 14. Sources
@@ -354,6 +404,13 @@ Two real differences from general-purpose tools:
 - [Using smart playlists with nested conditionals](https://www.macworld.com/article/1142846/nested_playlists.html) — Macworld on iTunes 9
 - [Audience Builder Advanced Features](https://knowledgebase.omeda.com/omedaclientkb/audience-builder-onq-advanced-features) — Omeda docs
 
+**Live-teardown sources (2026-06-03):**
+- [Segment conditions reference](https://help.klaviyo.com/hc/en-us/articles/115005062847) — Klaviyo (Text vs List operators)
+- [Understanding data types](https://help.klaviyo.com/hc/en-us/articles/115005237648) — Klaviyo (schemaless types, list CSV format)
+- [Understanding how segments update](https://help.klaviyo.com/hc/en-us/articles/115005233488) — Klaviyo (real-time vs 24h relative-time sweep)
+- [Data-driven segments](https://docs.customer.io/journeys/data-driven-segments/) · [Timestamp conditions](https://docs.customer.io/journeys/segmentation-and-timestamp-rules/) — Customer.io
+- [Triggered delivery / re-evaluate at send-time](https://www.braze.com/docs/user_guide/messaging/campaigns/schedule_your_campaign/triggered_delivery) · [SQL Segment Extensions](https://www.braze.com/docs/user_guide/brazeai/generative_ai/sql_segment_extensions) — Braze (send-time membership calc)
+
 ---
 
 ## 15. Open questions raised by this research
@@ -367,6 +424,8 @@ To pull back into the brainstorm:
 5. **Field picker hierarchy** — categorized tabs (Adobe-style) vs flat search (modern lightweight) vs hybrid. Hybrid is the default-correct answer; what are our categories?
 6. **Two-number count** — exact-stale + estimated-fresh. Worth doing on day one for performance, or wait until we have data on query cost?
 7. **Sample preview** — how many sample records? Adobe paginates; Customer.io shows a handful. Format (table? cards? customizable columns?).
+
+**Live-test addendum (2026-06-03):** the Klaviyo teardown (`klaviyo-test/`) informs Q5 (pickers are type/value-aware — but type discipline should live on the *field*, not the condition; see §7.4), Q6 (all tools' counts are eventually-consistent → label "as of …"; §8.4), and Q7 (sample preview is universal; §8.2). It also raised runtime concerns now captured in §5.5 / §7.4 / §8.4 and cross-referenced to `automations.md` open Q10 (membership-drift cadence).
 
 ---
 

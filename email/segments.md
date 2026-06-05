@@ -182,7 +182,7 @@ This distinction matters in three places:
 
 - **A Segment can't be "locked."** It's always live. Whoever uses the Segment decides what to do about people whose status changes over time. The Segment itself stays as a question — a saved criteria definition.
 - **Broadcasts implicitly snapshot** the Segment at send time. They fire once. The 284 people who matched the moment we hit send are the audience for that Broadcast — anyone who matches later doesn't matter, because there's no later for a Broadcast.
-- **Automations explicitly choose** how to handle ongoing matches via an enrollment policy ("at-launch only" / "newly-entering only" / "continuous"). This lives on the Automation, not on the Segment. The Segment doesn't care; the Automation decides when to ask.
+- **Automations are trigger-driven** — a person enters when they *cross into* the Segment (added-to-segment trigger) or hit a date/event, so enrollment is **newly-entering by construction** (revised 2026-06-03; see `automations.md`). The Segment stays a stateless question; the Automation's trigger + filters decide enrollment. Reaching the *existing* matches is a one-time backfill or a Broadcast, not an automation mode.
 
 Treating Segments as questions instead of lists keeps the data model simple and the user mental model honest. Re-using the same Segment in different campaigns with different ongoing behavior is the whole point.
 

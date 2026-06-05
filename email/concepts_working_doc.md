@@ -132,7 +132,7 @@ This is a hard line against the over-bundling we'd been doing earlier. If a conc
 
 ### 5.1 Segment — the query
 
-A saved filter that defines a group. Predicate-based: "Auto policies renewing in the next 30 days." Has an **anchor entity** (Account / Policy / Contact / Claim / Quote — the shape of each row in the result). Has a name, description, and a current count when asked.
+A saved filter that defines a group. Predicate-based: "Active auto policies," "accounts with a commercial policy." Has an **anchor entity** (Account / Policy / Contact / Claim / Quote — the shape of each row in the result). Has a name, description, and a current count when asked.
 
 **A Segment is stateless.** It's a question, not an answer. Ask it on Monday, get one set; ask it Friday, get a different set as data changes. The Segment doesn't track who's in it over time.
 
@@ -170,7 +170,7 @@ A reusable piece of content for a single channel. Email body + subject + merge t
 
 ### 5.3 Broadcast — the one-off send
 
-A single, manually-launched send. The user picks a Segment + a Template + a sender + a time → it goes once.
+A **scheduled** send to a **chosen** audience (= Klaviyo **Campaign**). The user picks a Segment + a Template + a sender + a time → it sends. **Scheduled, not triggered** — that's the line vs. Automation. A multi-message / multi-channel *scheduled* send is still a Broadcast (Klaviyo's "omnichannel campaign"), **not** an Automation — single-vs-series is not the dividing axis; scheduled-vs-triggered is.
 
 **What lives in a Broadcast:**
 - Reference to a Segment (whose current matches become the recipients at send time)
@@ -190,14 +190,14 @@ A Broadcast is the simpler of the two send primitives. Most concepts here also a
 
 ### 5.4 Automation — the stateful workflow
 
-A triggered, ongoing send pipeline. **This is where the complexity lives.** Has an entry Trigger + Segment + Sequence of Steps + enrollment + exit rules.
+A **triggered**, ongoing send pipeline (= Klaviyo **Flow**). **This is where the complexity lives.** Has an entry Trigger + Sequence of Steps + filters + exit rules. The line vs. Broadcast is **triggered (people enter continuously) vs. scheduled (audience picked, sent at a time)**.
 
 When the Trigger fires (or on its schedule), the Automation evaluates the Segment, enrolls matching people per its Enrollment policy, and walks them through the Sequence over time. Each person has their own state: which step they're on, when the next one fires, whether they've exited, etc.
 
 **What lives in an Automation:**
-- Entry **Trigger** — what causes evaluation (event: status changes / new policy bound / claim filed; date: X days before renewal; manual launch; segment entry)
-- Reference to a **Segment** — defines who's eligible at evaluation time
-- **Enrollment policy** — at-launch / newly-entering / continuous (see §5.6 — this is the "lock recipients?" question, parameterized clearly)
+- Entry **Trigger** — the *transition* that enrolls a person: **added to a Segment** (state-change), a **metric/event** (status changed / new policy bound / claim filed), a **date property** (X days before/after renewal/sold/birthday — recurring + reschedule-on-change), or manual
+- **Audience filters** — defined here with the trigger, not assembled elsewhere: **trigger filters** (on the event's data) + **profile filters** (on record state). A saved **Segment** can *be* the trigger ("added to segment") or serve as a filter
+- **Enrollment is trigger-driven = newly-entering** (see §5.6) — no at-launch/continuous modes; the backlog is a one-time backfill or a Broadcast. Only repeat knob = **re-entry**
 - **Sequence of Steps** — ordered list. Each Step has:
   - Step type (send email / send SMS / send postcard / wait / internal notification / branch / exit)
   - Reference to a Template (for send-type steps)
@@ -233,19 +233,19 @@ When the Trigger fires (or on its schedule), the Automation evaluates the Segmen
 | Send (or Dispatch) | **Runtime artifact** | Per-recipient-per-Message record. Where engagement events attach. |
 | Sender resolver | **Property of Broadcast & Automation** | Rule chain that picks the From identity. |
 | Fanout rule | **Property of Broadcast & Automation** | Turns Segment matches into recipient contacts. |
-| Campaign | Informal umbrella term | Either a Broadcast or an Automation. Use when context-agnostic. |
+| Campaign | Informal umbrella term | Either a Broadcast or an Automation, context-agnostic. ⚠️ Klaviyo uses "Campaign" to mean specifically a *Broadcast* (scheduled) and "Flow" for *Automation* (triggered) — don't conflate our umbrella term with theirs. |
 
-### 5.6 What "lock recipients" means and why it lives on Automation
+### 5.6 Enrollment is trigger-driven (newly-entering); the backlog is a one-time op
 
-The most common point of confusion (and what made AR feel tangled). A Segment is a *question*; the answer changes as data changes. The Automation decides **when to ask** and **what to do with people whose answer changed.**
+**Revised 2026-06-03** after verifying Klaviyo / Customer.io / Braze (see `changelog.md`). We previously modeled three enrollment policies (at-launch / newly-entering / continuous). Hands-on, the mainstream tools collapse this — and so do we.
 
-Three enrollment policies an Automation can use:
+An Automation is **triggered**, and every trigger is a **transition, not a state**: "added to a Segment *for the first time*," a metric/event firing, or a **date property** arriving (± offset). Entry is the *act of crossing in* → enrollment is **newly-entering by construction.** "Newly-entering" and "continuous" are the same behavior (you continuously enroll people as they newly trigger); there's no standing set to "lock."
 
-- **At-launch only** — snapshot the Segment when the Automation goes live. Everyone currently matching gets enrolled. People who match later are ignored. (AR's "At launch.")
-- **Newly-entering only** — don't enroll existing matches at launch. From now on, only people who *newly enter* the Segment get enrolled. (AR's "Future.")
-- **Continuously** — at launch, enroll everyone matching. From then on, enroll anyone who newly enters. (AR's "Ongoing.")
+What's left over is only the **existing book / backlog** ("reach everyone who *already* matches"). That is **not an ongoing automation mode** — it's a **one-time operation**: a deliberate **"add current matches" backfill** on the Automation (Klaviyo's "add past profiles"), or — more often — a **Broadcast** to the Segment. A discrete action, never a setting on the running Automation.
 
-If "lock vs live" lived on the Segment, you'd have to clone Segments to get different enrollment behaviors. It belongs on the Automation because the same Segment can drive different Automations with different policies. See conversation 2026-05-27 for the worked example.
+Free win: a trigger-driven flow **cannot** blast the backlog by accident — Reach's "all in *or* entering" failure mode (§12.2 Welcome Kit) is structurally impossible.
+
+The audience still isn't assembled on the Segment — the **trigger + filters live on the Automation**; a Segment plugs in as the trigger ("added to segment") or a filter. The remaining repeat knob is **re-entry** (AU11) — can the same person enter *again* — a separate question from initial enrollment.
 
 ### 5.7 PoC scope, restated under the new primitives
 
@@ -332,7 +332,7 @@ The biggest cluster — this is where complexity lives.
 | # | Concept | Status | Notes |
 |---|---|---|---|
 | AU1 | Entry Trigger | 🔲 | Categories: event-based (status change, new policy, claim filed); date-based (X days before/after renewal/effective/etc.); behavior-based (form submit, NPS response); manual launch; segment-entry. Each with config (offset, threshold, etc.). |
-| AU2 | Enrollment policy | 🔄 | At-launch / newly-entering / continuously. The "lock recipients?" question, parameterized. See §5.6. |
+| AU2 | Enrollment (trigger-driven) | ✅ | Entry = trigger = **newly-entering by construction** (§5.6, revised 2026-06-03). No at-launch/continuous modes; backlog = one-time backfill or Broadcast. Repeat knob = re-entry (AU11). |
 | AU3 | Enrollment state (runtime) | 🔲 | Per-person record: which Automation, when enrolled, current step, next fire time, exit state. Idempotent state machine. See RT cluster. |
 | AU4 | Sequence of Steps | 🔲 | Ordered list. Each Step = (step_type, payload, delay/timing). |
 | AU5 | Step types | 🔲 | Send-email / send-SMS / send-postcard / send-handwritten / wait / internal-notification / branch / tag-add/remove / action-item / webhook-out. Subset for PoC: email + wait + exit. |
@@ -403,6 +403,7 @@ System-generated artifacts and cross-cutting concerns. Not user-built, but centr
 - §5.1.1 (prior version) — Concierge service-request workflow is the PoC delivery model for tier 1, validated by Marker (§12.1).
 - §5 (this version) — **Four primitives locked.** Segment / Template / Broadcast / Automation. Audience deprecated as primary concept. Trigger / Fanout / Sender / Enrollment / "lock recipients" all properties of Broadcast or Automation, not peer concepts.
 - §5.6 — "Lock recipients" → Enrollment policy property of Automation (at-launch / newly-entering / continuous). Conceptually: Segments are questions, Automations decide when to ask.
+- **§5.6 revised 2026-06-03** — enrollment collapses to **trigger-driven (newly-entering)**; the three policies fold into one (triggers are transitions). Backlog = one-time backfill/Broadcast. Broadcast=Campaign / Automation=Flow (scheduled vs triggered). See `automations.md`.
 - §12.1 — Marker onboarding call (2026-05-27) — first concrete client signal. Validates three-tier authorship, sharpens Lead/Prospect boundary, confirms substatus limits, adds list-with-producer + sender-resolver requirements.
 
 ### 8.2 Canonical field walkthrough — "Auto policy is at or below state minimum"

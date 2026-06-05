@@ -49,12 +49,14 @@ Each block: anchor · category · predicate (plain + shape) · per-AMS notes · 
 
 ### S1 — Policies renewing in N days  *(Renewal Reminders — highest priority)*
 
+> **Revised 2026-06-03 — renewal is now a date-triggered *Automation*, not this windowed Segment.** A relative-time Segment churns daily (the membership-drift / batch-exit problem, `research_segment_builder_ux.md` §8.4). Instead the renewal program **triggers off `ams.policy.renewal_date` ± offset** (recurring, reschedule-on-change), filtered to `status = 'active'` — see `automations.md` (date-property trigger). The predicate below survives only as a **Broadcast** audience ("who's renewing this month"), not as the recurring renewal mechanism.
+
 - **Anchor:** Policy · **Category:** Renewal
 - **Predicate:** `ams.policy.status = 'active'` **AND** `ams.policy.renewal_date BETWEEN now() AND now() + N days` (default N = 30) — optionally **AND** `ams.policy.type IN {…}` to scope to a line of business. ("Days until renewal" is written inline from `renewal_date`, or `effective_date + term` if HawkSoft lacks a reliable renewal date — see Part 1. The `status = 'active'` is just a condition, for the stale-date reason.)
 - **Fields:** see the renewal note in Part 1 (prefer `renewal_date`, else `effective_date + agency term`).
 - **Display (Policy):** policy_number, type, carrier, effective_date, renewal_date, account name.
 - **Fanout:** Policy → named insured on that policy.
-- **Used by:** the Renewal Automation. **Per-policy enrollment** (one enrollment per renewing policy → clean drift, AR-style); **re-resolve at send**; **exit-on-no-longer-match** (e.g. policy canceled or renewed). Date-anchored, so a continuous/newly-entering policy works cleanly. *Parameters:* the window `N` and the LOB scope.
+- **Used by:** a **Broadcast** (one-off "policies renewing this month") — *not* the recurring renewal, which is a date-triggered Automation (see callout above + `automations.md`). As a Broadcast audience: per-policy rows, fanout to named insured.
 - *Note:* the account-bundled "all your renewing policies in one email" variant (Path A) is **post-PoC** (needs roll-up + count-tolerant content — see [`dynamic-content.md`](dynamic-content.md)).
 
 ### S2 — Pending cancellation, non-payment  *(Cancellations — highest priority; Marker)*
@@ -74,7 +76,7 @@ Each block: anchor · category · predicate (plain + shape) · per-AMS notes · 
 - **Fields:** `ams.policy.sold_date` (HawkSoft Sold Date); "days since sold" written inline.
 - **Display (Account):** account name, primary contact, earliest sold_date, first policy type.
 - **Fanout:** Account → primary contact.
-- **Used by:** the Welcome Kit Automation. **Enrollment policy = newly-entering only** — the textbook case (§12.2): avoids the Reach failure of blasting the whole existing active book. (Because the predicate is date-anchored — "sold in last N days" — even continuous enrollment approximates newly-entering and excludes the backlog.) **Never re-enroll** (you're welcomed once).
+- **Used by:** the Welcome Kit Automation — **date-property trigger on `sold_date`** (revised 2026-06-03). Date-anchored, so enrollment is newly-entering by construction and never touches the existing book — the §12.2 "don't blast the backlog" win, for free. **Never re-enroll** (welcomed once). *(The standing "newly sold" predicate below still works as a Broadcast audience.)*
 
 ### S4 — Cross-sell: Home without Auto  *(Cross-Sells — medium priority)*
 

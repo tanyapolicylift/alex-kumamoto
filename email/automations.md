@@ -4,26 +4,48 @@
 
 **Created:** 2026-05-27
 
+**Updated:** 2026-06-03 — trigger-driven enrollment model (collapsed the three enrollment policies; added date-property + added-to-segment triggers and the two filter layers). See Entry trigger + Enrollment.
+
 **Related:** [`concepts_working_doc.md`](concepts_working_doc.md) · [`segments.md`](segments.md) · [`templates.md`](templates.md) · [`broadcasts.md`](broadcasts.md) · [`changelog.md`](changelog.md)
 
 ---
 
 An **Automation** is the triggered, ongoing send pipeline. Where a Broadcast is "send this to these people now," an Automation is "whenever X happens, send this sequence to people who match, and keep doing that." Renewal reminders 60/30/7 days before expiration. Welcome kits that fire when a new policy binds. Cancellation save campaigns triggered when a policy moves to pending-cancellation status. The lifecycle stuff agencies care about — the work that adds up over a year — is mostly Automations.
 
-Automations are the heaviest of the four primitives. They have a trigger, a Segment, an enrollment policy that decides who gets enrolled and when, a sequence of Steps with delays between, exit conditions that can pull people out mid-sequence, re-enrollment rules, sender resolution per Step, and per-person state tracked over weeks or months. Most of the engineering reality of the email product lives here.
+Automations are the heaviest of the four primitives. They have a trigger, trigger + profile filters that decide who's eligible (enrollment is newly-entering by construction — see below), a sequence of Steps with delays between, exit conditions that can pull people out mid-sequence, re-entry rules, sender resolution per Step, and per-person state tracked over weeks or months. Most of the engineering reality of the email product lives here.
 
 This doc is intentionally a starter. It captures the concepts we've aligned on without committing to the implementation surface — that work happens once we've onboarded the first agency on the simpler primitives (Segments + Templates + Broadcasts) and have real signal on which Automation surfaces matter most.
 
 ---
 
+## Broadcast vs Automation — scheduled vs triggered
+
+The clean line between the two send primitives (confirmed against Klaviyo's Campaign/Flow split, 2026-06-03):
+
+- **Broadcast** (= Klaviyo **Campaign**) — you **pick an audience** (a Segment) and it sends on a **schedule** (now or a set time). Audience resolved at send.
+- **Automation** (= Klaviyo **Flow**) — people enter via a **trigger**, continuously, each on their own clock.
+
+The dividing line is **scheduled vs triggered** — **not** single-message-vs-series and not one-channel-vs-many. A *scheduled* series across channels is still a Broadcast (Klaviyo's "omnichannel campaign"); a *triggered* single email is still an Automation.
+
+Every documented client ask (`concepts_working_doc.md` §12.2 + `client_feedback.md`) lands in one of three buckets:
+
+| Pattern | Primitive | Examples |
+|---|---|---|
+| **Date-anchored** | Automation, **date-property trigger** | renewal reminders/notices, welcome kit (sold-date), inspection-by-date |
+| **State-transition** | Automation, **added-to-segment trigger** | cancellation/non-payment, NPS promoters, tag-based drips, cross-sell nurture |
+| **One-time to a current set** | **Broadcast** to a Segment | state-min-auto / $100k-liability pushes, one-off cross-sell blast, the existing-book backlog |
+
+So a windowed "renewing in N days" Segment isn't the renewal mechanism — it's only useful as a **Broadcast** audience. The recurring renewal program is a date-triggered Automation (below).
+
+---
+
 ## What an Automation is
 
-An Automation has six parts:
+An Automation has these parts:
 
 - **A name and description.** "Personal auto renewal nurture" — clear enough to find in the library, specific enough that nobody confuses it with the commercial auto version.
-- **An entry trigger.** The event that causes the Automation to evaluate. Could be an AMS event ("policy status changed to pending-cancellation"), a date-based recurring check ("daily — find policies renewing in 30 days"), a behavioral event ("contact submitted the contact form"), or a manual launch.
-- **A Segment.** Defines who's eligible when the trigger fires. The trigger says *when*; the Segment says *who among the matches actually qualifies*.
-- **An enrollment policy.** When the trigger fires + Segment evaluates, who *actually gets enrolled*? Everyone matching at launch? Only people newly entering the Segment? Continuously? This is the "lock recipients?" question, parameterized.
+- **An entry trigger.** The *transition* that enrolls a person: **added to a Segment** (state-change), a **metric/event** ("policy status changed to pending-cancellation," "new policy bound"), a **date property** ("30 days before `renewal_date`," recurring yearly, reschedule-on-change), or a manual launch. Because a trigger is a *transition*, enrollment is **newly-entering by construction** (see Enrollment, below).
+- **Audience filters.** The trigger says *when*; filters narrow *who* — **trigger filters** (on the event's data) + **profile filters** (on record state: active, auto, region). The audience is defined here *with* the trigger, not assembled in a separate place. A saved **Segment** can *be* the trigger ("added to segment") or serve as a filter.
 - **A sequence of Steps.** What happens to each enrolled person, in order, over time. Send an email. Wait 14 days. Send another email. Wait 7 days. Send a third. Each Step has its own Template (for send-type Steps) and timing relative to the previous Step or entry.
 - **Exit conditions and re-enrollment rules.** When does a person leave the Automation before completing the sequence (unsubscribed, policy status changed, manual exit)? Can they re-enter later if they re-qualify? Under what circumstances?
 
@@ -36,34 +58,36 @@ Behind all of this, the Automation maintains **per-person enrollment state** —
 The trigger is what wakes the Automation up. Categories we've identified:
 
 - **AMS event** — something changed in the agency management system that the Automation cares about. "Policy status changed to pending-cancellation" is the Marker example. Other examples: new policy bound, claim filed, account moved to lost, premium changed by more than X%.
-- **Date-based** — a daily (or other periodic) check that finds people matching some date condition. "Find policies whose renewal_date is exactly 30 days from today." Common for renewal nurtures.
+- **Date property** — fire relative to a date field on a record (`renewal_date`, `sold_date`, birthday): X days before/after, **recurring** (e.g. yearly) and **rescheduling when the date changes**, run once per record. This is the **primary renewal mechanism** — *not* a "renewing in N days" Segment (a relative-time Segment churns daily — the membership-drift / batch-exit problem, `research_segment_builder_ux.md` §8.4; the date trigger computes timing per-record instead). Validated against Klaviyo/Customer.io and the Katz/Eclipse requirement ("use expiry dates, not status, for renewals").
 - **Behavioral** — a person did something. Submitted a form, clicked a link, replied to a previous email.
 - **Manual launch** — a person on the PL team or agency staff explicitly enrolls someone or a Segment.
-- **Segment entry** — generic version of behavioral: anyone newly matching this Segment.
+- **Added to a Segment** — a person *enters* a Segment (state transition). This is how a Segment feeds an Automation — the Segment *is* the trigger (e.g. "added to Pending-cancellation / Non-payment," "added to NPS Promoters"). Fires on transition-in; pair with exit-on-no-longer-match for transition-out.
 
-Each trigger has its own configuration (offset days, threshold percentage, which event, etc.). The trigger's job is just to identify *when* the Automation should run — figuring out *who* to enroll is still the Segment + enrollment policy's job.
+Each trigger has its own configuration (offset days, recurrence, threshold, which event). Two filter layers narrow *who*: **trigger filters** (conditions on the trigger event's own data) and **profile filters** (conditions on the record's state — active, auto, region), checked at entry and re-checked before each Step. The **trigger is fixed once saved**; filters stay editable.
+
+Because every trigger is a *transition* (added-to-segment, an event, a date arriving), enrollment is **newly-entering by construction** — there's no "enroll everyone currently matching" mode. The existing backlog is a separate one-time operation (see Enrollment, next).
 
 **Anti-pattern to avoid** (observed in AR per Marker §12.1 of `concepts_working_doc.md`): burying the trigger in an ordered list of Steps. The trigger should be surfaced at the Automation's header level so users can answer "when does this fire?" in three seconds, not five minutes of digging.
 
 ---
 
-## Enrollment policy — the "lock recipients?" question
+## Enrollment — trigger-driven (newly-entering); the backlog is a one-time op
 
-When an Automation runs and the Segment resolves to a set of matching people, **what does the Automation do with that set over time?** Three policies:
+**Revised 2026-06-03.** We previously modeled three enrollment policies (at-launch / newly-entering / continuous). Verifying Klaviyo / Customer.io / Braze (see `changelog.md`) collapsed this, and it's cleaner.
 
-- **At-launch only.** Snapshot matching people when the Automation goes live. Enroll all of them. People who newly match later are ignored.
-- **Newly-entering only.** Don't enroll anyone matching at launch. From now on, enroll people who *newly enter* the Segment (e.g., a new policy is bound and matches the welcome-kit Segment).
-- **Continuously.** Combine the above. At launch, enroll everyone currently matching. Going forward, also enroll people who newly enter.
+Entry is **trigger-driven**, and every trigger is a **transition, not a state** (added-to-segment, an event, a date arriving). So enrollment is **newly-entering by construction** — "newly-entering" and "continuous" are the same behavior, and there's no standing set to "lock."
 
-The reason this lives on the Automation and not on the Segment is that the same Segment can drive different Automations with different enrollment behaviors. "Auto policies renewing in 30 days" might be used by a continuous Automation (welcome each new match into the renewal sequence) AND a one-time Automation (snapshot at launch and run the sequence on those people only).
+What's left over is only the **existing book / backlog** ("reach everyone who *already* matches"). That's **not an ongoing automation mode** — it's a **one-time operation**: either a deliberate **"add current matches" backfill** on the Automation (Klaviyo's verified "add past profiles" — existing matches enter at the trigger, anyone who already completed isn't re-sent), or — more often — a **Broadcast** to the Segment. A discrete action, not a running setting.
 
-For PoC, all three policies should be available — choose the right default per use case at Automation creation time.
+Free win: a trigger-driven flow **cannot** blast the backlog by accident — Reach's "all in *or* entering" failure mode (`concepts_working_doc.md` §12.2 Welcome Kit) is structurally impossible.
+
+(The old "this lives on the Automation, not the Segment" point still holds — the trigger + filters live on the Automation; a Segment plugs in as the trigger or a filter.) The remaining repeat knob is **re-entry** (below).
 
 ---
 
 ## The Segment reference
 
-An Automation references one Segment as its eligibility filter. Composition of Segments (intersect / union / except, per `segments.md`) is also supported at the Automation level — same recipe shape as for Broadcasts.
+An Automation's audience = its **trigger + filters** (above). A saved **Segment** plugs into either slot — as the **trigger** ("added to segment") or as a **profile filter** — but the audience is assembled in the Automation, not picked from a separate place. Composition of Segments (intersect / union / except, per `segments.md`) is supported where a Segment is referenced — same recipe shape as Broadcasts.
 
 The Automation does *not* own the Segment definition — the Segment lives in the Segment library independently. Edits to a Segment affect any in-flight Automations using it (with appropriate notifications when changes would materially shift the matching audience).
 
@@ -125,7 +149,7 @@ A Broadcast fires once, so the world can't change underneath it — it snapshots
 
 The first thing to untangle: "the Segment changes over time" is really **three independent clocks**, and only the last two are about drift:
 
-1. **Who enters, and when** — the [enrollment policy](#enrollment-policy--the-lock-recipients-question) above (at-launch / newly-entering / continuous). Already decided.
+1. **Who enters, and when** — **trigger-driven enrollment** (newly-entering; see Enrollment above). Already decided.
 2. **Do they still qualify** — *membership drift*. They matched at enrollment; do they still match later?
 3. **What each send shows** — *data drift*. A Sequence sends several emails; the specific records pulled into the content (e.g. "your 2 policies renewing soon") can change between enrollment and a later Step.
 
@@ -171,7 +195,7 @@ Per-Step sender overrides are worth pointing out specifically because they matte
 
 ## Pre-launch recipient verification
 
-Same surface as Broadcast verification, but with a twist: at launch, the verification shows who'd be enrolled *right now* based on the Automation's current Segment + enrollment policy + suppression filters. For at-launch-only enrollment, this is the full enrolled audience for the lifetime of the Automation. For newly-entering-only or continuous policies, this is just the starting state — future enrollees aren't shown here (they don't exist yet).
+Same surface as Broadcast verification, but with a twist: at launch the verification *previews* who currently qualifies based on the Automation's trigger + filters + suppression. Because enrollment is trigger-driven (newly-entering), this is just a preview of the current matches — future enrollees aren't shown (they don't exist yet). A one-time **backfill** (or a Broadcast for the backlog) is where you'd verify-and-send to the existing set.
 
 The verification surface is shared between Broadcasts and Automations because the questions are the same: who's getting what, from whom, with what content? Same screen, similar affordances (filter, sort, bulk exclude with notes, render preview per recipient, sender preview per recipient).
 
@@ -181,9 +205,9 @@ The verification surface is shared between Broadcasts and Automations because th
 
 The Marker onboarding (`concepts_working_doc.md` §12.1) committed PolicyLift to three specific Automations in the first weeks:
 
-- **Cancellation Automation** — by Friday 2026-05-29 (2 days from the call). Trigger: policy status changes to `pending cancellation`. Segment: that policy. Sequence: 3 emails over time, CSR as sender, HawkSoft external ID + customer name in every subject line. Exit conditions include "policy status no longer pending cancellation" (because the customer paid the bill or the cancellation reason was resolved).
-- **Welcome Kit Automation** — within ~2 weeks. Trigger: new policy bound. Sequence: a few touches over the first 30-60 days introducing the agency, key contacts, and self-service tools.
-- **Renewal Automation** — within ~2 weeks. Trigger: date-based, 60 days before policy renewal date (using `effective_date + 300 days` as the canonical "Policy renewing in N days" computation, with `policy.status = 'active'` as the status guard). Sequence: 60/30/7 day touches with renewal reminders.
+- **Cancellation Automation** — by Friday 2026-05-29 (2 days from the call). **Trigger:** *added to* the "Pending cancellation — non-payment" Segment (HawkSoft `status = Cancelled (Pending)` + `substatus = Non-Payment`). Sequence: 3 emails over time, CSR as sender, HawkSoft external ID + customer name in every subject line. **Exit:** policy no longer pending-cancellation (customer paid / reason resolved).
+- **Welcome Kit Automation** — within ~2 weeks. **Trigger:** date property on `sold_date` (or the new-policy-bound event) — date-anchored, so it's newly-entering and never touches the existing book. Sequence: a few touches over the first 30-60 days. **Re-entry:** never (welcomed once).
+- **Renewal Automation** — within ~2 weeks. **Trigger:** **date property** on `policy.renewal_date` (fall back to `effective_date + agency term` where HawkSoft lacks a reliable renewal date), firing at **60/30/7 days before**, recurring yearly and rescheduling if the date changes; **profile filter** `status = 'active'` (canceled policies carry stale dates). Sequence: the 60/30/7 touches. *(This replaces the earlier "Policy renewing in N days" Segment — the window is the trigger offset, not segment membership.)*
 
 These three Automations are the operational scope for the first onboarding. Each one exercises a different trigger type (event-based, event-based, date-based) and helps validate the Automation infrastructure's reach.
 
@@ -213,9 +237,10 @@ Where they touch other concepts:
 
 We've aligned on:
 
-- The six parts (trigger, Segment, enrollment policy, Sequence of Steps, exits, re-enrollment)
-- Three enrollment policies (at-launch / newly-entering / continuous)
-- Trigger categories (AMS event, date-based, behavioral, manual, segment entry)
+- The parts (trigger + filters, Sequence of Steps, exits, re-entry; enrollment is trigger-driven)
+- **Enrollment is trigger-driven (newly-entering by construction)**; the backlog is a one-time backfill or Broadcast, not an automation mode (revised 2026-06-03). Repeat knob = re-entry.
+- Trigger types (added-to-segment, metric/event, **date property** [offset + recurrence + reschedule-on-change], behavioral, manual) + two filter layers (trigger filters + profile filters); trigger fixed after save
+- **Broadcast vs Automation = scheduled vs triggered** (= Klaviyo Campaign vs Flow); three-bucket use-case taxonomy (date-anchored / state-transition → Automation; one-time-to-current-set → Broadcast)
 - PoC step types (email, wait, exit) with beyond-PoC list flagged
 - Recipient + sender resolution shared with Broadcast
 - Pre-launch verification surface shared with Broadcast
@@ -233,7 +258,7 @@ Still to work through (incrementally, in this doc as decisions land):
 - **Calendar-driven sub-pattern** (AU14 in the working doc) — holiday calendar with on/off toggles per occasion; how this fits the Automation primitive vs being its own thing
 - **Approval mode** — per-Step or per-Automation, YOLO vs Outbox, daily digest format
 - **Re-enrollment defaults per trigger category** — concrete recommendations once we've seen more triggers in practice
-- **Builder UX** — what does it actually look like to compose an Automation, especially the trigger + enrollment policy choice
+- **Builder UX** — what does it actually look like to compose an Automation, especially the trigger + filters choice
 - **Per-Automation reporting** — engagement rollups, drop-off-by-step, attribution to outcomes (policy renewed, cancellation prevented, etc.)
 - **In-flight editing** — what happens when an Automation is edited while people are enrolled in it (does a Step change affect already-enrolled people who haven't hit that Step yet?)
 
