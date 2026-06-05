@@ -46,9 +46,9 @@ LIBRARY ── browse/search/filter saved segments  (each marked Managed / Regul
 ### Screens to build
 
 1. **Segment Library** *(list)* — Reach-style. Columns: **name + description** (a **Managed** pill sits inline *after* the name; **no pill for Regular**) · **Type** = the anchor as a plural noun (Policies / Accounts / Contacts) · **Count** = a pure number, **right-aligned** (Type now carries the anchor, so the count drops its unit) · **Last modified** = **right-aligned** (trailing column — a date as last column reads better right-aligned, per Tanya/Fairs). **The whole row is clickable → Detail** (`cursor-pointer` + onclick; no per-row Edit/View button). Toolbar: search + **Kind filter** (Managed / Regular); "New Segment" button. *No status dot, no actions column, no category/AMS/owner columns.* **Managed pill = the platform's shadcn green badge** (`bg-green-50 text-green-700 border-green-200`, the "Quote Packet Generated" style). Layout: Name column is greedy (`w-full`, `table-auto`); Type/Count/Last are content-width and cluster at the right edge (the Fairs Documents pattern) rather than floating in fixed-width boxes.
-2. **Segment Detail** — the screen a row-click lands on. **Decisions below are pending Martin's comp review (~2026-06-03).**
+2. **Segment Detail** — the screen a row-click lands on. **DECIDED 2026-06-03 — Klaviyo-style tabbed page** (over Reach's single modal): tab **1 = the anchor's results** (named for the anchor — *Policies (284)* / *Accounts (N)* / *Contacts (N)* — anchor columns + a result-meta row), then **Definition** (read-only criteria / Edit→Builder), **Automations** (campaigns using this segment), **Settings**. Tabs 2–4 are stubs for now; built `agency/segment-detail.html` (page + results tab).
 
-   Proposed anatomy:
+   Original single-page anatomy (superseded by tabs; kept for reference):
    ```
    ← Segments
    ┌──────────────────────────────────────────────────────────────┐
@@ -67,7 +67,7 @@ LIBRARY ── browse/search/filter saved segments  (each marked Managed / Regul
    └──────────────────────────────────────────────────────────────┘
    ```
 
-   Open decisions (with current lean):
+   How the open decisions resolved (2026-06-03) — **net:** (1) criteria → the **Definition** tab, not inline; (2) sample preview → **is** the results tab; (3) reachable estimate → kept, shown softly in the result-meta row ("est., default fanout") — still the most debatable, easy to drop; (4) Managed → read-only chip + no Edit. Original leans:
    - **(1) Criteria display** — show the conditions rendered **read-only** (lean: yes — transparency for Managed; reuses the builder's condition rendering, sets up Step 3) vs. just the prose description.
    - **(2) Sample preview** — make it the main body; anchor-specific columns (Account: name/primary contact/status/premium · Policy: number/type/carrier/effective/renewal/account · Contact: name/email/role/account); ~25 mock rows + "showing 25 of N." (lean: yes — load-bearing trust surface, the Ley/Marker "let me see who's in it.")
    - **(3) Reachable-contacts estimate** — show "~240 customers reachable (est., default fanout)" in the stat strip (lean: yes, clearly labeled) vs. leave it to the audience-verification step (fanout is chosen there, not on the Segment).
@@ -87,7 +87,7 @@ A fictional agency. Need: ~8–10 library segments across categories (our S1–S
 ### Build steps (ordered)
 
 - **Step 1 — Nav group + Segment Library page.** ✅ *Done (2026-06-02).* Added the **Campaigns** group to `agency-shell.html`; built `agency/segments.html` (library list, Managed/Regular badges, 9 mock segments). Nav label chosen: **Campaigns** (may roll into Marketing later).
-- **Step 2 — Segment Detail page.** `agency/segment-detail.html` (or a representative one): count + sample preview.
+- **Step 2 — Segment Detail page (tabbed).** ✅ *Page + first tab done (2026-06-03).* `agency/segment-detail.html` — **Klaviyo-style tabbed** (decided over Reach's modal). Tab 1 = **the anchor's results** (named for the anchor — here **Policies (284)** — anchor columns + result-meta row); **Definition / Automations / Settings** tabs present but static stubs. Built on the S1 Managed segment. Next: Definition (read-only criteria) → Automations (campaigns using it) + Settings.
 - **Step 3 — Segment Builder.** `agency/segment-builder.html`: anchor → category conditions → CNF groups → quantifier → count/preview → save. The big one; may need minimal inline JS for add-condition / category-switch interactions.
 - **Step 4 — Compose mode.** Combine saved segments (include / intersect / except) into a new Regular segment.
 

@@ -8,6 +8,20 @@ See `README.md` for what's in the skeleton today and how to use it.
 
 ---
 
+## 2026-06-03 — `[proto]` Segment Detail page (tabbed, Klaviyo-style) + first tab (email tool, Step 2)
+
+Built **`agency/segment-detail.html`** — the screen a Segment Library row-click lands on. **Decided the detail surface is a Klaviyo-style tabbed page** (compared Klaviyo's full tabbed segment page vs Reach's single edit-modal-with-preview live; chose tabs for room to grow — results / definition / automations-using-it / settings — and the richer trust surface).
+
+**Tab 1 = the anchor's results,** named for the anchor (**Policies (284)** here, since S1 is Policy-anchored — a deliberate contrast with Klaviyo's one-size "Members"; an Account-anchored segment would read "Accounts (N)"). Anchor-specific columns (Policy # · Type · Carrier · Effective · Renewal · Account, per `../../segment_library_poc.md` Part 3), 25 mock auto-policy rows + "Showing 25 of 284", a **result-meta row** (count · ~reachable est. · **Managed-by-PolicyLift** lock chip · updated · "as of 8:42 AM" — the last per the segment-update eventual-consistency finding), static "Show more". Header: back-link → Segments, title + **Managed** badge, anchor·description, **Use in Automation** (outline) + **Use in Broadcast** (primary) stubs.
+
+Tabs **Definition / Automations / Settings** sit in the bar but are **static stubs** — only the Policies panel is rendered (proto tabs carry no JS yet). Reused verified shadcn markup (tabs from `dashboard.html`; table/badge/button from `segments.html`); confirmed every utility (`bg-base-muted`, `bg-green-50`, `tabular-nums`, `hover:text-foreground`, …) against compiled `app.css`. Served + smoke-checked (page/assets 200).
+
+How the blueprint's 4 open decisions resolved: (1) criteria → the **Definition** tab (not inline); (2) sample preview → **is** the results tab; (3) reachable estimate → kept, shown softly ("est., default fanout") — still the most debatable; (4) Managed → read-only chip + no Edit.
+
+Next (Step 2 cont.): **Definition** tab (read-only criteria for Managed; reuses the builder's condition rendering) → **Automations** tab (campaigns using this segment) + **Settings**. Then Step 3 (Builder).
+
+---
+
 ## 2026-06-02 — `[proto]` Campaigns nav group + Segment Library page (email tool, Step 1)
 
 First email-tool screen. Added a **new collapsible "Campaigns" sidebar group** (the tool replacing Reach) to `assets/chrome/agency-shell.html`, between the top-level items and Marketing — modeled exactly on the Marketing group so `wireGroups()` handles it. Sub-items: **Segments** (live → `/agency/segments.html`), Templates / Broadcasts / Automations (`#`, auto-dimmed). Icon: lucide `send`.
